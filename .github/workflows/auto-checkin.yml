@@ -31,7 +31,7 @@ jobs:
         
     - name: 执行上班打卡
       if: github.event.schedule == '30 0 * * *'
-      run: python auto.py START
+      run: python obfuscated/auto.py START
       env:
         GX_USER_PHONE: ${{ secrets.GX_USER_PHONE }}
         GX_USER_PASSWORD: ${{ secrets.GX_USER_PASSWORD }}
@@ -57,7 +57,7 @@ jobs:
         
     - name: 执行下班打卡
       if: github.event.schedule == '0 10 * * *'
-      run: python auto.py END
+      run: python obfuscated/auto.py END
       env:
         GX_USER_PHONE: ${{ secrets.GX_USER_PHONE }}
         GX_USER_PASSWORD: ${{ secrets.GX_USER_PASSWORD }}
