@@ -30,7 +30,7 @@ jobs:
           libxext6 \
           libxrender-dev \
           libfontconfig1 \
-          libgl1-mesa-glx
+          libgl1
         
     - name: 安装Python依赖
       run: |
@@ -68,7 +68,7 @@ jobs:
       if: github.event.schedule == '0 10 * * *'
       run: python obfuscated/auto.py END
       env:
-        GX_USER_PHONE: ${{ secrets.GX_USER_PHONE }}
+        GX_USER_PHONE: ${{ secrets.GX_USER_PASSWORD }}
         GX_USER_PASSWORD: ${{ secrets.GX_USER_PASSWORD }}
         GX_LOCATION_ADDRESS: ${{ secrets.GX_LOCATION_ADDRESS }}
         GX_LOCATION_LATITUDE: ${{ secrets.GX_LOCATION_LATITUDE }}
