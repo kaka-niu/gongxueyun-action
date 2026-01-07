@@ -4,8 +4,8 @@ on:
   schedule:
     # 上班打卡 - 每天北京时间8:30执行（UTC时间0:30）
     - cron: '30 0 * * *'
-    # 下班打卡 - 每天北京时间18:00执行（UTC时间10:00）
-    - cron: '0 10 * * *'
+    # 下班打卡 - 每天北京时间19:20执行（UTC时间11:20）
+    - cron: '20 11 * * *'
   workflow_dispatch: # 允许手动触发
 
 jobs:
@@ -68,7 +68,7 @@ jobs:
       if: github.event.schedule == '0 10 * * *'
       run: python obfuscated/auto.py END
       env:
-        GX_USER_PHONE: ${{ secrets.GX_USER_PASSWORD }}
+        GX_USER_PHONE: ${{ secrets.GX_USER_PHONE }}
         GX_USER_PASSWORD: ${{ secrets.GX_USER_PASSWORD }}
         GX_LOCATION_ADDRESS: ${{ secrets.GX_LOCATION_ADDRESS }}
         GX_LOCATION_LATITUDE: ${{ secrets.GX_LOCATION_LATITUDE }}
