@@ -149,37 +149,7 @@ mainn.py是单次打卡的测试文件 gong_xue_yun.py是主程序入口（带�
 5. 记录操作日志
 6. 验证成功后运行gong_xue_yun.py,设置定时任务
 
-## 在GitHub Actions上部署
 
-要在GitHub Actions上自动运行打卡任务，需要配置以下环境变量作为GitHub Secrets：
-
-1. **用户认证信息**：
-   - `GX_USER_PHONE`: 工学云账号手机号
-   - `GX_USER_PASSWORD`: 工学云账号密码
-
-2. **打卡位置信息**：
-   - `GX_LOCATION_ADDRESS`: 打卡地址
-   - `GX_LOCATION_LATITUDE`: 纬度
-   - `GX_LOCATION_LONGITUDE`: 经度
-   - `GX_LOCATION_PROVINCE`: 省份
-   - `GX_LOCATION_CITY`: 城市
-   - `GX_LOCATION_AREA`: 区域
-
-3. **打卡设置**：
-   - `GX_CLOCKIN_MODE`: 打卡模式（weekday/everyday/customize）
-   - `GX_HOLIDAYS_CLOCKIN`: 节假日是否打卡（true/false）
-   - `GX_TIME_START`: 上班打卡时间（格式：HH:MM）
-   - `GX_TIME_END`: 下班打卡时间（格式：HH:MM）
-   - `GX_TIME_FLOAT`: 时间浮动范围（单位：分钟）
-
-4. **邮件通知设置**（可选）：
-   - `GX_SMTP_ENABLE`: 是否启用邮件通知（true/false）
-   - `GX_SMTP_HOST`: SMTP服务器地址
-   - `GX_SMTP_PORT`: SMTP端口
-   - `GX_SMTP_USERNAME`: SMTP用户名
-   - `GX_SMTP_PASSWORD`: SMTP密码
-   - `GX_SMTP_FROM`: 发件人名称
-   - `GX_SMTP_TO`: 收件人列表，用逗号分隔
 ## 在GitHub Actions上部署
 
 要在GitHub Actions上自动运行打卡任务，需要配置以下环境变量作为GitHub Secrets：
@@ -243,4 +213,4 @@ mainn.py是单次打卡的测试文件 gong_xue_yun.py是主程序入口（带�
 
 | 交流讨论 | 赞赏 |
 |-------|-------|
-| <img src="/GongXueYunAutoCheckIn_CodeVersion-master/image/1.png" width="200" alt="alt text"> | <img src="/GongXueYunAutoCheckIn_CodeVersion-master/image/2.jpg" width="200" alt="alt text"> |
+| <img src="/image/1.png" width="200" alt="alt text"> | <img src="/image/2.jpg" width="200" alt="alt text"> |
