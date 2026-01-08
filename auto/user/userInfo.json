@@ -1,0 +1,51 @@
+{
+    "userInfo": {
+        "authType": 2,
+        "expiredTime": 2083497760000,
+        "gender": 1,
+        "headImg": "f005585371b08470a447374c1a8e85c7.png",
+        "isAccount": 0,
+        "moguNo": "10417671",
+        "msgConfig": {},
+        "neteaseImId": "9062490fa915410d8b1f6a6e5b53523c",
+        "nikeName": "刘香",
+        "orgJson": {
+            "classId": "0ee0171f13a3208cc2db586efe299271",
+            "className": "智能231",
+            "depId": "ef9deebb84b530d2f1c9de3db5af5cdb",
+            "depName": "电子信息学院",
+            "grade": "2023",
+            "majorField": "",
+            "majorId": "e96d2943ce7d4fd9baf262843450ce41",
+            "majorName": "智能产品开发与应用",
+            "schoolId": "f217a719d8f5c8b1dd1d628b17da70d0",
+            "schoolName": "绵阳职业技术学院",
+            "snowFlakeId": "1000373",
+            "studentId": "3a2088aaf0e03bf38351cc32948e34d1",
+            "studentNumber": "202301249",
+            "userName": "刘香"
+        },
+        "phone": "15808462201",
+        "roleGroup": [
+            {
+                "currPage": 1,
+                "orderBy": "create_time",
+                "pageSize": 10,
+                "roleId": "1123121137695158273",
+                "roleKey": "student",
+                "roleLevel": "0",
+                "roleName": "学生",
+                "sort": "desc",
+                "totalCount": 0,
+                "totalPage": 0
+            }
+        ],
+        "roleId": "1123121137695158273",
+        "roleKey": "student",
+        "roleLevel": "0",
+        "roleName": "学生",
+        "token": "eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyMjY0NDF9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODM0OTc3NjAsIm5iZiI6MTc2Nzg3NzY2MCwiaWF0IjoxNzY3ODc4NTYwfQ.4eEIOOLhst4DEQb0uHxgSu2FhGK2WDAWmzIFMqLxp-8lwkgIzQjkuANX3szL5MInHPmScwBNpdrr833GZsnPmQ",
+        "userId": "108226441",
+        "userType": "student"
+    }
+}
