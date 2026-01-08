@@ -140,12 +140,16 @@ def get_checkin_type() -> dict[str, str]:
         # 检查是否有强制设置的打卡类型
         global FORCED_CHECKIN_TYPE
         if FORCED_CHECKIN_TYPE is not None:
-            checkin_type = FORCED_CHECKIN_TYPE
-            display_type = "上班" if checkin_type == "START" else "下班"
-            result = {"type": checkin_type, "display": display_type}
-            logger.debug(f"使用强制打卡类型: {result}")
-            logger.info(f"强制打卡类型返回结果类型: {type(result)}, 值: {result}")
-            return result
+            # 确保FORCED_CHECKIN_TYPE是有效的打卡类型
+            if FORCED_CHECKIN_TYPE in ["START", "END"]:
+                checkin_type = FORCED_CHECKIN_TYPE
+                display_type = "上班" if checkin_type == "START" else "下班"
+                result = {"type": checkin_type, "display": display_type}
+                logger.debug(f"使用强制打卡类型: {result}")
+                logger.info(f"强制打卡类型返回结果类型: {type(result)}, 值: {result}")
+                return result
+            else:
+                logger.warning(f"无效的强制打卡类型: {FORCED_CHECKIN_TYPE}，忽略强制设置")
         
         current_hour = datetime.now().hour
         

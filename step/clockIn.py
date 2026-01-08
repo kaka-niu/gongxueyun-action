@@ -4,11 +4,11 @@ from datetime import datetime
 from manager.ConfigManager import ConfigManager
 from manager.UserInfoManager import UserInfoManager
 from util.ApiService import ApiService
-from util.HelperFunctions import get_checkin_type, desensitize_name, FORCED_CHECKIN_TYPE, check_attendance_status
+from util.HelperFunctions import get_checkin_type, desensitize_name, check_attendance_status
 
 logger = logging.getLogger(__name__)
 
-FORCED_CHECKIN_TYPE = FORCED_CHECKIN_TYPE
+# 使用全局变量FORCED_CHECKIN_TYPE，不需要重新定义
 
 def desensitize_phone(phone: str) -> str:
     """
@@ -75,6 +75,14 @@ def clock_in() -> dict[str, str]:
                 
                 # 重新获取打卡类型
                 temp_checkin = get_checkin_type()
+                # 确保temp_checkin是字典类型
+                if not isinstance(temp_checkin, dict):
+                    logger.error(f"补打上班卡时获取的打卡类型不正确: {temp_checkin}, 类型: {type(temp_checkin)}")
+                    # 恢复原始强制打卡类型
+                    FORCED_CHECKIN_TYPE = original_forced_type
+                    # 使用默认的上班打卡类型
+                    temp_checkin = {"type": "START", "display": "上班"}
+                
                 temp_checkin_type = temp_checkin.get("type")
                 temp_display_type = temp_checkin.get("display")
                 
@@ -98,6 +106,12 @@ def clock_in() -> dict[str, str]:
                     
                     # 重新获取下班打卡类型，确保使用最新的配置
                     checkin = get_checkin_type()
+                    # 确保checkin是字典类型
+                    if not isinstance(checkin, dict):
+                        logger.error(f"补打上班卡后重新获取的打卡类型不正确: {checkin}, 类型: {type(checkin)}")
+                        # 使用默认的下班打卡类型
+                        checkin = {"type": "END", "display": "下班"}
+                    
                     checkin_type = checkin.get("type")
                     display_type = checkin.get("display")
                     logger.info(f"补打上班卡后重新获取的打卡类型: {checkin}, 类型: {type(checkin)}")
