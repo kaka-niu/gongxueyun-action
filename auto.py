@@ -286,6 +286,9 @@ def execute_checkin(checkin_type, user_index=None):
         result = clock_in()
         logging.info(result)
         
+        # 重置强制打卡类型，避免影响后续操作
+        step.clockIn.FORCED_CHECKIN_TYPE = None
+        
         # 发送邮件通知
         # 直接从配置文件读取SMTP配置，避免环境变量覆盖
         try:

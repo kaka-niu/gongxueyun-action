@@ -1,10 +1,12 @@
 import logging
 import threading
 from datetime import datetime, timedelta
-
+import holidays
 import requests
+from typing import Dict, Any, List
 
 from manager.ConfigManager import ConfigManager
+from manager.UserInfoManager import UserInfoManager
 
 # 尝试导入主模块的日志上下文，失败则创建本地版本
 try:
@@ -175,3 +177,36 @@ def get_checkin_type() -> dict[str, str]:
                 return {"type": "END", "display": "下班"}
         else:
             return {"type": "HOLIDAY", "display": "休息/节假日"}
+
+
+def check_attendance_status(checkin_list: List[Dict[str, Any]], current_date: datetime = None) -> Dict[str, bool]:
+    """
+    检查打卡状态，确定今天是否已经打了上班卡和下班卡。
+
+    Args:
+        checkin_list: 打卡记录列表
+        current_date: 当前日期，默认为今天
+
+    Returns:
+        dict: 包含 'has_start' 和 'has_end' 的字典，表示是否已打上班卡和下班卡
+    """
+    if current_date is None:
+        current_date = datetime.now()
+    
+    has_start = False
+    has_end = False
+    
+    if checkin_list:
+        for checkin_info in checkin_list:
+            if checkin_info.get("type") == "START":
+                checkin_time = datetime.strptime(
+                    checkin_info["createTime"], "%Y-%m-%d %H:%M:%S")
+                if checkin_time.date() == current_date.date():
+                    has_start = True
+            elif checkin_info.get("type") == "END":
+                checkin_time = datetime.strptime(
+                    checkin_info["createTime"], "%Y-%m-%d %H:%M:%S")
+                if checkin_time.date() == current_date.date():
+                    has_end = True
+    
+    return {"has_start": has_start, "has_end": has_end}

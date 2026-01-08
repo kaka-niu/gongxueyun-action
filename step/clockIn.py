@@ -4,7 +4,7 @@ from datetime import datetime
 from manager.ConfigManager import ConfigManager
 from manager.UserInfoManager import UserInfoManager
 from util.ApiService import ApiService
-from util.HelperFunctions import get_checkin_type, desensitize_name, FORCED_CHECKIN_TYPE
+from util.HelperFunctions import get_checkin_type, desensitize_name, FORCED_CHECKIN_TYPE, check_attendance_status
 
 logger = logging.getLogger(__name__)
 
@@ -40,43 +40,68 @@ def clock_in() -> dict[str, str]:
     # 调用API服务
     api_client = ApiService()
     # 获取打卡信息
-    checkin_info = api_client.get_checkin_info()
+    checkin_list = api_client.get_checkin_info()
     
-    # 将打卡信息转换为列表格式，以便后续处理
-    checkin_list = [checkin_info] if checkin_info else []
+    # 检查打卡状态
+    attendance_status = check_attendance_status(checkin_list, current_time)
+    has_start = attendance_status["has_start"]
+    has_end = attendance_status["has_end"]
     
     # 检查是否已经打过相同类型的卡
-    if checkin_list:
-        for info in checkin_list:
-            if info.get("type") == checkin_type:
-                checkin_time = datetime.strptime(
-                    info["createTime"], "%Y-%m-%d %H:%M:%S")
-                if checkin_time.date() == current_time.date():
-                    log = f"今日[{display_type}]卡已打，无需重复打卡"
-                    logger.info(log)
-                    return {"title": "工学云签到任务通知", "content": log}
+    if (checkin_type == "START" and has_start) or (checkin_type == "END" and has_end):
+        log = f"今日[{display_type}]卡已打，无需重复打卡"
+        logger.info(log)
+        return {"title": "工学云签到任务通知", "content": log}
+    
+    # 设置打卡信息
+    last_checkin_info = checkin_list[0] if checkin_list else {}
     
     # 如果是下班打卡，检查是否已经打过上班卡
     if checkin_type == "END":
-        has_start_checkin = False
-        if checkin_list:
-            for info in checkin_list:
-                if info.get("type") == "START":
-                    checkin_time = datetime.strptime(
-                        info["createTime"], "%Y-%m-%d %H:%M:%S")
-                    if checkin_time.date() == current_time.date():
-                        has_start_checkin = True
-                        break
-        
-        if not has_start_checkin:
-            # 未打上班卡，忽略检查，继续执行下班卡打卡
-            logger.info("今日未打上班卡，继续执行下班卡打卡")
+        if not has_start:
+            # 如果是手动执行END打卡，且未打上班卡，则提示错误
+            if FORCED_CHECKIN_TYPE is not None and FORCED_CHECKIN_TYPE == "END":
+                log = "今日未打上班卡，无法执行下班打卡"
+                logger.info(log)
+                return {"title": "工学云签到任务通知", "content": log}
+            else:
+                # 非手动模式下，如果未打上班卡，则先打上班卡
+                logger.info("今日未打上班卡，先执行上班打卡")
+                
+                # 临时设置强制打卡类型为START
+                original_forced_type = FORCED_CHECKIN_TYPE
+                FORCED_CHECKIN_TYPE = "START"
+                
+                # 重新获取打卡类型
+                temp_checkin = get_checkin_type()
+                temp_checkin_type = temp_checkin.get("type")
+                temp_display_type = temp_checkin.get("display")
+                
+                # 执行上班打卡
+                temp_checkin_data = {
+                    "type": temp_checkin_type,
+                    "lastDetailAddress": last_checkin_info.get("address") if last_checkin_info else None,
+                    "attachments": None,
+                    "description": "",
+                }
+
+                temp_success = api_client.submit_clock_in(temp_checkin_data)
+                
+                # 恢复原始强制打卡类型
+                FORCED_CHECKIN_TYPE = original_forced_type
+                
+                if temp_success.get("result"):
+                    logger.info("上班卡补打成功")
+                    # 更新has_start状态
+                    has_start = True
+                else:
+                    logger.warning(f"上班卡补打失败：{temp_success.get('data')}")
+                    # 即使上班卡补打失败，也继续尝试下班打卡
 
     user_name = desensitize_name(UserInfoManager.get("nikeName"))
     logger.info(f"用户 {user_name} 开始 {display_type} 打卡")
 
     # 设置打卡信息
-    last_checkin_info = checkin_list[0] if checkin_list else {}
     checkin_data = {
         "type": checkin_type,
         "lastDetailAddress": last_checkin_info.get("address"),
