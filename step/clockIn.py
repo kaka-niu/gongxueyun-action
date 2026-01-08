@@ -34,6 +34,7 @@ def clock_in() -> dict[str, str]:
 
     # 获取打卡类型
     checkin = get_checkin_type()
+    logging.info(f"get_checkin_type返回的值: {checkin}, 类型: {type(checkin)}")
     checkin_type = checkin.get("type")
     display_type = checkin.get("display")
 
