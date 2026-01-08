@@ -61,19 +61,30 @@ def create_config_from_env():
                 logging.info("已从SEND环境变量获取SMTP配置")
                 logging.info(f"SMTP配置: {json.dumps(smtp_config, ensure_ascii=False)}")
                 
-                # 验证必需字段
-                if "smtp" not in smtp_config:
-                    logging.error("SEND环境变量中缺少smtp字段")
-                    raise ValueError("SEND环境变量中缺少smtp字段")
+                # 检查SEND环境变量的格式
+                # 格式1: {"smtp": {...}}
+                # 格式2: 直接是SMTP配置对象 {...}
+                if "smtp" in smtp_config:
+                    smtp_config = smtp_config["smtp"]
+                    logging.info("检测到SEND环境变量为格式1: {\"smtp\": {...}}")
+                else:
+                    logging.info("检测到SEND环境变量为格式2: 直接SMTP配置对象")
                 
-                smtp = smtp_config["smtp"]
+                # 验证必需字段
                 required_fields = ["enable", "host", "port", "username", "password", "from", "to"]
                 for field in required_fields:
-                    if field not in smtp:
+                    if field not in smtp_config:
                         logging.error(f"SMTP配置中缺少必需字段: {field}")
                         raise ValueError(f"SMTP配置中缺少必需字段: {field}")
                 
                 logging.info("SMTP配置验证通过")
+                logging.info(f"SMTP配置详情:")
+                logging.info(f"  启用状态: {smtp_config.get('enable')}")
+                logging.info(f"  服务器: {smtp_config.get('host')}:{smtp_config.get('port')}")
+                logging.info(f"  用户名: {smtp_config.get('username')}")
+                logging.info(f"  发件人: {smtp_config.get('from')}")
+                logging.info(f"  收件人: {smtp_config.get('to')}")
+                logging.info(f"  密码已设置: {'是' if smtp_config.get('password') else '否'}")
             except json.JSONDecodeError as e:
                 logging.error(f"SEND环境变量JSON格式错误: {str(e)}")
                 logging.error(f"SEND环境变量内容: {send_json_str}")
@@ -146,13 +157,13 @@ def create_config_from_env():
                         },
                         # 如果用户配置中包含smtp字段，直接使用；否则使用SEND环境变量或默认配置
                         "smtp": user_configs.get("smtp", {
-                            "enable": smtp_config.get("smtp", {}).get("enable", user_configs.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true")) if smtp_config else user_configs.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true"),
-                            "host": smtp_config.get("smtp", {}).get("host", user_configs.get("smtpHost", safe_get_env_var("GX_SMTP_HOST"))) if smtp_config else user_configs.get("smtpHost", safe_get_env_var("GX_SMTP_HOST")),
-                            "port": smtp_config.get("smtp", {}).get("port", user_configs.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465")))) if smtp_config else user_configs.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465"))),
-                            "username": smtp_config.get("smtp", {}).get("username", user_configs.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME"))) if smtp_config else user_configs.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME")),
-                            "password": smtp_config.get("smtp", {}).get("password", user_configs.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD"))) if smtp_config else user_configs.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD")),
-                            "from": smtp_config.get("smtp", {}).get("from", user_configs.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun"))) if smtp_config else user_configs.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun")),
-                            "to": smtp_config.get("smtp", {}).get("to", user_configs.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])) if smtp_config else user_configs.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])
+                            "enable": smtp_config.get("enable", user_configs.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true")) if smtp_config else user_configs.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true"),
+                            "host": smtp_config.get("host", user_configs.get("smtpHost", safe_get_env_var("GX_SMTP_HOST"))) if smtp_config else user_configs.get("smtpHost", safe_get_env_var("GX_SMTP_HOST")),
+                            "port": smtp_config.get("port", user_configs.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465")))) if smtp_config else user_configs.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465"))),
+                            "username": smtp_config.get("username", user_configs.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME"))) if smtp_config else user_configs.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME")),
+                            "password": smtp_config.get("password", user_configs.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD"))) if smtp_config else user_configs.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD")),
+                            "from": smtp_config.get("from", user_configs.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun"))) if smtp_config else user_configs.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun")),
+                            "to": smtp_config.get("to", user_configs.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])) if smtp_config else user_configs.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])
                         }),
                         "device": user_configs.get("device", safe_get_env_var("GX_DEVICE_INFO", "{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}"))
                     }
@@ -197,13 +208,13 @@ def create_config_from_env():
                                 },
                                 # 如果用户配置中包含smtp字段，直接使用；否则使用SEND环境变量或默认配置
                                 "smtp": item.get("smtp", {
-                                    "enable": smtp_config.get("smtp", {}).get("enable", item.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true")) if smtp_config else item.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true"),
-                                    "host": smtp_config.get("smtp", {}).get("host", item.get("smtpHost", safe_get_env_var("GX_SMTP_HOST"))) if smtp_config else item.get("smtpHost", safe_get_env_var("GX_SMTP_HOST")),
-                                    "port": smtp_config.get("smtp", {}).get("port", item.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465")))) if smtp_config else item.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465"))),
-                                    "username": smtp_config.get("smtp", {}).get("username", item.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME"))) if smtp_config else item.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME")),
-                                    "password": smtp_config.get("smtp", {}).get("password", item.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD"))) if smtp_config else item.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD")),
-                                    "from": smtp_config.get("smtp", {}).get("from", item.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun"))) if smtp_config else item.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun")),
-                                    "to": smtp_config.get("smtp", {}).get("to", item.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])) if smtp_config else item.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])
+                                    "enable": smtp_config.get("enable", item.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true")) if smtp_config else item.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true"),
+                                    "host": smtp_config.get("host", item.get("smtpHost", safe_get_env_var("GX_SMTP_HOST"))) if smtp_config else item.get("smtpHost", safe_get_env_var("GX_SMTP_HOST")),
+                                    "port": smtp_config.get("port", item.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465")))) if smtp_config else item.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465"))),
+                                    "username": smtp_config.get("username", item.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME"))) if smtp_config else item.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME")),
+                                    "password": smtp_config.get("password", item.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD"))) if smtp_config else item.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD")),
+                                    "from": smtp_config.get("from", item.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun"))) if smtp_config else item.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun")),
+                                    "to": smtp_config.get("to", item.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])) if smtp_config else item.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])
                                 }),
                                 "device": item.get("device", safe_get_env_var("GX_DEVICE_INFO", "{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}"))
                             }
@@ -288,13 +299,17 @@ def execute_checkin(checkin_type, user_index=None):
                 smtp_password = ConfigManager.get("smtp", "password")
                 smtp_from = ConfigManager.get("smtp", "from")
                 smtp_to = ConfigManager.get("smtp", "to")
+                smtp_enable = ConfigManager.get("smtp", "enable")
                 
                 logging.info(f"SMTP配置详情:")
+                logging.info(f"  启用状态: {smtp_enable}")
                 logging.info(f"  服务器: {smtp_host}:{smtp_port}")
                 logging.info(f"  用户名: {smtp_username}")
                 logging.info(f"  发件人: {smtp_from}")
                 logging.info(f"  收件人数量: {len(smtp_to) if smtp_to else 0}")
                 logging.info(f"  密码已设置: {'是' if smtp_password else '否'}")
+                logging.info(f"  邮件服务器类型: SSL (SMTP_SSL)")
+                logging.info(f"  调试模式: 已启用")
                 
                 if not all([smtp_host, smtp_port, smtp_username, smtp_password, smtp_to]):
                     logging.error("SMTP配置不完整，跳过邮件发送")

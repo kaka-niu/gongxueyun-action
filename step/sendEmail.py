@@ -26,14 +26,17 @@ def send_email(title, content):
     smtp_username = ConfigManager.get("smtp", "username")
     smtp_password = ConfigManager.get("smtp", "password")
     from_name = ConfigManager.get("smtp", "from")
+    smtp_enable = ConfigManager.get("smtp", "enable")
     
     # 记录详细的SMTP配置信息（脱敏处理）
     logger.info(f"邮件配置检查:")
+    logger.info(f"  启用状态: {smtp_enable}")
     logger.info(f"  收件人数量: {len(to_emails) if to_emails else 0}")
     logger.info(f"  SMTP服务器: {smtp_host}:{smtp_port}")
     logger.info(f"  发件人用户名: {smtp_username}")
     logger.info(f"  发件人名称: {from_name}")
     logger.info(f"  密码已设置: {'是' if smtp_password else '否'}")
+    logger.info(f"  邮件服务器类型: SSL (SMTP_SSL)")
     
     # 检查必要的邮件配置
     if not all([to_emails, smtp_host, smtp_port, smtp_username, smtp_password]):
@@ -62,6 +65,8 @@ def send_email(title, content):
             
             # 使用SMTP_SSL连接
             with smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=10) as server:
+                # 启用调试模式，显示与SMTP服务器的详细交互
+                server.set_debuglevel(1)
                 logger.info(f"SMTP_SSL服务器连接成功，正在登录用户 {smtp_username}...")
                 server.login(smtp_username, smtp_password)
                 logger.info("登录成功，正在发送邮件...")
