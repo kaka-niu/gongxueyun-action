@@ -392,12 +392,41 @@ def execute_checkin(checkin_type, user_index=None):
         logging.info(result)
         
         # 发送邮件通知
-        if ConfigManager.get("smtp", "enable"):
+        smtp_enabled = ConfigManager.get("smtp", "enable")
+        logging.info(f"SMTP邮件通知配置检查 - 启用状态: {smtp_enabled}")
+        
+        if smtp_enabled:
             try:
-                send_email(result["title"], result["content"])
+                # 检查SMTP配置
+                smtp_host = ConfigManager.get("smtp", "host")
+                smtp_port = ConfigManager.get("smtp", "port")
+                smtp_username = ConfigManager.get("smtp", "username")
+                smtp_password = ConfigManager.get("smtp", "password")
+                smtp_from = ConfigManager.get("smtp", "from")
+                smtp_to = ConfigManager.get("smtp", "to")
+                
+                logging.info(f"SMTP配置详情:")
+                logging.info(f"  服务器: {smtp_host}:{smtp_port}")
+                logging.info(f"  用户名: {smtp_username}")
+                logging.info(f"  发件人: {smtp_from}")
+                logging.info(f"  收件人数量: {len(smtp_to) if smtp_to else 0}")
+                logging.info(f"  密码已设置: {'是' if smtp_password else '否'}")
+                
+                if not all([smtp_host, smtp_port, smtp_username, smtp_password, smtp_to]):
+                    logging.error("SMTP配置不完整，跳过邮件发送")
+                    logging.error(f"缺失配置项: host={bool(smtp_host)}, port={bool(smtp_port)}, username={bool(smtp_username)}, password={bool(smtp_password)}, to={bool(smtp_to)}")
+                else:
+                    logging.info(f"准备发送邮件通知，标题: {result['title']}")
+                    logging.info(f"邮件内容: {result['content']}")
+                    send_email(result["title"], result["content"])
+                    logging.info("邮件发送完成")
             except Exception as e:
                 logging.error(f"邮件发送过程中出现错误: {str(e)}")
+                import traceback
+                logging.error(f"错误堆栈: {traceback.format_exc()}")
                 logging.warning("邮件发送失败，但打卡任务已完成")
+        else:
+            logging.info("SMTP邮件通知已禁用，跳过邮件发送")
         
         return True
     except Exception as e:
@@ -420,6 +449,9 @@ def execute_multi_user_checkin(checkin_type):
                 with open("config.json", "w", encoding="utf-8") as f:
                     json.dump(user_config, f, ensure_ascii=False, indent=4)
                 
+                # 重置ConfigManager缓存，确保加载最新配置
+                ConfigManager._config_cache = None
+                
                 # 执行打卡
                 if execute_checkin(checkin_type, i):
                     success_count += 1
@@ -434,6 +466,8 @@ def execute_multi_user_checkin(checkin_type):
             return execute_checkin(checkin_type)
     except Exception as e:
         logging.error(f"执行多用户打卡过程中出现错误: {str(e)}")
+        import traceback
+        logging.error(f"错误堆栈: {traceback.format_exc()}")
         return False
 
 if __name__ == "__main__":
