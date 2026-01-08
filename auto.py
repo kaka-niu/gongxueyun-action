@@ -348,27 +348,33 @@ def execute_multi_user_checkin(checkin_type):
         # 加载配置文件
         with open("config.json", "r", encoding="utf-8") as f:
             config_data = json.load(f)
-        
+
         # 检查是否为多用户配置
         if isinstance(config_data, list):
             # 多用户配置
             success_count = 0
             for i, user_config in enumerate(config_data):
-                # 保存当前用户配置到临时文件
+                # 保存当前用户配置到临时文件，确保格式正确
                 with open("config.json", "w", encoding="utf-8") as f:
-                    json.dump(user_config, f, ensure_ascii=False, indent=4)
-                
+                    # 确保配置格式正确，包含config外层
+                    if "config" in user_config:
+                        # 如果已经有config外层，直接写入
+                        json.dump(user_config, f, ensure_ascii=False, indent=4)
+                    else:
+                        # 如果没有config外层，添加它
+                        json.dump({"config": user_config}, f, ensure_ascii=False, indent=4)
+
                 # 重置ConfigManager缓存，确保加载最新配置
                 ConfigManager._config_cache = None
-                
+
                 # 执行打卡
                 if execute_checkin(checkin_type, i):
                     success_count += 1
-                
+
                 # 重置UserInfoManager缓存
                 UserInfoManager._userInfo_cache = None
-            
-            logging.info(f"多用户打卡完成，成功打卡{success_count}/{len(config_data)}个用户")
+
+            logging.info(f"多用户打卡完成，成功打卡{success_count}/{len(config_data)}个用户")  
             return success_count > 0
         else:
             # 单用户配置
