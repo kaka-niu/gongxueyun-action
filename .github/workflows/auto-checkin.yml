@@ -24,10 +24,6 @@ on:
 jobs:
   check-in:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        mode: [morning, evening]
-      fail-fast: false
     
     steps:
     - name: 检出代码
@@ -42,28 +38,26 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pyyaml  # 添加yaml支持
     
-    - name: 早上打卡
-      if: matrix.mode == 'morning' || (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'morning')
+    - name: 判断打卡模式并执行
       env:
         USERS: ${{ secrets.USERS }}
-        MODE: morning
       run: |
-        python auto.py
-    
-    - name: 下午打卡
-      if: matrix.mode == 'evening' || (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'evening')
-      env:
-        USERS: ${{ secrets.USERS }}
-        MODE: evening
-      run: |
-        python auto.py
-    
-    - name: 手动打卡
-      if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'manual'
-      env:
-        USERS: ${{ secrets.USERS }}
-        MODE: manual
-      run: |
+        # 获取当前UTC小时
+        CURRENT_HOUR=$(date -u +%H)
+        echo "当前UTC时间: $CURRENT_HOUR 点"
+        
+        # 根据时间设置模式
+        if [ "$CURRENT_HOUR" = "23" ]; then
+          echo "执行早上打卡（上班卡）"
+          MODE=morning
+        elif [ "$CURRENT_HOUR" = "09" ]; then
+          echo "执行下午打卡（下班卡）"
+          MODE=evening
+        else
+          echo "手动模式执行"
+          MODE=manual
+        fi
+        
+        # 执行打卡
         python auto.py

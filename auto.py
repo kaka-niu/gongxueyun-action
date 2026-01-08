@@ -42,7 +42,7 @@ def setup_logging():
 def load_users_config():
     """从环境变量或配置文件加载用户配置"""
     # 尝试从环境变量获取用户配置
-    users_json = os.environ.get('USERS', None)
+    users_json = os.environ.get('USER', None)
     
     if users_json:
         try:
