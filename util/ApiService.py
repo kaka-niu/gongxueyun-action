@@ -128,6 +128,76 @@ class ApiService:
             headers["sign"] = create_sign(*sign_data)
         return headers
 
+    def pass_blockPuzzle_captcha(self) -> str:
+        """
+        处理滑块验证码，获取验证结果。
+
+        Returns:
+            str: 验证码识别结果的JSON字符串。
+        """
+        try:
+            # 获取验证码图片
+            captcha_url = "attach/captcha/slider"
+            response = self.session.get(BASE_URL + captcha_url, timeout=30)
+            response.raise_for_status()
+            
+            captcha_data = response.json()
+            if not captcha_data.get("data"):
+                logger.error("获取滑块验证码失败：返回数据为空")
+                raise ValueError("获取滑块验证码失败：返回数据为空")
+            
+            # 提取验证码图片数据
+            target = captcha_data["data"].get("targetImage", "")
+            background = captcha_data["data"].get("backImage", "")
+            
+            if not target or not background:
+                logger.error("滑块验证码图片数据不完整")
+                raise ValueError("滑块验证码图片数据不完整")
+            
+            # 调用验证码识别函数
+            result = recognize_blockPuzzle_captcha(target, background)
+            logger.info("滑块验证码识别成功")
+            return result
+            
+        except Exception as e:
+            logger.error(f"滑块验证码处理失败: {e}")
+            raise
+
+    def solve_click_word_captcha(self) -> str:
+        """
+        处理点击文字验证码，获取验证结果。
+
+        Returns:
+            str: 验证码识别结果的JSON字符串。
+        """
+        try:
+            # 获取验证码图片
+            captcha_url = "attach/captcha/clickWord"
+            response = self.session.get(BASE_URL + captcha_url, timeout=30)
+            response.raise_for_status()
+            
+            captcha_data = response.json()
+            if not captcha_data.get("data"):
+                logger.error("获取点击文字验证码失败：返回数据为空")
+                raise ValueError("获取点击文字验证码失败：返回数据为空")
+            
+            # 提取验证码图片数据和文字列表
+            target = captcha_data["data"].get("targetImage", "")
+            wordlist = captcha_data["data"].get("wordList", [])
+            
+            if not target or not wordlist:
+                logger.error("点击文字验证码数据不完整")
+                raise ValueError("点击文字验证码数据不完整")
+            
+            # 调用验证码识别函数
+            result = recognize_clickWord_captcha(target, wordlist)
+            logger.info("点击文字验证码识别成功")
+            return result
+            
+        except Exception as e:
+            logger.error(f"点击文字验证码处理失败: {e}")
+            raise
+
     def login(self) -> bool:
         """
         执行用户登录操作，成功后将 user_info 写入 UserInfoManager 管理的缓存和文件。
