@@ -65,7 +65,7 @@ class ConfigManager:
         env_value = os.getenv(f"GX_{env_key}")
         
         if env_value is not None and env_value != "":
-            logger.debug(f"从环境变量 GX_{env_key} 读取配置: {env_value}")
+            logger.info(f"从环境变量 GX_{env_key} 读取配置: {env_value}")
             # 根据配置类型进行适当转换
             if keys[-1] in ["latitude", "longitude"]:
                 try:
@@ -78,7 +78,9 @@ class ConfigManager:
                 except ValueError:
                     pass
             elif keys[-1] == "enable":
-                return env_value.lower() == "true"
+                result = env_value.lower() == "true"
+                logger.info(f"将字符串 '{env_value}' 转换为布尔值: {result}")
+                return result
             elif keys[-1] == "customDays":
                 if env_value:
                     return [int(day) for day in env_value.split(",")]
@@ -88,7 +90,7 @@ class ConfigManager:
         config_data = cls.load()
         if not config_data:
             if keys[0] == "smtp":
-                logger.debug(f"未找到SMTP配置，使用默认值: {default}")
+                logger.warning(f"未找到SMTP配置，使用默认值: {default}")
             return default
         
         data = config_data
@@ -97,11 +99,11 @@ class ConfigManager:
                 data = data[key]
             else:
                 if keys[0] == "smtp":
-                    logger.debug(f"未找到SMTP配置项 {'.'.join(keys)}，使用默认值: {default}")
+                    logger.warning(f"未找到SMTP配置项 {'.'.join(keys)}，使用默认值: {default}")
                 return default
         
         if keys[0] == "smtp":
-            logger.debug(f"从配置文件读取SMTP配置项 {'.'.join(keys)}: {data}")
+            logger.info(f"从配置文件读取SMTP配置项 {'.'.join(keys)}: {data}")
         return data
 
     @classmethod
