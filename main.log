@@ -1,331 +1,127 @@
-2026-01-07 12:19:52,547 - INFO - 检查登录状态
-2026-01-07 12:19:52,549 - INFO - 检测到用户信息不一致，执行重新登录
-2026-01-07 12:19:52,550 - INFO - 执行登录
-2026-01-07 12:19:53,877 - INFO - 滑块匹配成功，最大相似度: 0.29102781414985657
-2026-01-07 12:19:53,878 - INFO - 提取PNG宽度成功: 47
-2026-01-07 12:19:53,878 - INFO - 计算滑块距离成功: 262.1
-2026-01-07 12:19:53,878 - INFO - 验证码识别成功: {'x': 262.1, 'y': 5}
-2026-01-07 12:19:54,635 - INFO - 登录数据：{'phone': 'b8d4c5b4c3e4e8952067b0509d9c1846', 'password': '9ad64af7d5357ecf006304509470cbab', 'captcha': 'HhewQAjlR1Op4hYa+JtVBK10u7IeyImzS0dOfkPIjnOnzMXTr/zLX4wQAIIOu8jXlj7h3ufONKkHvGUvA3N+MQ==', 'loginType': 'android', 'uuid': '977d6bf467e34440bf32296992c0d672', 'device': 'android', 'version': '5.16.0', 't': '9fc4419560c8c96b10e63f2c06527431'}
-2026-01-07 12:19:55,415 - INFO - 登录结果：{'authType': 2, 'expiredTime': 2083378794000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10483118', 'msgConfig': {}, 'neteaseImId': 'ea2f4c263d204b5a924d4a12a1d9fdd1', 'nikeName': '雷家圆', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': 'c443e48b0d8c9f993442ce000e5dc448', 'studentNumber': '202301149', 'userName': '雷家圆'}, 'phone': '15681220905', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyODkyNjJ9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzNzg3OTQsIm5iZiI6MTc2Nzc1ODY5NCwiaWF0IjoxNzY3NzU5NTk0fQ.01FHncDXR3OzwqVbQySEtzY3AQJ9WcfAjWShgFBrMyHQQ2hXWwbkGzpe6D-tUXFiA21G5VdQxGolVIC_-ezUMA', 'userId': '108289262', 'userType': 'student'}
-2026-01-07 12:19:55,417 - INFO - userInfo.json 已更新: D:\disk\new\user\userInfo.json
-2026-01-07 12:19:55,417 - INFO - 用户信息已保存到 UserInfoManager 管理的文件和缓存中
-2026-01-07 12:19:55,417 - INFO - 登录成功
-2026-01-07 12:19:55,417 - INFO - 用户数据：{'authType': 2, 'expiredTime': 2083378794000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10483118', 'msgConfig': {}, 'neteaseImId': 'ea2f4c263d204b5a924d4a12a1d9fdd1', 'nikeName': '雷家圆', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': 'c443e48b0d8c9f993442ce000e5dc448', 'studentNumber': '202301149', 'userName': '雷家圆'}, 'phone': '15681220905', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyODkyNjJ9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzNzg3OTQsIm5iZiI6MTc2Nzc1ODY5NCwiaWF0IjoxNzY3NzU5NTk0fQ.01FHncDXR3OzwqVbQySEtzY3AQJ9WcfAjWShgFBrMyHQQ2hXWwbkGzpe6D-tUXFiA21G5VdQxGolVIC_-ezUMA', 'userId': '108289262', 'userType': 'student'}
-2026-01-07 12:19:55,417 - INFO - 用户类型：student
-2026-01-07 12:19:55,417 - INFO - 检查打卡信息
-2026-01-07 12:19:55,418 - INFO - 未检测到打卡信息，开始执行获取打卡信息
-2026-01-07 12:19:56,203 - INFO - 获取到的实习计划数据: {'totalCount': 0, 'pageSize': 10, 'totalPage': 0, 'currPage': 1, 'isDeleted': None, 'createBy': None, 'modifiedBy': None, 'createTime': None, 'modifiedTime': None, 'createByName': None, 'modifiedByName': None, 'orderBy': 'create_time', 'sort': 'desc', 'planId': 'ec6b6bfd032dd9a7ff04909a7459edd9', 'schoolId': None, 'depId': None, 'depName': None, 'planName': '2023级智能产品开发与应用2025-2026实习学年第一学期岗位实习', 'planNumber': None, 'planLevel': None, 'planGrades': None, 'type': 'GW_PRACTICE', 'startTime': '2025-12-08 00:00:00', 'endTime': '2026-01-09 00:00:00', 'subsidy': None, 'description': None, 'planState': None, 'backup': None, 'isSign': 1, 'isAuto': '0', 'batchId': 'ebbd0c1d43afa3285007a85f9738c77b', 'practiceStus': None, 'snowFlakeId': None, 'batchName': '2025-2026', 'planPaper': {'isDeleted': 0, 'createTime': '2025-11-25 18:47:52', 'planPaperId': '0b479e8f0b888519368258f244bad5b3', 'planId': 'ec6b6bfd032dd9a7ff04909a7459edd9', 'dayPaperNum': 0, 'weekPaperNum': 200, 'monthPaperNum': 0, 'summaryPaperNum': 3000, 'weekReportCount': 5, 'paperReportCount': 25, 'monthReportCount': 1, 'summaryReportCount': 1, 'maxDayNum': 8000, 'maxWeekNum': 8000, 'maxMonthNum': 8000, 'maxSummaryNum': 8000, 'snowFlakeId': 1000373, 'dayPaper': True, 'weekPaper': True, 'monthPaper': True, 'summaryPaper': True}, 'planPaperMap': None, 'attachments': None, 'planMajors': None, 'planClasses': None, 'planAppraiseItem': None, 'planAppraiseItemDtos': None, 'planAppraiseItemEntities': None, 'majorNames': None, 'createName': '史瑞环', 'attachmentNum': 1, 'planIds': None, 'signCount': None, 'auditState': None, 'majorTeacher': None, 'majorId': None, 'majorName': None, 'majorField': None, 'semester': None, 'planExtra': None, 'majorTeacherId': None, 'isSysDefault': 0, 'internshipForm': None, 'teacherName': '157b5e107cf7bfc863e7d8acf02e1c55', 'teacherId': None, 'mobile': 'af2ce7966ebb217b86a3f09604fc3c5f', 'isCopyAllocate': None, 'isCopy': None, 'isShowUpDel': None, 'isBuyInsurance': None, 'stuItemIds': None, 'selfMultiple': None, 'schoolTeacher': None, 'companyMultiple': None, 'multipleTheory': None, 'practiceState': 2, 'aboutType': None, 'practiceTeas': None, 'practiceStateNum': None, 'programId': None, 'attachmentsList': None, 'isTalentPlan': None, 'comment': None, 'auditName': None, 'isApply': 0, 'levelEntity': None, 'insuranceList': None}
-2026-01-07 12:19:56,205 - INFO - planInfo.json 已更新: D:\disk\new\user\planInfo.json
-2026-01-07 12:19:56,205 - INFO - 实习计划信息已更新到 PlanInfoManager
-2026-01-07 12:19:56,205 - INFO - 打卡信息获取成功
-2026-01-07 12:19:56,205 - INFO - 执行签到打卡
-2026-01-07 12:19:56,995 - INFO - 用户 雷*圆 开始 下班 打卡
-2026-01-07 12:19:56,995 - INFO - 打卡类型：END
-2026-01-07 12:19:57,764 - INFO - 打卡成功
-2026-01-07 12:19:57,764 - INFO - {'title': '工学云签到成功通知', 'content': '签到账号：15681220905\n签到类型：下班\n签到地点：四川省 · 资阳市 · 乐至县 · 友谊路南段与川西环线交叉口东北300米'}
-2026-01-07 12:22:36,346 - INFO - 检查登录状态
-2026-01-07 12:22:36,347 - INFO - 检测到本地 token，跳过登录
-2026-01-07 12:22:36,347 - INFO - 用户数据：{'authType': 2, 'expiredTime': 2083378794000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10483118', 'msgConfig': {}, 'neteaseImId': 'ea2f4c263d204b5a924d4a12a1d9fdd1', 'nikeName': '雷家圆', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': 'c443e48b0d8c9f993442ce000e5dc448', 'studentNumber': '202301149', 'userName': '雷家圆'}, 'phone': '15681220905', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyODkyNjJ9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzNzg3OTQsIm5iZiI6MTc2Nzc1ODY5NCwiaWF0IjoxNzY3NzU5NTk0fQ.01FHncDXR3OzwqVbQySEtzY3AQJ9WcfAjWShgFBrMyHQQ2hXWwbkGzpe6D-tUXFiA21G5VdQxGolVIC_-ezUMA', 'userId': '108289262', 'userType': 'student'}
-2026-01-07 12:22:36,347 - INFO - 用户类型：student
-2026-01-07 12:22:36,347 - INFO - 检查打卡信息
-2026-01-07 12:22:36,348 - INFO - 检测到本地已有打卡信息 ，跳过获取打卡信息
-2026-01-07 12:22:36,348 - INFO - 执行签到打卡
-2026-01-07 12:22:37,157 - INFO - 今日[下班]卡已打，无需重复打卡
-2026-01-07 12:22:37,157 - INFO - {'title': '工学云签到任务通知', 'content': '今日[下班]卡已打，无需重复打卡'}
-2026-01-07 12:22:37,158 - INFO - 准备发送邮件，SMTP服务器: smtp.qq.com:465
-2026-01-07 12:22:37,158 - INFO - 正在连接到SMTP服务器 smtp.qq.com:465...
-2026-01-07 12:22:37,336 - INFO - SMTP_SSL服务器连接成功，正在登录用户 2154335573@qq.com...
-2026-01-07 12:22:37,589 - INFO - 登录成功，正在发送邮件...
-2026-01-07 12:22:38,127 - INFO - 邮件发送成功: 2154335573@qq.com
-2026-01-07 12:22:38,188 - WARNING - SMTP_SSL连接失败: (-1, b'\x00\x00\x00')
-2026-01-07 12:22:38,188 - INFO - 尝试使用SMTP+STARTTLS方式连接...
-2026-01-07 12:22:48,228 - ERROR - 邮件发送失败: 2154335573@qq.com, 错误: Connection unexpectedly closed: timed out
-2026-01-07 12:22:48,229 - INFO - 正在连接到SMTP服务器 smtp.qq.com:465...
-2026-01-07 12:22:48,377 - INFO - SMTP_SSL服务器连接成功，正在登录用户 2154335573@qq.com...
-2026-01-07 12:22:48,567 - INFO - 登录成功，正在发送邮件...
-2026-01-07 12:22:49,037 - INFO - 邮件发送成功: lx15808462201@gmail.com
-2026-01-07 12:22:49,072 - WARNING - SMTP_SSL连接失败: (-1, b'\x00\x00\x00')
-2026-01-07 12:22:49,072 - INFO - 尝试使用SMTP+STARTTLS方式连接...
-2026-01-07 12:22:59,130 - ERROR - 邮件发送失败: lx15808462201@gmail.com, 错误: Connection unexpectedly closed: timed out
-2026-01-07 12:26:03,598 - INFO - 检查登录状态
-2026-01-07 12:26:03,599 - INFO - 检测到用户信息不一致，执行重新登录
-2026-01-07 12:26:03,599 - INFO - 执行登录
-2026-01-07 12:26:04,802 - INFO - 滑块匹配成功，最大相似度: 0.4578650891780853
-2026-01-07 12:26:04,803 - INFO - 提取PNG宽度成功: 47
-2026-01-07 12:26:04,803 - INFO - 计算滑块距离成功: 179.0
-2026-01-07 12:26:04,803 - INFO - 验证码识别成功: {'x': 179.0, 'y': 5}
-2026-01-07 12:26:05,554 - INFO - 登录数据：{'phone': 'c2d932f42e0c4dea883a77b909c92e29', 'password': 'd9e73af3d1ef14f9fcd0a2f1fe609993', 'captcha': 'AQMT9IrV8Ir5zs0uoC2J6cYWk3SqQ4wcEhIEVvRForjQZK6974+p9tpSflUN18VZoHirOCOZjLQVA6mz4KD04A==', 'loginType': 'android', 'uuid': '36ac7ee7b4614af3a1f4b012ca89a956', 'device': 'android', 'version': '5.16.0', 't': '4d7418c9a56ba0ced8a4438821ad1d44'}
-2026-01-07 12:26:06,304 - INFO - 登录结果：{'authType': 2, 'expiredTime': 2083379165000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10417671', 'msgConfig': {}, 'neteaseImId': '9062490fa915410d8b1f6a6e5b53523c', 'nikeName': '刘香', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': '3a2088aaf0e03bf38351cc32948e34d1', 'studentNumber': '202301249', 'userName': '刘香'}, 'phone': '15808462201', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyMjY0NDF9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzNzkxNjUsIm5iZiI6MTc2Nzc1OTA2NSwiaWF0IjoxNzY3NzU5OTY1fQ.5k_82HdQW5g_u_8zoahOHinzAQD4Xv3hzFQbhxvuFjiv8J4FIt3Y4cBEKL4qV957hGYL3IFqct5g24M2qZQC1w', 'userId': '108226441', 'userType': 'student'}
-2026-01-07 12:26:06,306 - INFO - userInfo.json 已更新: D:\disk\new\user\userInfo.json
-2026-01-07 12:26:06,306 - INFO - 用户信息已保存到 UserInfoManager 管理的文件和缓存中
-2026-01-07 12:26:06,306 - INFO - 登录成功
-2026-01-07 12:26:06,306 - INFO - 用户数据：{'authType': 2, 'expiredTime': 2083379165000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10417671', 'msgConfig': {}, 'neteaseImId': '9062490fa915410d8b1f6a6e5b53523c', 'nikeName': '刘香', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': '3a2088aaf0e03bf38351cc32948e34d1', 'studentNumber': '202301249', 'userName': '刘香'}, 'phone': '15808462201', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyMjY0NDF9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzNzkxNjUsIm5iZiI6MTc2Nzc1OTA2NSwiaWF0IjoxNzY3NzU5OTY1fQ.5k_82HdQW5g_u_8zoahOHinzAQD4Xv3hzFQbhxvuFjiv8J4FIt3Y4cBEKL4qV957hGYL3IFqct5g24M2qZQC1w', 'userId': '108226441', 'userType': 'student'}
-2026-01-07 12:26:06,307 - INFO - 用户类型：student
-2026-01-07 12:26:06,307 - INFO - 检查打卡信息
-2026-01-07 12:26:06,307 - INFO - 检测到本地已有打卡信息 ，跳过获取打卡信息
-2026-01-07 12:26:06,307 - INFO - 执行签到打卡
-2026-01-07 12:26:07,074 - INFO - 今日未打上班卡，请先打上班卡
-2026-01-07 12:26:07,074 - INFO - {'title': '工学云签到任务通知', 'content': '今日未打上班卡，请先打上班卡'}
-2026-01-07 12:26:07,074 - INFO - 准备发送邮件，SMTP服务器: smtp.qq.com:465
-2026-01-07 12:26:07,075 - INFO - 正在连接到SMTP服务器 smtp.qq.com:465...
-2026-01-07 12:26:07,243 - INFO - SMTP_SSL服务器连接成功，正在登录用户 2154335573@qq.com...
-2026-01-07 12:26:07,432 - INFO - 登录成功，正在发送邮件...
-2026-01-07 12:26:08,091 - INFO - 邮件发送成功: 2154335573@qq.com
-2026-01-07 12:26:08,129 - ERROR - 邮件发送失败: 2154335573@qq.com, 错误: (-1, b'\x00\x00\x00')
-2026-01-07 12:26:08,130 - INFO - 正在连接到SMTP服务器 smtp.qq.com:465...
-2026-01-07 12:26:08,347 - INFO - SMTP_SSL服务器连接成功，正在登录用户 2154335573@qq.com...
-2026-01-07 12:26:08,574 - INFO - 登录成功，正在发送邮件...
-2026-01-07 12:26:09,123 - INFO - 邮件发送成功: lx15808462201@gmail.com
-2026-01-07 12:26:09,173 - ERROR - 邮件发送失败: lx15808462201@gmail.com, 错误: (-1, b'\x00\x00\x00')
-2026-01-07 12:27:07,359 - INFO - 检查登录状态
-2026-01-07 12:27:07,359 - INFO - 检测到本地 token，跳过登录
-2026-01-07 12:27:07,360 - INFO - 用户数据：{'authType': 2, 'expiredTime': 2083379165000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10417671', 'msgConfig': {}, 'neteaseImId': '9062490fa915410d8b1f6a6e5b53523c', 'nikeName': '刘香', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': '3a2088aaf0e03bf38351cc32948e34d1', 'studentNumber': '202301249', 'userName': '刘香'}, 'phone': '15808462201', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyMjY0NDF9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzNzkxNjUsIm5iZiI6MTc2Nzc1OTA2NSwiaWF0IjoxNzY3NzU5OTY1fQ.5k_82HdQW5g_u_8zoahOHinzAQD4Xv3hzFQbhxvuFjiv8J4FIt3Y4cBEKL4qV957hGYL3IFqct5g24M2qZQC1w', 'userId': '108226441', 'userType': 'student'}
-2026-01-07 12:27:07,360 - INFO - 用户类型：student
-2026-01-07 12:27:07,360 - INFO - 检查打卡信息
-2026-01-07 12:27:07,360 - INFO - 检测到本地已有打卡信息 ，跳过获取打卡信息
-2026-01-07 12:27:07,360 - INFO - 执行签到打卡
-2026-01-07 12:27:08,163 - INFO - 今日未打上班卡，请先打上班卡
-2026-01-07 12:27:08,163 - INFO - {'title': '工学云签到任务通知', 'content': '今日未打上班卡，请先打上班卡'}
-2026-01-07 12:27:08,164 - INFO - 准备发送邮件，SMTP服务器: smtp.qq.com:465
-2026-01-07 12:27:08,164 - INFO - 正在连接到SMTP服务器 smtp.qq.com:465...
-2026-01-07 12:27:08,359 - INFO - SMTP_SSL服务器连接成功，正在登录用户 2154335573@qq.com...
-2026-01-07 12:27:08,584 - INFO - 登录成功，正在发送邮件...
-2026-01-07 12:27:09,112 - INFO - 邮件发送成功: 2154335573@qq.com
-2026-01-07 12:27:09,157 - ERROR - 邮件发送失败: 2154335573@qq.com, 错误: (-1, b'\x00\x00\x00')
-2026-01-07 12:27:59,425 - INFO - 检查登录状态
-2026-01-07 12:27:59,426 - INFO - 检测到本地 token，跳过登录
-2026-01-07 12:27:59,426 - INFO - 用户数据：{'authType': 2, 'expiredTime': 2083379165000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10417671', 'msgConfig': {}, 'neteaseImId': '9062490fa915410d8b1f6a6e5b53523c', 'nikeName': '刘香', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': '3a2088aaf0e03bf38351cc32948e34d1', 'studentNumber': '202301249', 'userName': '刘香'}, 'phone': '15808462201', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyMjY0NDF9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzNzkxNjUsIm5iZiI6MTc2Nzc1OTA2NSwiaWF0IjoxNzY3NzU5OTY1fQ.5k_82HdQW5g_u_8zoahOHinzAQD4Xv3hzFQbhxvuFjiv8J4FIt3Y4cBEKL4qV957hGYL3IFqct5g24M2qZQC1w', 'userId': '108226441', 'userType': 'student'}
-2026-01-07 12:27:59,426 - INFO - 用户类型：student
-2026-01-07 12:27:59,426 - INFO - 检查打卡信息
-2026-01-07 12:27:59,427 - INFO - 检测到本地已有打卡信息 ，跳过获取打卡信息
-2026-01-07 12:27:59,427 - INFO - 执行签到打卡
-2026-01-07 12:28:01,230 - WARNING - Token失效，正在重新登录...
-2026-01-07 12:28:01,230 - INFO - 执行登录
-2026-01-07 12:28:02,136 - INFO - 滑块匹配成功，最大相似度: 0.22715605795383453
-2026-01-07 12:28:02,137 - INFO - 提取PNG宽度成功: 47
-2026-01-07 12:28:02,137 - INFO - 计算滑块距离成功: 92.9
-2026-01-07 12:28:02,137 - INFO - 验证码识别成功: {'x': 92.9, 'y': 5}
-2026-01-07 12:28:06,065 - INFO - 滑块匹配成功，最大相似度: 0.2782212197780609
-2026-01-07 12:28:06,065 - INFO - 提取PNG宽度成功: 47
-2026-01-07 12:28:06,066 - INFO - 计算滑块距离成功: 152.1
-2026-01-07 12:28:06,066 - INFO - 验证码识别成功: {'x': 152.1, 'y': 5}
-2026-01-07 12:28:06,792 - INFO - 登录数据：{'phone': 'c2d932f42e0c4dea883a77b909c92e29', 'password': 'd9e73af3d1ef14f9fcd0a2f1fe609993', 'captcha': 'V35VbcsIpeXSgas19LmNiGE3Q9oqt57dxParrhzwdCW96BIi+YNVipt9jQE7MmxjwkF/70ahAE0EPCS2tKCFHQ==', 'loginType': 'android', 'uuid': 'f57ad16e25fa43e887409680c3363a4e', 'device': 'android', 'version': '5.16.0', 't': '2b3d60766c65f4bbe4cdf38ebbd08cdd'}
-2026-01-07 12:28:07,524 - INFO - 登录结果：{'authType': 2, 'expiredTime': 2083379286000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10417671', 'msgConfig': {}, 'neteaseImId': '9062490fa915410d8b1f6a6e5b53523c', 'nikeName': '刘香', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': '3a2088aaf0e03bf38351cc32948e34d1', 'studentNumber': '202301249', 'userName': '刘香'}, 'phone': '15808462201', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyMjY0NDF9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzNzkyODYsIm5iZiI6MTc2Nzc1OTE4NiwiaWF0IjoxNzY3NzYwMDg2fQ.BRDub1yM7YvQPyRun32ieCj5Xv71NV6F5sKajnrB7oL0hyna0581e24vDUjJZxvLJ4G4IGjr2quZMpVAlG9IBg', 'userId': '108226441', 'userType': 'student'}
-2026-01-07 12:28:07,526 - INFO - userInfo.json 已更新: D:\disk\new\user\userInfo.json
-2026-01-07 12:28:07,526 - INFO - 用户信息已保存到 UserInfoManager 管理的文件和缓存中
-2026-01-07 12:28:07,526 - INFO - 已更新 Authorization Token，重试请求
-2026-01-07 12:28:08,264 - INFO - 今日未打上班卡，请先打上班卡
-2026-01-07 12:28:08,264 - INFO - {'title': '工学云签到任务通知', 'content': '今日未打上班卡，请先打上班卡'}
-2026-01-07 12:28:08,264 - INFO - 准备发送邮件，SMTP服务器: smtp.qq.com:465
-2026-01-07 12:28:08,265 - INFO - 正在连接到SMTP服务器 smtp.qq.com:465...
-2026-01-07 12:28:08,460 - INFO - SMTP_SSL服务器连接成功，正在登录用户 2154335573@qq.com...
-2026-01-07 12:28:08,670 - INFO - 登录成功，正在发送邮件...
-2026-01-07 12:28:09,201 - INFO - 邮件发送成功: 2154335573@qq.com
-2026-01-07 12:28:09,244 - ERROR - 邮件发送失败: 2154335573@qq.com, 错误: (-1, b'\x00\x00\x00')
-2026-01-07 12:32:11,355 - INFO - 检查登录状态
-2026-01-07 12:32:11,356 - INFO - 检测到本地 token，跳过登录
-2026-01-07 12:32:11,356 - INFO - 用户数据：{'authType': 2, 'expiredTime': 2083379286000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10417671', 'msgConfig': {}, 'neteaseImId': '9062490fa915410d8b1f6a6e5b53523c', 'nikeName': '刘香', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': '3a2088aaf0e03bf38351cc32948e34d1', 'studentNumber': '202301249', 'userName': '刘香'}, 'phone': '15808462201', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyMjY0NDF9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzNzkyODYsIm5iZiI6MTc2Nzc1OTE4NiwiaWF0IjoxNzY3NzYwMDg2fQ.BRDub1yM7YvQPyRun32ieCj5Xv71NV6F5sKajnrB7oL0hyna0581e24vDUjJZxvLJ4G4IGjr2quZMpVAlG9IBg', 'userId': '108226441', 'userType': 'student'}
-2026-01-07 12:32:11,356 - INFO - 用户类型：student
-2026-01-07 12:32:11,356 - INFO - 检查打卡信息
-2026-01-07 12:32:11,356 - INFO - 检测到本地已有打卡信息 ，跳过获取打卡信息
-2026-01-07 12:32:11,357 - INFO - 执行签到打卡
-2026-01-07 12:32:12,217 - INFO - 今日未打上班卡，继续执行下班卡打卡
-2026-01-07 12:32:12,217 - INFO - 用户 刘* 开始 下班 打卡
-2026-01-07 12:32:12,217 - INFO - 打卡类型：END
-2026-01-07 12:32:13,063 - INFO - 打卡成功
-2026-01-07 12:32:13,063 - INFO - {'title': '工学云签到成功通知', 'content': '签到账号：15808462201\n签到类型：下班\n签到地点：四川省 · 资阳市 · 乐至县 · 友谊路南段与川西环线交叉口东北300米'}
-2026-01-07 12:32:13,063 - INFO - 准备发送邮件，SMTP服务器: smtp.qq.com:465
-2026-01-07 12:32:13,064 - INFO - 正在连接到SMTP服务器 smtp.qq.com:465...
-2026-01-07 12:32:13,225 - INFO - SMTP_SSL服务器连接成功，正在登录用户 2154335573@qq.com...
-2026-01-07 12:32:13,463 - INFO - 登录成功，正在发送邮件...
-2026-01-07 12:32:13,958 - INFO - 邮件发送成功: 2154335573@qq.com
-2026-01-07 12:32:13,993 - ERROR - 邮件发送失败: 2154335573@qq.com, 错误: (-1, b'\x00\x00\x00')
-2026-01-07 14:35:19,056 - INFO - 检查登录状态
-2026-01-07 14:35:19,058 - INFO - 检测到本地 token，跳过登录
-2026-01-07 14:35:19,058 - INFO - 用户数据：{'authType': 2, 'expiredTime': 2083379286000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10417671', 'msgConfig': {}, 'neteaseImId': '9062490fa915410d8b1f6a6e5b53523c', 'nikeName': '刘香', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': '3a2088aaf0e03bf38351cc32948e34d1', 'studentNumber': '202301249', 'userName': '刘香'}, 'phone': '15808462201', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyMjY0NDF9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzNzkyODYsIm5iZiI6MTc2Nzc1OTE4NiwiaWF0IjoxNzY3NzYwMDg2fQ.BRDub1yM7YvQPyRun32ieCj5Xv71NV6F5sKajnrB7oL0hyna0581e24vDUjJZxvLJ4G4IGjr2quZMpVAlG9IBg', 'userId': '108226441', 'userType': 'student'}
-2026-01-07 14:35:19,059 - INFO - 用户类型：student
-2026-01-07 14:35:19,059 - INFO - 检查打卡信息
-2026-01-07 14:35:19,059 - INFO - 检测到本地已有打卡信息 ，跳过获取打卡信息
-2026-01-07 14:35:19,059 - INFO - 执行签到打卡
-2026-01-07 14:35:20,287 - WARNING - Token失效，正在重新登录...
-2026-01-07 14:35:20,287 - INFO - 执行登录
-2026-01-07 14:35:20,689 - INFO - 滑块匹配成功，最大相似度: 0.18914546072483063
-2026-01-07 14:35:20,689 - INFO - 提取PNG宽度成功: 47
-2026-01-07 14:35:20,689 - INFO - 计算滑块距离成功: 254.1
-2026-01-07 14:35:20,689 - INFO - 验证码识别成功: {'x': 254.1, 'y': 5}
-2026-01-07 14:35:20,866 - INFO - 登录数据：{'phone': 'c2d932f42e0c4dea883a77b909c92e29', 'password': 'd9e73af3d1ef14f9fcd0a2f1fe609993', 'captcha': 'T58EZ8zG/1q0XupLJyxXTjpwYH7XSDjVTk1qQa/njUyDZxLm1Wms39N9z8qLd3PM5CABhqjMioWiWFTYj+kLww==', 'loginType': 'android', 'uuid': '76824f3c31184e4c9db89ce40f09c643', 'device': 'android', 'version': '5.16.0', 't': '3c182b43f48dfd882bdb8e08ebd8f9cf'}
-2026-01-07 14:35:21,040 - INFO - 登录结果：{'authType': 2, 'expiredTime': 2083386920000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10417671', 'msgConfig': {}, 'neteaseImId': '9062490fa915410d8b1f6a6e5b53523c', 'nikeName': '刘香', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': '3a2088aaf0e03bf38351cc32948e34d1', 'studentNumber': '202301249', 'userName': '刘香'}, 'phone': '15808462201', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyMjY0NDF9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzODY5MjAsIm5iZiI6MTc2Nzc2NjgyMCwiaWF0IjoxNzY3NzY3NzIwfQ.JOGauOwHwfIHBYgvPgmvQIOXr3nmN_nfr5IhtyQl-IRX3SKTbgzjStjGz8bXM-VDdRcwrrU9JPjvMyY-qcByhg', 'userId': '108226441', 'userType': 'student'}
-2026-01-07 14:35:21,042 - INFO - userInfo.json 已更新: D:\disk\new\user\userInfo.json
-2026-01-07 14:35:21,042 - INFO - 用户信息已保存到 UserInfoManager 管理的文件和缓存中
-2026-01-07 14:35:21,042 - INFO - 已更新 Authorization Token，重试请求
-2026-01-07 14:35:21,216 - INFO - 今日[下班]卡已打，无需重复打卡
-2026-01-07 14:35:21,216 - INFO - {'title': '工学云签到任务通知', 'content': '今日[下班]卡已打，无需重复打卡'}
-2026-01-07 14:35:21,217 - INFO - 准备发送邮件，SMTP服务器: smtp.qq.com:465
-2026-01-07 14:35:21,217 - INFO - 正在连接到SMTP服务器 smtp.qq.com:465...
-2026-01-07 14:35:21,419 - INFO - SMTP_SSL服务器连接成功，正在登录用户 2154335573@qq.com...
-2026-01-07 14:35:21,686 - INFO - 登录成功，正在发送邮件...
-2026-01-07 14:35:22,436 - INFO - 邮件发送成功: 2154335573@qq.com
-2026-01-07 14:35:22,481 - WARNING - 邮件发送失败，但打卡任务已完成
-2026-01-07 15:05:16,976 - INFO - 检查登录状态
-2026-01-07 15:05:16,979 - WARNING - config.json 不存在: D:\disk\new\config.json
-2026-01-07 15:05:16,979 - INFO - 检测到用户信息不一致，执行重新登录
-2026-01-07 15:05:16,979 - INFO - 执行登录
-2026-01-07 15:05:16,980 - WARNING - config.json 不存在: D:\disk\new\config.json
-2026-01-07 15:05:17,001 - ERROR - 加密失败: 'NoneType' object has no attribute 'encode'
-2026-01-07 15:05:17,001 - ERROR - 登录过程发生异常：加密失败: 'NoneType' object has no attribute 'encode'
+2026-01-08 10:45:36,964 - INFO - 检查登录状态
+2026-01-08 10:45:36,966 - INFO - 检测到用户信息不一致，执行重新登录
+2026-01-08 10:45:36,968 - INFO - 执行登录
+2026-01-08 10:45:38,911 - INFO - 滑块匹配成功，最大相似度: 0.532844066619873
+2026-01-08 10:45:38,912 - INFO - 提取PNG宽度成功: 47
+2026-01-08 10:45:38,912 - INFO - 计算滑块距离成功: 147.0
+2026-01-08 10:45:38,912 - INFO - 验证码识别成功: {'x': 147.0, 'y': 5}
+2026-01-08 10:45:39,923 - INFO - 登录数据：{'phone': 'c2d932f42e0c4dea883a77b909c92e29', 'password': 'd9e73af3d1ef14f9fcd0a2f1fe609993', 'captcha': 'JI9UY2wBHznSLSoCuGDSYJD9DMpCTj7xelRbvIItBYxsryEH9svK8+GorNWg5yjMPUNTVJKQfSRDUroEc8H/Xw==', 'loginType': 'android', 'uuid': '8ae1694dc2734849975eea5905069b9d', 'device': 'android', 'version': '5.16.0', 't': '99080dc529d456b2679d38c657ffa13b'}
+2026-01-08 10:45:40,714 - INFO - 登录结果：{'authType': 2, 'expiredTime': 2083459539000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10417671', 'msgConfig': {}, 'neteaseImId': '9062490fa915410d8b1f6a6e5b53523c', 'nikeName': '刘香', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': '3a2088aaf0e03bf38351cc32948e34d1', 'studentNumber': '202301249', 'userName': '刘香'}, 'phone': '15808462201', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyMjY0NDF9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODM0NTk1MzksIm5iZiI6MTc2NzgzOTQzOSwiaWF0IjoxNzY3ODQwMzM5fQ._38fZU3qb5-D7WTgsJ11EE4azbShGtibWY84XlM4H2HmDOKAFbMswo9t0-G7G2uoIJCLPN5zsPeVlcJXWZmFng', 'userId': '108226441', 'userType': 'student'}
+2026-01-08 10:45:40,716 - INFO - userInfo.json 已更新: D:\disk\GongXueYunAutoCheckIn_CodeVersion-master\GongXueYunAutoCheckIn_CodeVersion-master\user\userInfo.json
+2026-01-08 10:45:40,716 - INFO - 用户信息已保存到 UserInfoManager 管理的文件和缓存中
+2026-01-08 10:45:40,716 - INFO - 登录成功
+2026-01-08 10:45:40,716 - INFO - 用户数据：{'authType': 2, 'expiredTime': 2083459539000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10417671', 'msgConfig': {}, 'neteaseImId': '9062490fa915410d8b1f6a6e5b53523c', 'nikeName': '刘香', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': '3a2088aaf0e03bf38351cc32948e34d1', 'studentNumber': '202301249', 'userName': '刘香'}, 'phone': '15808462201', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyMjY0NDF9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODM0NTk1MzksIm5iZiI6MTc2NzgzOTQzOSwiaWF0IjoxNzY3ODQwMzM5fQ._38fZU3qb5-D7WTgsJ11EE4azbShGtibWY84XlM4H2HmDOKAFbMswo9t0-G7G2uoIJCLPN5zsPeVlcJXWZmFng', 'userId': '108226441', 'userType': 'student'}
+2026-01-08 10:45:40,716 - INFO - 用户类型：student
+2026-01-08 10:45:40,716 - INFO - 检查打卡信息
+2026-01-08 10:45:40,717 - INFO - 未检测到打卡信息，开始执行获取打卡信息
+2026-01-08 10:45:41,515 - INFO - 获取到的实习计划数据: {'totalCount': 0, 'pageSize': 10, 'totalPage': 0, 'currPage': 1, 'isDeleted': None, 'createBy': None, 'modifiedBy': None, 'createTime': None, 'modifiedTime': None, 'createByName': None, 'modifiedByName': None, 'orderBy': 'create_time', 'sort': 'desc', 'planId': 'ec6b6bfd032dd9a7ff04909a7459edd9', 'schoolId': None, 'depId': None, 'depName': None, 'planName': '2023级智能产品开发与应用2025-2026实习学年第一学期岗位实习', 'planNumber': None, 'planLevel': None, 'planGrades': None, 'type': 'GW_PRACTICE', 'startTime': '2025-12-08 00:00:00', 'endTime': '2026-01-09 00:00:00', 'subsidy': None, 'description': None, 'planState': None, 'backup': None, 'isSign': 1, 'isAuto': '0', 'batchId': 'ebbd0c1d43afa3285007a85f9738c77b', 'practiceStus': None, 'snowFlakeId': None, 'batchName': '2025-2026', 'planPaper': {'isDeleted': 0, 'createTime': '2025-11-25 18:47:52', 'planPaperId': '0b479e8f0b888519368258f244bad5b3', 'planId': 'ec6b6bfd032dd9a7ff04909a7459edd9', 'dayPaperNum': 0, 'weekPaperNum': 200, 'monthPaperNum': 0, 'summaryPaperNum': 3000, 'weekReportCount': 5, 'paperReportCount': 25, 'monthReportCount': 1, 'summaryReportCount': 1, 'maxDayNum': 8000, 'maxWeekNum': 8000, 'maxMonthNum': 8000, 'maxSummaryNum': 8000, 'snowFlakeId': 1000373, 'dayPaper': True, 'weekPaper': True, 'monthPaper': True, 'summaryPaper': True}, 'planPaperMap': None, 'attachments': None, 'planMajors': None, 'planClasses': None, 'planAppraiseItem': None, 'planAppraiseItemDtos': None, 'planAppraiseItemEntities': None, 'majorNames': None, 'createName': '史瑞环', 'attachmentNum': 1, 'planIds': None, 'signCount': None, 'auditState': None, 'majorTeacher': None, 'majorId': None, 'majorName': None, 'majorField': None, 'semester': None, 'planExtra': None, 'majorTeacherId': None, 'isSysDefault': 0, 'internshipForm': None, 'teacherName': '157b5e107cf7bfc863e7d8acf02e1c55', 'teacherId': None, 'mobile': 'af2ce7966ebb217b86a3f09604fc3c5f', 'isCopyAllocate': None, 'isCopy': None, 'isShowUpDel': None, 'isBuyInsurance': None, 'stuItemIds': None, 'selfMultiple': None, 'schoolTeacher': None, 'companyMultiple': None, 'multipleTheory': None, 'practiceState': 3, 'aboutType': None, 'practiceTeas': None, 'practiceStateNum': None, 'programId': None, 'attachmentsList': None, 'isTalentPlan': None, 'comment': None, 'auditName': None, 'isApply': 0, 'levelEntity': None, 'insuranceList': None}
+2026-01-08 10:45:41,517 - INFO - planInfo.json 已更新: D:\disk\GongXueYunAutoCheckIn_CodeVersion-master\GongXueYunAutoCheckIn_CodeVersion-master\user\planInfo.json
+2026-01-08 10:45:41,517 - INFO - 实习计划信息已更新到 PlanInfoManager
+2026-01-08 10:45:41,517 - INFO - 打卡信息获取成功
+2026-01-08 10:45:41,517 - INFO - 执行签到打卡
+2026-01-08 10:45:42,284 - INFO - 用户 刘* 开始 上班 打卡
+2026-01-08 10:45:42,284 - INFO - 打卡类型：START
+2026-01-08 10:45:43,174 - INFO - 打卡成功
+2026-01-08 10:45:43,175 - INFO - {'title': '工学云签到成功通知', 'content': '签到账号：15808462201\n签到地点：四川省 · 资阳市 · 乐至县 · 友谊路南段与川西环线交叉口东北300米'}
+2026-01-08 21:06:44,238 - INFO - 检查登录状态
+2026-01-08 21:06:44,239 - INFO - 检测到本地 token，跳过登录
+2026-01-08 21:06:44,240 - INFO - 用户数据：{'authType': 2, 'expiredTime': 2083459539000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10417671', 'msgConfig': {}, 'neteaseImId': '9062490fa915410d8b1f6a6e5b53523c', 'nikeName': '刘香', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': '3a2088aaf0e03bf38351cc32948e34d1', 'studentNumber': '202301249', 'userName': '刘香'}, 'phone': '15808462201', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyMjY0NDF9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODM0NTk1MzksIm5iZiI6MTc2NzgzOTQzOSwiaWF0IjoxNzY3ODQwMzM5fQ._38fZU3qb5-D7WTgsJ11EE4azbShGtibWY84XlM4H2HmDOKAFbMswo9t0-G7G2uoIJCLPN5zsPeVlcJXWZmFng', 'userId': '108226441', 'userType': 'student'}
+2026-01-08 21:06:44,240 - INFO - 用户类型：student
+2026-01-08 21:06:44,240 - INFO - 检查打卡信息
+2026-01-08 21:06:44,241 - INFO - 检测到本地已有打卡信息 ，跳过获取打卡信息
+2026-01-08 21:06:44,241 - INFO - 执行签到打卡
+2026-01-08 21:06:46,083 - WARNING - Token失效，正在重新登录...
+2026-01-08 21:06:46,084 - INFO - 执行登录
+2026-01-08 21:06:47,023 - INFO - 滑块匹配成功，最大相似度: 0.3512515425682068
+2026-01-08 21:06:47,023 - INFO - 提取PNG宽度成功: 47
+2026-01-08 21:06:47,023 - INFO - 计算滑块距离成功: 130.1
+2026-01-08 21:06:47,024 - INFO - 验证码识别成功: {'x': 130.1, 'y': 5}
+2026-01-08 21:06:47,794 - INFO - 登录数据：{'phone': 'c2d932f42e0c4dea883a77b909c92e29', 'password': 'd9e73af3d1ef14f9fcd0a2f1fe609993', 'captcha': 'HybMGJdxbqg1ON/yLZZOCZHACvUMEBogatxbCPnhwl1OEtDsDmaUEQs8m0ETnOs0cXxfOuM+L0GebI8Kb5PnDQ==', 'loginType': 'android', 'uuid': '71d0070f92464cf1ab8513718ec724dc', 'device': 'android', 'version': '5.16.0', 't': '5c2da1decc355734408e67ab85921b56'}
+2026-01-08 21:06:48,536 - INFO - 登录结果：{'authType': 2, 'expiredTime': 2083496807000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10417671', 'msgConfig': {}, 'neteaseImId': '9062490fa915410d8b1f6a6e5b53523c', 'nikeName': '刘香', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': '3a2088aaf0e03bf38351cc32948e34d1', 'studentNumber': '202301249', 'userName': '刘香'}, 'phone': '15808462201', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyMjY0NDF9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODM0OTY4MDcsIm5iZiI6MTc2Nzg3NjcwNywiaWF0IjoxNzY3ODc3NjA3fQ.QQnMYjnH3bVrLf8xmapEmiEPCpF9egNS_jc3R3ECvOGt5AaLelJJI0BZFzZNfuE7k7IVcQXNTQlsVcZ4Nh3esA', 'userId': '108226441', 'userType': 'student'}
+2026-01-08 21:06:48,538 - INFO - userInfo.json 已更新: D:\disk\GongXueYunAutoCheckIn_CodeVersion-master\GongXueYunAutoCheckIn_CodeVersion-master\user\userInfo.json
+2026-01-08 21:06:48,538 - INFO - 用户信息已保存到 UserInfoManager 管理的文件和缓存中
+2026-01-08 21:06:48,538 - INFO - 已更新 Authorization Token，重试请求
+2026-01-08 21:06:49,295 - INFO - 今日[上班]卡已打，无需重复打卡
+2026-01-08 21:06:49,295 - INFO - {'title': '工学云签到任务通知', 'content': '今日[上班]卡已打，无需重复打卡'}
+2026-01-08 21:17:26,637 - INFO - 当前时间 21:17，执行下班卡测试
+2026-01-08 21:17:26,638 - INFO - 检查登录状态
+2026-01-08 21:17:26,638 - INFO - 检测到本地 token，跳过登录
+2026-01-08 21:17:26,638 - INFO - 用户数据：{'authType': 2, 'expiredTime': 2083496807000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10417671', 'msgConfig': {}, 'neteaseImId': '9062490fa915410d8b1f6a6e5b53523c', 'nikeName': '刘香', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': '3a2088aaf0e03bf38351cc32948e34d1', 'studentNumber': '202301249', 'userName': '刘香'}, 'phone': '15808462201', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyMjY0NDF9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODM0OTY4MDcsIm5iZiI6MTc2Nzg3NjcwNywiaWF0IjoxNzY3ODc3NjA3fQ.QQnMYjnH3bVrLf8xmapEmiEPCpF9egNS_jc3R3ECvOGt5AaLelJJI0BZFzZNfuE7k7IVcQXNTQlsVcZ4Nh3esA', 'userId': '108226441', 'userType': 'student'}
+2026-01-08 21:17:26,639 - INFO - 用户类型：student
+2026-01-08 21:17:26,639 - INFO - 检查打卡信息
+2026-01-08 21:17:26,639 - INFO - 检测到本地已有打卡信息 ，跳过获取打卡信息
+2026-01-08 21:17:26,639 - INFO - 执行签到打卡
+2026-01-08 21:17:27,454 - INFO - 今日[上班]卡已打，无需重复打卡
+2026-01-08 21:17:27,454 - INFO - 下班卡测试结果：{'title': '工学云签到任务通知', 'content': '今日[上班]卡已打，无需重复打卡'}
+2026-01-08 21:17:41,971 - INFO - 当前时间 21:17，执行下班卡测试
+2026-01-08 21:17:41,971 - INFO - 检查登录状态
+2026-01-08 21:17:41,972 - INFO - 检测到本地 token，跳过登录
+2026-01-08 21:17:41,972 - INFO - 用户数据：{'authType': 2, 'expiredTime': 2083496807000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10417671', 'msgConfig': {}, 'neteaseImId': '9062490fa915410d8b1f6a6e5b53523c', 'nikeName': '刘香', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': '3a2088aaf0e03bf38351cc32948e34d1', 'studentNumber': '202301249', 'userName': '刘香'}, 'phone': '15808462201', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyMjY0NDF9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODM0OTY4MDcsIm5iZiI6MTc2Nzg3NjcwNywiaWF0IjoxNzY3ODc3NjA3fQ.QQnMYjnH3bVrLf8xmapEmiEPCpF9egNS_jc3R3ECvOGt5AaLelJJI0BZFzZNfuE7k7IVcQXNTQlsVcZ4Nh3esA', 'userId': '108226441', 'userType': 'student'}
+2026-01-08 21:17:41,972 - INFO - 用户类型：student
+2026-01-08 21:17:41,972 - INFO - 检查打卡信息
+2026-01-08 21:17:41,973 - INFO - 检测到本地已有打卡信息 ，跳过获取打卡信息
+2026-01-08 21:17:41,973 - INFO - 执行签到打卡
+2026-01-08 21:17:42,737 - INFO - 今日[上班]卡已打，无需重复打卡
+2026-01-08 21:17:42,737 - INFO - 下班卡测试结果：{'title': '工学云签到任务通知', 'content': '今日[上班]卡已打，无需重复打卡'}
+2026-01-08 21:20:03,597 - INFO - 当前时间 21:20，执行下班卡测试
+2026-01-08 21:20:03,598 - INFO - 检查登录状态
+2026-01-08 21:20:03,598 - ERROR - 读取 config.json 失败: 'list' object has no attribute 'get'
+2026-01-08 21:20:03,598 - INFO - 检测到用户信息不一致，执行重新登录
+2026-01-08 21:20:03,598 - INFO - 执行登录
+2026-01-08 21:20:03,599 - ERROR - 读取 config.json 失败: 'list' object has no attribute 'get'
+2026-01-08 21:20:03,607 - ERROR - 加密失败: 'NoneType' object has no attribute 'encode'
+2026-01-08 21:20:03,607 - ERROR - 登录过程发生异常：加密失败: 'NoneType' object has no attribute 'encode'
 Traceback (most recent call last):
-  File "d:\disk\new\util\CryptoUtils.py", line 59, in aes_encrypt
+  File "d:\disk\GongXueYunAutoCheckIn_CodeVersion-master\GongXueYunAutoCheckIn_CodeVersion-master\util\CryptoUtils.py", line 59, in aes_encrypt
     ciphertext = cipher.encrypt(plaintext)
-  File "E:\Download1\conda\envs\ocr\lib\site-packages\aes_pkcs5\algorithms\__init__.py", line 32, in encrypt
+  File "E:\appication\python\Lib\site-packages\aes_pkcs5\algorithms\__init__.py", line 32, in encrypt
     message = message.encode()
+              ^^^^^^^^^^^^^^
 AttributeError: 'NoneType' object has no attribute 'encode'
 
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "d:\disk\new\util\ApiService.py", line 253, in login
+  File "d:\disk\GongXueYunAutoCheckIn_CodeVersion-master\GongXueYunAutoCheckIn_CodeVersion-master\util\ApiService.py", line 253, in login
     "phone": aes_encrypt(ConfigManager.get("user", "phone")),
-  File "d:\disk\new\util\CryptoUtils.py", line 64, in aes_encrypt
+             ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\disk\GongXueYunAutoCheckIn_CodeVersion-master\GongXueYunAutoCheckIn_CodeVersion-master\util\CryptoUtils.py", line 64, in aes_encrypt
     raise ValueError(f"加密失败: {str(e)}")
 ValueError: 加密失败: 'NoneType' object has no attribute 'encode'
-2026-01-07 15:05:17,004 - WARNING - 登录失败
-2026-01-07 15:05:17,005 - WARNING - 登录失败
-2026-01-07 15:05:55,110 - INFO - 检查登录状态
-2026-01-07 15:05:55,112 - WARNING - config.json 不存在: D:\disk\new\config.json
-2026-01-07 15:05:55,112 - INFO - 检测到用户信息不一致，执行重新登录
-2026-01-07 15:05:55,113 - INFO - 执行登录
-2026-01-07 15:05:55,113 - WARNING - config.json 不存在: D:\disk\new\config.json
-2026-01-07 15:05:55,125 - ERROR - 加密失败: 'NoneType' object has no attribute 'encode'
-2026-01-07 15:05:55,125 - ERROR - 登录过程发生异常：加密失败: 'NoneType' object has no attribute 'encode'
-Traceback (most recent call last):
-  File "d:\disk\new\util\CryptoUtils.py", line 59, in aes_encrypt
-    ciphertext = cipher.encrypt(plaintext)
-  File "E:\Download1\conda\envs\ocr\lib\site-packages\aes_pkcs5\algorithms\__init__.py", line 32, in encrypt
-    message = message.encode()
-AttributeError: 'NoneType' object has no attribute 'encode'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "d:\disk\new\util\ApiService.py", line 253, in login
-    "phone": aes_encrypt(ConfigManager.get("user", "phone")),
-  File "d:\disk\new\util\CryptoUtils.py", line 64, in aes_encrypt
-    raise ValueError(f"加密失败: {str(e)}")
-ValueError: 加密失败: 'NoneType' object has no attribute 'encode'
-2026-01-07 15:05:55,126 - WARNING - 登录失败
-2026-01-07 15:05:55,127 - WARNING - 登录失败
-2026-01-07 15:07:13,453 - INFO - 检查登录状态
-2026-01-07 15:07:13,455 - INFO - 检测到用户信息不一致，执行重新登录
-2026-01-07 15:07:13,455 - INFO - 执行登录
-2026-01-07 15:07:17,068 - INFO - 滑块匹配成功，最大相似度: 0.4184143841266632
-2026-01-07 15:07:17,069 - INFO - 提取PNG宽度成功: 47
-2026-01-07 15:07:17,069 - INFO - 计算滑块距离成功: 157.0
-2026-01-07 15:07:17,069 - INFO - 验证码识别成功: {'x': 157.0, 'y': 5}
-2026-01-07 15:07:19,093 - INFO - 登录数据：{'phone': 'b8d4c5b4c3e4e8952067b0509d9c1846', 'password': '9ad64af7d5357ecf006304509470cbab', 'captcha': 'vWLgInDsdUFJ+b+O/Rsbzrv64nzntUqplE1/9nppCLXtdgDlf7ETLpL+JLVT86RsZKxW/o+Phtcfy4HDwUouHw==', 'loginType': 'android', 'uuid': '62e233821e2d401eacd3c8330a14bcc8', 'device': 'android', 'version': '5.16.0', 't': '4bacbaa6c19e5a2516fad374dca58f55'}
-2026-01-07 15:07:24,972 - INFO - 登录结果：{'authType': 2, 'expiredTime': 2083388843000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10483118', 'msgConfig': {}, 'neteaseImId': 'ea2f4c263d204b5a924d4a12a1d9fdd1', 'nikeName': '雷家圆', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': 'c443e48b0d8c9f993442ce000e5dc448', 'studentNumber': '202301149', 'userName': '雷家圆'}, 'phone': '15681220905', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyODkyNjJ9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzODg4NDMsIm5iZiI6MTc2Nzc2ODc0MywiaWF0IjoxNzY3NzY5NjQzfQ.5ge73GAgiPom2zY-4e6A4Fm9LfCP1qbnCboGMnLG6msjYshUNcTCkLvuwgShx91oxd4IHBBnmtuNf_mR5_zHZQ', 'userId': '108289262', 'userType': 'student'}
-2026-01-07 15:07:24,975 - INFO - userInfo.json 已更新: D:\disk\new\user\userInfo.json
-2026-01-07 15:07:24,975 - INFO - 用户信息已保存到 UserInfoManager 管理的文件和缓存中
-2026-01-07 15:07:24,975 - INFO - 登录成功
-2026-01-07 15:07:24,975 - INFO - 用户数据：{'authType': 2, 'expiredTime': 2083388843000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10483118', 'msgConfig': {}, 'neteaseImId': 'ea2f4c263d204b5a924d4a12a1d9fdd1', 'nikeName': '雷家圆', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': 'c443e48b0d8c9f993442ce000e5dc448', 'studentNumber': '202301149', 'userName': '雷家圆'}, 'phone': '15681220905', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyODkyNjJ9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzODg4NDMsIm5iZiI6MTc2Nzc2ODc0MywiaWF0IjoxNzY3NzY5NjQzfQ.5ge73GAgiPom2zY-4e6A4Fm9LfCP1qbnCboGMnLG6msjYshUNcTCkLvuwgShx91oxd4IHBBnmtuNf_mR5_zHZQ', 'userId': '108289262', 'userType': 'student'}
-2026-01-07 15:07:24,975 - INFO - 用户类型：student
-2026-01-07 15:07:24,975 - INFO - 检查打卡信息
-2026-01-07 15:07:24,975 - INFO - 检测到本地已有打卡信息 ，跳过获取打卡信息
-2026-01-07 15:07:24,975 - INFO - 执行签到打卡
-2026-01-07 15:07:27,191 - INFO - 今日[下班]卡已打，无需重复打卡
-2026-01-07 15:07:27,191 - INFO - {'title': '工学云签到任务通知', 'content': '今日[下班]卡已打，无需重复打卡'}
-2026-01-07 15:07:27,193 - INFO - 准备发送邮件，SMTP服务器: smtp.qq.com:465
-2026-01-07 15:07:27,193 - INFO - 正在连接到SMTP服务器 smtp.qq.com:465...
-2026-01-07 15:07:27,660 - INFO - SMTP_SSL服务器连接成功，正在登录用户 2154335573@qq.com...
-2026-01-07 15:07:27,993 - INFO - 登录成功，正在发送邮件...
-2026-01-07 15:07:28,630 - INFO - 邮件发送成功: 2154335573@qq.com
-2026-01-07 15:07:28,709 - WARNING - 邮件发送失败，但打卡任务已完成
-2026-01-07 15:07:28,709 - INFO - 正在连接到SMTP服务器 smtp.qq.com:465...
-2026-01-07 15:07:29,037 - INFO - SMTP_SSL服务器连接成功，正在登录用户 2154335573@qq.com...
-2026-01-07 15:07:29,322 - INFO - 登录成功，正在发送邮件...
-2026-01-07 15:07:29,949 - INFO - 邮件发送成功: lx15808462201@gmail.com
-2026-01-07 15:07:30,031 - WARNING - 邮件发送失败，但打卡任务已完成
-2026-01-07 16:25:47,772 - INFO - 检查登录状态
-2026-01-07 16:25:47,773 - WARNING - config.json 不存在: D:\disk\new\config.json
-2026-01-07 16:25:47,774 - INFO - 检测到用户信息不一致，执行重新登录
-2026-01-07 16:25:47,774 - INFO - 执行登录
-2026-01-07 16:25:47,775 - WARNING - config.json 不存在: D:\disk\new\config.json
-2026-01-07 16:25:47,796 - ERROR - 加密失败: 'NoneType' object has no attribute 'encode'
-2026-01-07 16:25:47,797 - ERROR - 登录过程发生异常：加密失败: 'NoneType' object has no attribute 'encode'
-Traceback (most recent call last):
-  File "d:\disk\new\util\CryptoUtils.py", line 59, in aes_encrypt
-    ciphertext = cipher.encrypt(plaintext)
-  File "E:\Download1\conda\envs\ocr\lib\site-packages\aes_pkcs5\algorithms\__init__.py", line 32, in encrypt
-    message = message.encode()
-AttributeError: 'NoneType' object has no attribute 'encode'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "d:\disk\new\util\ApiService.py", line 253, in login
-    "phone": aes_encrypt(ConfigManager.get("user", "phone")),
-  File "d:\disk\new\util\CryptoUtils.py", line 64, in aes_encrypt
-    raise ValueError(f"加密失败: {str(e)}")
-ValueError: 加密失败: 'NoneType' object has no attribute 'encode'
-2026-01-07 16:25:47,799 - WARNING - 登录失败
-2026-01-07 16:25:47,799 - WARNING - 登录失败
-2026-01-07 16:26:12,288 - INFO - 检查登录状态
-2026-01-07 16:26:12,289 - INFO - 检测到本地 token，跳过登录
-2026-01-07 16:26:12,289 - INFO - 用户数据：{'authType': 2, 'expiredTime': 2083388843000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10483118', 'msgConfig': {}, 'neteaseImId': 'ea2f4c263d204b5a924d4a12a1d9fdd1', 'nikeName': '雷家圆', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': 'c443e48b0d8c9f993442ce000e5dc448', 'studentNumber': '202301149', 'userName': '雷家圆'}, 'phone': '15681220905', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyODkyNjJ9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzODg4NDMsIm5iZiI6MTc2Nzc2ODc0MywiaWF0IjoxNzY3NzY5NjQzfQ.5ge73GAgiPom2zY-4e6A4Fm9LfCP1qbnCboGMnLG6msjYshUNcTCkLvuwgShx91oxd4IHBBnmtuNf_mR5_zHZQ', 'userId': '108289262', 'userType': 'student'}
-2026-01-07 16:26:12,289 - INFO - 用户类型：student
-2026-01-07 16:26:12,289 - INFO - 检查打卡信息
-2026-01-07 16:26:12,291 - INFO - 检测到本地已有打卡信息 ，跳过获取打卡信息
-2026-01-07 16:26:12,291 - INFO - 执行签到打卡
-2026-01-07 16:26:13,691 - WARNING - Token失效，正在重新登录...
-2026-01-07 16:26:13,691 - INFO - 执行登录
-2026-01-07 16:26:14,309 - INFO - 滑块匹配成功，最大相似度: 0.23029054701328278
-2026-01-07 16:26:14,309 - INFO - 提取PNG宽度成功: 47
-2026-01-07 16:26:14,309 - INFO - 计算滑块距离成功: 165.9
-2026-01-07 16:26:14,310 - INFO - 验证码识别成功: {'x': 165.9, 'y': 5}
-2026-01-07 16:26:14,545 - INFO - 登录数据：{'phone': 'b8d4c5b4c3e4e8952067b0509d9c1846', 'password': '9ad64af7d5357ecf006304509470cbab', 'captcha': 'qsObh+XEY9I12QHy+fvXR7IUoy+dI5dtbB74Mg9ZxezgktNa5v6rVhPqrw3nRct4jTWfKZImz3cGyHQdxFeM5A==', 'loginType': 'android', 'uuid': 'e6f52722f31947e18d7edc9ef4746941', 'device': 'android', 'version': '5.16.0', 't': 'c53886ac6d8b09cfb345d14301f60ebf'}
-2026-01-07 16:26:14,835 - INFO - 登录结果：{'authType': 2, 'expiredTime': 2083393574000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10483118', 'msgConfig': {}, 'neteaseImId': 'ea2f4c263d204b5a924d4a12a1d9fdd1', 'nikeName': '雷家圆', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': 'c443e48b0d8c9f993442ce000e5dc448', 'studentNumber': '202301149', 'userName': '雷家圆'}, 'phone': '15681220905', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyODkyNjJ9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzOTM1NzQsIm5iZiI6MTc2Nzc3MzQ3NCwiaWF0IjoxNzY3Nzc0Mzc0fQ.isCAA1rG91RkkIv6B0mkd7WkcWZlZ35nvQEI1AOgkl0fWWkEpkaPf_gqjm2VXqyuxW9ZAdWB5M157jRQRXjYtA', 'userId': '108289262', 'userType': 'student'}
-2026-01-07 16:26:14,838 - INFO - userInfo.json 已更新: D:\disk\new\user\userInfo.json
-2026-01-07 16:26:14,838 - INFO - 用户信息已保存到 UserInfoManager 管理的文件和缓存中
-2026-01-07 16:26:14,838 - INFO - 已更新 Authorization Token，重试请求
-2026-01-07 16:26:15,101 - INFO - 今日[下班]卡已打，无需重复打卡
-2026-01-07 16:26:15,101 - INFO - {'title': '工学云签到任务通知', 'content': '今日[下班]卡已打，无需重复打卡'}
-2026-01-07 16:26:15,102 - INFO - 准备发送邮件，SMTP服务器: smtp.qq.com:465
-2026-01-07 16:26:15,102 - INFO - 正在连接到SMTP服务器 smtp.qq.com:465...
-2026-01-07 16:26:15,501 - INFO - SMTP_SSL服务器连接成功，正在登录用户 2154335573@qq.com...
-2026-01-07 16:26:15,946 - INFO - 登录成功，正在发送邮件...
-2026-01-07 16:26:16,750 - INFO - 邮件发送成功: 2154335573@qq.com
-2026-01-07 16:26:16,825 - WARNING - 邮件发送失败，但打卡任务已完成
-2026-01-07 19:31:57,692 - INFO - 检查登录状态
-2026-01-07 19:31:57,693 - INFO - 检测到本地 token，跳过登录
-2026-01-07 19:31:57,693 - INFO - 用户数据：{'authType': 2, 'expiredTime': 2083393574000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10483118', 'msgConfig': {}, 'neteaseImId': 'ea2f4c263d204b5a924d4a12a1d9fdd1', 'nikeName': '雷家圆', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': 'c443e48b0d8c9f993442ce000e5dc448', 'studentNumber': '202301149', 'userName': '雷家圆'}, 'phone': '15681220905', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyODkyNjJ9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzOTM1NzQsIm5iZiI6MTc2Nzc3MzQ3NCwiaWF0IjoxNzY3Nzc0Mzc0fQ.isCAA1rG91RkkIv6B0mkd7WkcWZlZ35nvQEI1AOgkl0fWWkEpkaPf_gqjm2VXqyuxW9ZAdWB5M157jRQRXjYtA', 'userId': '108289262', 'userType': 'student'}
-2026-01-07 19:31:57,694 - INFO - 用户类型：student
-2026-01-07 19:31:57,694 - INFO - 检查打卡信息
-2026-01-07 19:31:57,695 - INFO - 检测到本地已有打卡信息 ，跳过获取打卡信息
-2026-01-07 19:31:57,695 - INFO - 执行签到打卡
-2026-01-07 19:31:57,933 - INFO - 今日[下班]卡已打，无需重复打卡
-2026-01-07 19:31:57,936 - INFO - {'title': '工学云签到任务通知', 'content': '今日[下班]卡已打，无需重复打卡'}
-2026-01-07 19:31:57,936 - INFO - 准备发送邮件，SMTP服务器: smtp.qq.com:465
-2026-01-07 19:31:57,937 - INFO - 正在连接到SMTP服务器 smtp.qq.com:465...
-2026-01-07 19:31:58,095 - INFO - SMTP_SSL服务器连接成功，正在登录用户 2154335573@qq.com...
-2026-01-07 19:31:58,359 - INFO - 登录成功，正在发送邮件...
-2026-01-07 19:31:58,865 - INFO - 邮件发送成功: 2154335573@qq.com
-2026-01-07 19:31:58,900 - WARNING - 邮件发送失败，但打卡任务已完成
-2026-01-08 10:39:38,660 - INFO - 检查登录状态
-2026-01-08 10:39:38,660 - INFO - 检测到用户信息不一致，执行重新登录
-2026-01-08 10:39:38,660 - INFO - 执行登录
-2026-01-08 10:39:38,693 - ERROR - 登录过程发生异常：'ApiService' object has no attribute 'pass_blockPuzzle_captcha'
-Traceback (most recent call last):
-  File "d:\disk\new\util\ApiService.py", line 145, in login
-    "captcha": self.pass_blockPuzzle_captcha(),
-AttributeError: 'ApiService' object has no attribute 'pass_blockPuzzle_captcha'
-2026-01-08 10:39:38,696 - WARNING - 登录失败
-2026-01-08 10:39:38,696 - WARNING - 登录失败
-2026-01-08 10:39:55,012 - INFO - 检查登录状态
-2026-01-08 10:39:55,012 - INFO - 检测到用户信息不一致，执行重新登录
-2026-01-08 10:39:55,012 - INFO - 执行登录
-2026-01-08 10:39:55,026 - ERROR - 登录过程发生异常：'ApiService' object has no attribute 'pass_blockPuzzle_captcha'
-Traceback (most recent call last):
-  File "d:\disk\new\util\ApiService.py", line 145, in login
-    "captcha": self.pass_blockPuzzle_captcha(),
-AttributeError: 'ApiService' object has no attribute 'pass_blockPuzzle_captcha'
-2026-01-08 10:39:55,027 - WARNING - 登录失败
-2026-01-08 10:39:55,027 - WARNING - 登录失败
+2026-01-08 21:20:03,611 - WARNING - 登录失败
+2026-01-08 21:20:03,611 - WARNING - 登录失败
+2026-01-08 21:21:39,805 - INFO - 当前时间 21:21，执行下班卡测试
+2026-01-08 21:21:39,805 - INFO - 检查登录状态
+2026-01-08 21:21:39,806 - INFO - 检测到本地 token，跳过登录
+2026-01-08 21:21:39,806 - INFO - 用户数据：{'authType': 2, 'expiredTime': 2083496807000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10417671', 'msgConfig': {}, 'neteaseImId': '9062490fa915410d8b1f6a6e5b53523c', 'nikeName': '刘香', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': '3a2088aaf0e03bf38351cc32948e34d1', 'studentNumber': '202301249', 'userName': '刘香'}, 'phone': '15808462201', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyMjY0NDF9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODM0OTY4MDcsIm5iZiI6MTc2Nzg3NjcwNywiaWF0IjoxNzY3ODc3NjA3fQ.QQnMYjnH3bVrLf8xmapEmiEPCpF9egNS_jc3R3ECvOGt5AaLelJJI0BZFzZNfuE7k7IVcQXNTQlsVcZ4Nh3esA', 'userId': '108226441', 'userType': 'student'}
+2026-01-08 21:21:39,806 - INFO - 用户类型：student
+2026-01-08 21:21:39,806 - INFO - 检查打卡信息
+2026-01-08 21:21:39,807 - INFO - 检测到本地已有打卡信息 ，跳过获取打卡信息
+2026-01-08 21:21:39,807 - INFO - 执行签到打卡
+2026-01-08 21:21:40,617 - INFO - 用户 刘* 开始 下班 打卡
+2026-01-08 21:21:40,617 - INFO - 打卡类型：END
+2026-01-08 21:21:41,390 - INFO - 打卡成功
+2026-01-08 21:21:41,390 - INFO - 下班卡测试结果：{'title': '工学云签到成功通知', 'content': '签到账号：15808462201\n签到地点：四川省 · 资阳市 · 乐至县 · 友谊路南段与川西环线交叉口东北300米'}
+2026-01-08 21:22:37,165 - INFO - 当前时间 21:22，执行下班卡测试
+2026-01-08 21:22:37,165 - INFO - 检查登录状态
+2026-01-08 21:22:37,166 - INFO - 检测到本地 token，跳过登录
+2026-01-08 21:22:37,166 - INFO - 用户数据：{'authType': 2, 'expiredTime': 2083496807000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10417671', 'msgConfig': {}, 'neteaseImId': '9062490fa915410d8b1f6a6e5b53523c', 'nikeName': '刘香', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': '3a2088aaf0e03bf38351cc32948e34d1', 'studentNumber': '202301249', 'userName': '刘香'}, 'phone': '15808462201', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyMjY0NDF9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODM0OTY4MDcsIm5iZiI6MTc2Nzg3NjcwNywiaWF0IjoxNzY3ODc3NjA3fQ.QQnMYjnH3bVrLf8xmapEmiEPCpF9egNS_jc3R3ECvOGt5AaLelJJI0BZFzZNfuE7k7IVcQXNTQlsVcZ4Nh3esA', 'userId': '108226441', 'userType': 'student'}
+2026-01-08 21:22:37,166 - INFO - 用户类型：student
+2026-01-08 21:22:37,166 - INFO - 检查打卡信息
+2026-01-08 21:22:37,167 - INFO - 检测到本地已有打卡信息 ，跳过获取打卡信息
+2026-01-08 21:22:37,167 - INFO - 执行签到打卡
+2026-01-08 21:22:39,088 - WARNING - Token失效，正在重新登录...
+2026-01-08 21:22:39,088 - INFO - 执行登录
+2026-01-08 21:22:40,015 - INFO - 滑块匹配成功，最大相似度: 0.18226853013038635
+2026-01-08 21:22:40,015 - INFO - 提取PNG宽度成功: 47
+2026-01-08 21:22:40,015 - INFO - 计算滑块距离成功: 246.0
+2026-01-08 21:22:40,016 - INFO - 验证码识别成功: {'x': 246.0, 'y': 5}
+2026-01-08 21:22:40,771 - INFO - 登录数据：{'phone': 'c2d932f42e0c4dea883a77b909c92e29', 'password': 'd9e73af3d1ef14f9fcd0a2f1fe609993', 'captcha': 'ebpKq5nR8ikRMRqmDYQZnq3+iYSNS0/3fwQ7LQFr1w/lS5xRsgBEuDh58Qcc7GG/CFCLUXAZk9luaMOeB31BJQ==', 'loginType': 'android', 'uuid': '2a2bd3c3ee9045dda20cf3f55ec44ec1', 'device': 'android', 'version': '5.16.0', 't': 'e72150f4a950b5c95fe8b808f2c2f040'}
+2026-01-08 21:22:41,538 - INFO - 登录结果：{'authType': 2, 'expiredTime': 2083497760000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10417671', 'msgConfig': {}, 'neteaseImId': '9062490fa915410d8b1f6a6e5b53523c', 'nikeName': '刘香', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': '3a2088aaf0e03bf38351cc32948e34d1', 'studentNumber': '202301249', 'userName': '刘香'}, 'phone': '15808462201', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyMjY0NDF9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODM0OTc3NjAsIm5iZiI6MTc2Nzg3NzY2MCwiaWF0IjoxNzY3ODc4NTYwfQ.4eEIOOLhst4DEQb0uHxgSu2FhGK2WDAWmzIFMqLxp-8lwkgIzQjkuANX3szL5MInHPmScwBNpdrr833GZsnPmQ', 'userId': '108226441', 'userType': 'student'}
+2026-01-08 21:22:41,540 - INFO - userInfo.json 已更新: D:\disk\GongXueYunAutoCheckIn_CodeVersion-master\GongXueYunAutoCheckIn_CodeVersion-master\user\userInfo.json
+2026-01-08 21:22:41,540 - INFO - 用户信息已保存到 UserInfoManager 管理的文件和缓存中
+2026-01-08 21:22:41,540 - INFO - 已更新 Authorization Token，重试请求
+2026-01-08 21:22:42,275 - INFO - 今日[下班]卡已打，无需重复打卡
+2026-01-08 21:22:42,275 - INFO - 下班卡测试结果：{'title': '工学云签到任务通知', 'content': '今日[下班]卡已打，无需重复打卡'}
+2026-01-08 21:22:43,190 - INFO - 邮件已成功发送到 2154335573@qq.com
+2026-01-08 21:22:43,233 - ERROR - SMTP响应异常：(-1, b'\x00\x00\x00')

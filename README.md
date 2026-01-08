@@ -1,457 +1,426 @@
-# 工学云自动打卡系统实现
+# GongXueYunAutoCheckIn-UI（工学云自动打卡脚本UI版本）
+
+GongXueYunAutoCheckIn 工学云自动打卡，采用新接口，更安全，支持多用户、自定义位置信息、保持登录状态、每日打卡检查、打卡位置浮动、消息推送，免服务器运行
+
+修改这个项目的初衷是因为我自己需要使用，23年写过一版，但是工学云服务接口更新了，新增了滑块验证，除了开发者预留测试接口，只能训练视觉模型去模拟我们滑动，去年没有使用需求就没管，今年需要用到，发现请求还新增了数据加密，找了好久终于在github上找到了这个项目，使用的新接口并且解决了滑块验证和数据加密的问题（膜拜大佬），因此重新修改这个项目。(
+原作者已停止维护)
+
+[//]: # (等到实习结束，这个项目也将会停止更新。天下没有不散的筵席，有缘再会。最后建议可以迁移到下面这个平台，价格算是全网最良心的了)
+原作者有开发更多功能，但是我只需要使用打卡功能，故而修改了项目，需要体验更多功能，例如带图打卡、周报月报等，请访问原作者连接
+
+原项目作者链接：https://github.com/Rockytkg/AutoMoGuDingCheckIn?tab=readme-ov-file
+
+改了两个版本：
+1.使用脚本运行，可以定时，异地打卡，但是电脑不能关机
+
+代码版本项目链接如下：https://gitee.com/polaris_lx/GongXueYunAutoCheckIn_CodeVersion
+
+2.使用UI界面使用，可以实现异地打卡，但是属于即时打卡，需要用户自己手动打卡
+
+UI版本项目链接如下：https://gitee.com/polaris_lx/GongXueYunAutoCheckIn_UIVersion
+
+
+---
 
 ## 项目概述
 
-工学云自动打卡系统是一个基于Python的自动化工具，用于自动完成工学云平台的每日打卡任务。该项目通过模拟真实用户操作，实现自动登录、获取计划信息、执行打卡以及发送邮件通知等功能。
+GongXueYunAutoCheckIn 旨在：
 
-`原作者项目地址`: https://gitee.com/gumeite-hardware-products_0/GongXueYunAutoCheckIn_CodeVersion
-在基础上增加了下班卡，工作流部署代码
-## 项目架构
-mainn.py是单次打卡的测试文件 gong_xue_yun.py是主程序入口（带定时功能）
-auto.py是GitHub Actions部署的主要文件
-### 主要目录结构
+- 自动化工学云应用中的签到过程。
 
-```
-.
-├── .github/workflows/  # GitHub Actions工作流配置
-│   └── auto-checkin.yml
-├── manager/           # 配置和数据管理模块
-│   ├── ConfigManager.py      # 系统配置管理
-│   ├── PlanInfoManager.py    # 计划信息管理
-│   └── UserInfoManager.py    # 用户信息管理
-├── step/              # 执行步骤模块
-│   ├── clockIn.py     # 打卡执行
-│   ├── fetchPlan.py   # 获取计划
-│   ├── login.py       # 登录
-│   └── sendEmail.py   # 发送邮件
-├── user/              # 用户数据存储
-│   ├── planInfo.json  # 计划信息文件
-│   └── userInfo.json  # 用户信息文件
-├── util/              # 工具模块
-│   ├── ApiService.py      # API服务接口
-│   ├── CaptchaUtils.py    # 验证码处理
-│   ├── CryptoUtils.py     # 加密解密工具
-│   ├── HelperFunctions.py # 辅助函数
-│   └── generate_send_config.py  # 生成SEND环境变量配置的脚本
-├── config.json        # 系统配置文件
-├── gong_xue_yun.py    # 主程序入口（带定时功能）
-├── main.py           # 主执行流程
-├── auto.py           # GitHub Actions部署的主要文件
-├── test_send_env.py  # 测试SEND环境变量的脚本
-├── SMTP_CONFIG.md    # SMTP配置详细说明
-└── README.md
-```
+---
 
-## 核心模块详解
+## 功能列表
 
-### 1. 配置管理模块 (manager/)
+- [x] 自动签到
+- [x] 消息推送功能
+- [x] 多用户支持
+- [X] 打卡位置浮动
 
-#### ConfigManager.py
-- 负责管理 [config.json](file:///d%3A/disk/GongXueYunAutoCheckIn_CodeVersion-master/GongXueYunAutoCheckIn_CodeVersion-master/config.json) 配置文件
-- 提供 [get](file:///d%3A/disk/GongXueYunAutoCheckIn_CodeVersion-master/GongXueYunAutoCheckIn_CodeVersion-master/manager/ConfigManager.py#L57-L72) 和 [set](file:///d%3A/disk/GongXueYunAutoCheckIn_CodeVersion-master/GongXueYunAutoCheckIn_CodeVersion-master/manager/ConfigManager.py#L74-L84) 方法访问任意层级的配置项
-- 支持嵌套键访问，如 `ConfigManager.get("clockIn", "location", "address")`
-- 缓存配置数据，避免重复读取文件
+---
 
-#### UserInfoManager.py
-- 管理用户信息，包括登录凭证、token等
-- 将用户数据存储在 [userInfo.json](file:///d%3A/disk/GongXueYunAutoCheckIn_CodeVersion-master/GongXueYunAutoCheckIn_CodeVersion-master/user/userInfo.json) 文件中
-- 提供对用户信息的缓存访问，支持嵌套键访问
+## 运行效果图
 
-#### PlanInfoManager.py
-- 管理实习计划信息，存储在 [planInfo.json](file:///d%3A/disk/GongXueYunAutoCheckIn_CodeVersion-master/GongXueYunAutoCheckIn_CodeVersion-master/user/planInfo.json) 文件中
-- 实现大小写不敏感的键访问，提高容错性
+<div>
+邮箱通知
+<br>
+<img src="image/邮箱通知.jpg" width="75%"  alt="邮箱通知效果"/>
+<img src="image/重复邮件内容.jpg" width="75%"  alt="邮箱通知效果"/>
+<img src="image/邮件列表.png" width="75%"  alt="邮箱通知效果"/>
 
-### 2. 执行步骤模块 (step/)
+运行日志截图
+<br>
+<img src="image/日志截图.png" width="75%"  alt="邮箱通知效果"/>
+</div>
 
-#### login.py
-- 实现登录流程，首先检查本地是否已有有效token
-- 如果本地token存在且用户信息一致，则跳过登录
-- 否则调用 [ApiService](file:///d%3A/disk/GongXueYunAutoCheckIn_CodeVersion-master/GongXueYunAutoCheckIn_CodeVersion-master/util/ApiService.py#L32-L435) 执行登录操作
-- 登录成功后将用户信息保存到 [userInfo.json](file:///d%3A/disk/GongXueYunAutoCheckIn_CodeVersion-master/GongXueYunAutoCheckIn_CodeVersion-master/user/userInfo.json)
+---
 
-#### fetchPlan.py
-- 获取用户的实习计划信息
-- 检查本地是否已有计划信息，如有则跳过获取
-- 调用 [ApiService.fetch_plan()](file:///d%3A/disk/GongXueYunAutoCheckIn_CodeVersion-master/GongXueYunAutoCheckIn_CodeVersion-master/util/ApiService.py#L322-L353) 获取计划并保存到 [planInfo.json](file:///d%3A/disk/GongXueYunAutoCheckIn_CodeVersion-master/GongXueYunAutoCheckIn_CodeVersion-master/user/planInfo.json)
+### 1. Github 工作流（免服务器部署）
 
-#### clockIn.py
-- 执行打卡操作的核心模块
-- 根据配置和时间判断打卡类型（上班/下班/节假日）
-- 避免重复打卡，检查当日是否已完成相应打卡
-- 调用 [ApiService.submit_clock_in()](file:///d%3A/disk/GongXueYunAutoCheckIn_CodeVersion-master/GongXueYunAutoCheckIn_CodeVersion-master/util/ApiService.py#L377-L434) 提交打卡信息
+参见 [Wiki](https://github.com/Rockytkg/AutoMoGuDingCheckIn/wiki/Github-%E5%B7%A5%E4%BD%9C%E6%B5%81%E9%83%A8%E7%BD%B2)
 
-#### sendEmail.py
-- 可选的邮件通知功能
-- 根据配置决定是否启用邮件通知
-- 发送打卡成功或失败的通知邮件
+**切记不要将配置文件上传到公开仓库，否则会造成信息泄露。请使用环境变量！！！，已经泄露请立刻修改工学云密码！！！**
 
-### 3. 工具模块 (util/)
+### 2. 本地运行
 
-#### ApiService.py
-- 项目的核心网络请求模块
-- 封装了与工学云服务器的所有API交互
-- 处理登录、获取计划、打卡等操作
-- 实现了自动处理滑块验证码和点选验证码的功能
-- 包含重试机制和Token失效处理
+#### 环境
 
-#### CaptchaUtils.py
-- 验证码识别工具
-- 实现滑块拼图验证码和点选文字验证码的自动识别
+- Python 3.10+
+- pip（Python 包管理器）
 
-#### CryptoUtils.py
-- 加解密工具
-- 实现AES加密解密和签名算法
-- 用于处理工学云API的加密需求
+#### 安装
 
-#### HelperFunctions.py
-- 提供辅助功能函数
-- 包括工作日判断、姓名脱敏、获取当前月份信息等
+1. 克隆代码库：
 
-## 核心功能实现
+   ```bash
+   git https://gitee.com/polaris_lx/GongXueYunAutoCheckIn_Code.git
+   cd GongXueYunAutoCheckIn_Code
+   ```
 
-### 1. 定时打卡机制
+2. 按照下面要求添加配置文件
+3. 执行（linux 系统，windows 需要自行配置计划任务程序）
 
-[gong_xue_yun.py](file:///d%3A/disk/GongXueYunAutoCheckIn_CodeVersion-master/GongXueYunAutoCheckIn_CodeVersion-master/gong_xue_yun.py) 文件实现了定时打卡功能：
+   ```bash
+   chmod +x setup.sh
+   bash setup.sh
+   ```
 
-- 支持三种打卡模式：[weekday](file:///d%3A/disk/GongXueYunAutoCheckIn_CodeVersion-master/GongXueYunAutoCheckIn_CodeVersion-master/util/HelperFunctions.py#L147-L147)（法定工作日）、[everyday](file:///d%3A/disk/GongXueYunAutoCheckIn_CodeVersion-master/GongXueYunAutoCheckIn_CodeVersion-master/util/HelperFunctions.py#L150-L150)（每天）、[customize](file:///d%3A/disk/GongXueYunAutoCheckIn_CodeVersion-master/GongXueYunAutoCheckIn_CodeVersion-master/util/HelperFunctions.py#L153-L153)（自定义）
-- 使用 [schedule](file:///d%3A/disk/GongXueYunAutoCheckIn_CodeVersion-master/GongXueYunAutoCheckIn_CodeVersion-master/main.py#L9-L9) 库进行任务调度
-- 每天生成随机打卡时间（在配置时间基础上增加随机分钟数）
+   按照脚本提示设置定时任务并执行
 
-### 2. 验证码处理
+#### 配置
 
-项目实现了对工学云平台验证码的自动处理：
+1. 在根目录，根据下表修改 config.json 文件中的配置（每个文件就是一个用户）
 
-- 滑块拼图验证码：通过图像识别技术定位滑块位置
-- 点选文字验证码：识别图片中的文字并返回坐标
+<!-- markdownlint-disable MD033 -->
+<table>
+    <tr>
+        <th>配置项</th>
+        <th>字段</th>
+        <th>说明</th>
+        <th>示例</th>
+    </tr>
+    <!-- 用户信息 -->
+    <tr>
+        <td rowspan="2">用户信息</td>
+        <td>phone</td>
+        <td>工学云登录手机号。</td>
+        <td>18800000000</td>
+    </tr>
+    <tr>
+        <td>password</td>
+        <td>工学云登录密码。</td>
+        <td>your_password</td>
+    </tr>
+    <!-- 打卡设置 -->
+    <tr>
+        <td rowspan="11">打卡设置</td>
+        <td>mode</td>
+        <td>打卡模式：<code>everyday</code> 每天；<code>customize</code> 自定义周几；<code>weekday</code> 法定工作日。</td>
+        <td>weekday</td>
+    </tr>
+    <tr>
+        <td>location.address</td>
+        <td>打卡地点详细地址。</td>
+        <td>四川省 · 成都市 · 高新区 · 在科创十一街附近</td>
+    </tr>
+    <tr>
+        <td>location.latitude</td>
+        <td>打卡纬度。</td>
+        <td>30.559922</td>
+    </tr>
+    <tr>
+        <td>location.longitude</td>
+        <td>打卡经度。</td>
+        <td>104.093023</td>
+    </tr>
+    <tr>
+        <td>location.province</td>
+        <td>省份。</td>
+        <td>四川省</td>
+    </tr>
+    <tr>
+        <td>location.city</td>
+        <td>城市。</td>
+        <td>成都市</td>
+    </tr>
+    <tr>
+        <td>location.area</td>
+        <td>区域。</td>
+        <td>高新区</td>
+    </tr>
+    <tr>
+        <td>holidaysClockIn</td>
+        <td>节假日是否也打卡。（ 打`休息/节假日`卡 ）</td>
+        <td>false</td>
+    </tr>
+    <tr>
+        <td>customDays</td>
+        <td>自定义周几打卡（1=周一，7=周日）。</td>
+        <td>[1,2,3,4,5]</td>
+    </tr>
+    <tr>
+        <td>time.start</td>
+        <td>固定打卡时间（小时:分钟）</td>
+        <td>08:45</td>
+    </tr>
+    <tr>
+        <td>time.float</td>
+        <td>浮动范围（分钟）。</td>
+        <td>10</td>
+    </tr>
+    <!-- SMTP 推送 -->
+    <tr>
+        <td rowspan="7">SMTP 推送通知</td>
+        <td>enable</td>
+        <td>是否启用邮件推送。</td>
+        <td>true</td>
+    </tr>
+    <tr>
+        <td>host</td>
+        <td>SMTP 邮件服务器地址。</td>
+        <td>smtp.163.com</td>
+    </tr>
+    <tr>
+        <td>port</td>
+        <td>SMTP 端口，通常 465。</td>
+        <td>465</td>
+    </tr>
+    <tr>
+        <td>username</td>
+        <td>发件邮箱账号。</td>
+        <td>sender@163.com</td>
+    </tr>
+    <tr>
+        <td>password</td>
+        <td>SMTP 授权码或密码。</td>
+        <td>smtp_password</td>
+    </tr>
+    <tr>
+        <td>from/to</td>
+        <td>发件人名称</td>
+        <td>极星科技研发部助理机器人零号</td>
+    </tr>
+    <tr>
+        <td>from/to</td>
+        <td>收件人列表</td>
+        <td>["1880000000@163.com","18800000000@qq.com"]</td>
+    </tr>
+    <!-- 设备信息 -->
+    <tr>
+        <td rowspan="1">设备信息</td>
+        <td>device</td>
+        <td>设备信息</td>
+        <td>{brand: Xiaomi 17Pro, systemVersion: 16, Platform: Android, isPhysicalDevice: true, incremental: 25098PN5AC}</td>
+</table>
 
-### 3. 加密机制
-
-项目使用了复杂的加密机制来模拟真实用户请求：
-
-- AES加密用于处理密码、请求参数等
-- 签名算法确保请求的合法性
-
-### 4. 防检测机制
-
-- 随机打卡时间，避免在固定时间点打卡
-- 模拟真实用户设备信息
-- 智能处理验证码，确保请求的合法性
-
-## 配置说明
-
-[config.json](file:///d%3A/disk/GongXueYunAutoCheckIn_CodeVersion-master/GongXueYunAutoCheckIn_CodeVersion-master/config.json) 文件包含以下配置项：
-
-1. **用户信息**：手机号和密码
-2. **打卡设置**：
-   - 打卡模式（工作日/每天/自定义）
-   - 打卡位置信息（经纬度、地址等）
-   - 打卡时间设置
-3. **邮件通知**：SMTP服务器配置
-4. **设备信息**：模拟设备信息
-
-## 运行流程
-
-1. 检查是否需要在当天执行任务
-2. 生成随机打卡时间
-3. 执行 [main.py](file:///d%3A/disk/GongXueYunAutoCheckIn_CodeVersion-master/GongXueYunAutoCheckIn_CodeVersion-master/main.py) 中的 [execute_tasks()](file:///d%3A/disk/GongXueYunAutoCheckIn_CodeVersion-master/GongXueYunAutoCheckIn_CodeVersion-master/main.py#L27-L48) 函数
-4. 依次执行登录、获取计划、打卡、发送邮件等步骤
-5. 记录操作日志
-6. 验证成功后运行gong_xue_yun.py,设置定时任务
-
-
-## 在GitHub Actions上部署
-
-要在GitHub Actions上自动运行打卡任务，需要配置以下环境变量作为GitHub Secrets：
-
-### 用户配置方式
-
-您可以选择以下三种配置方式之一：
-
-#### 1. 单用户配置
-添加以下环境变量：
-- `GX_USER_PHONE` - 工学云账号手机号
-- `GX_USER_PASSWORD` - 工学云账号密码
-
-#### 2. 多用户配置
-添加以下环境变量（多个用户用逗号分隔）：
-- `GX_USER_PHONES` - 多用户手机号列表（逗号分隔）
-- `GX_USER_PASSWORDS` - 多用户密码列表（逗号分隔）
-
-#### 3. JSON格式配置（推荐）
-添加以下环境变量：
-- `USER` - 完整的JSON格式配置（支持单用户和多用户）
-
-JSON格式示例：
-
-**单用户配置**：
-```json
-{
-  "config": {
-    "user": {
-      "phone": "工学云手机号",
-      "password": "工学云密码"
-    },
-    "clockIn": {
-      "mode": "daily",
-      "location": {
-        "address": "打卡地址",
-        "latitude": "纬度",
-        "longitude": "经度",
-        "province": "省份",
-        "city": "城市",
-        "area": "区域"
-      },
-      "customDays": [1, 3, 5]
-    },
-    "smtp": {
-      "enable": true,
-      "host": "smtp.qq.com",
-      "port": 465,
-      "username": "your_email@qq.com",
-      "password": "your_password",
-      "from": "gongxueyun",
-      "to": ["your_email@qq.com"]
-    }
-  }
-}
-```
-
-### SMTP邮件通知配置
-
-系统支持两种方式配置SMTP邮件通知：
-
-#### 方式一：使用SEND环境变量（推荐）
-
-在GitHub仓库的Settings > Secrets and variables > Actions中添加SEND环境变量，值为以下格式的JSON：
+##### 示例 JSON 配置
 
 ```json
 {
-  "smtp": {
-    "enable": true,
-    "host": "smtp.qq.com",
-    "port": 465,
-    "username": "your_email@qq.com",
-    "password": "your_password",
-    "from": "gongxueyun",
-    "to": ["your_email@qq.com"]
-  }
-}
-```
-
-#### 方式二：使用单独的SMTP环境变量
-
-在GitHub仓库的Settings > Secrets and variables > Actions中添加以下环境变量：
-
-- `GX_SMTP_ENABLE`: 是否启用SMTP（true/false）
-- `GX_SMTP_HOST`: SMTP服务器地址（如：smtp.qq.com）
-- `GX_SMTP_PORT`: SMTP服务器端口（如：465）
-- `GX_SMTP_USERNAME`: SMTP用户名（邮箱地址）
-- `GX_SMTP_PASSWORD`: SMTP密码（QQ邮箱使用授权码）
-- `GX_SMTP_FROM`: 发件人名称（如：gongxueyun）
-- `GX_SMTP_TO`: 收件人邮箱地址（多个地址用逗号分隔）
-
-### 位置信息配置
-
-添加以下环境变量（可选）：
-- `GX_LOCATION_ADDRESS`: 打卡地址
-- `GX_LOCATION_LATITUDE`: 纬度
-- `GX_LOCATION_LONGITUDE`: 经度
-- `GX_LOCATION_PROVINCE`: 省份
-- `GX_LOCATION_CITY`: 城市
-- `GX_LOCATION_AREA`: 区域
-
-### 其他配置
-
-添加以下环境变量（可选）：
-- `GX_CLOCKIN_MODE`: 打卡模式（everyday/weekday/customize）
-- `GX_HOLIDAYS_CLOCKIN`: 节假日是否打卡（true/false）
-- `GX_TIME_START`: 上班打卡时间（默认：8:30）
-- `GX_TIME_END`: 下班打卡时间（默认：18:00）
-- `GX_TIME_FLOAT`: 打卡时间浮动（分钟，默认：1）
-- `GX_CUSTOM_DAYS`: 自定义打卡日（逗号分隔，如：1,2,3,4,5）
-- `GX_DEVICE_INFO`: 设备信息
-
-## 故障排除
-
-如果系统日志显示"环境变量 SEND 未设置"，请检查：
-
-1. 确保已在GitHub仓库的Settings > Secrets and variables > Actions中添加了SEND环境变量
-2. 确保SEND环境变量的值是有效的JSON格式
-3. 确保JSON中包含了所有必需的字段：enable, host, port, username, password, from, to
-
-可以使用提供的测试脚本验证配置：
-
-```bash
-python test_send_env.py
-```
-
-也可以使用配置生成器创建正确的SEND环境变量：
-
-```bash
-python util/generate_send_config.py
-```
-
-更多详细信息请参考 [SMTP_CONFIG.md](SMTP_CONFIG.md) 文件。
-      "host": "smtp服务地址",
-      "port": 465,
-      "username": "发件人邮箱",
-      "password": "smtp密码",
-      "from": "发件人名称",
-      "to": ["收件人邮箱"]
-    }
-  }
-}
-```
-
-**多用户配置**：
-```json
-[
-  {
-    "config": {
+   "config": {
       "user": {
-        "phone": "工学云手机号1",
-        "password": "工学云密码1"
+         "phone": "18800000000",
+         "password": "123456"
       },
       "clockIn": {
-        "mode": "daily",
-        "location": {
-          "address": "打卡地址1",
-          "latitude": "纬度1",
-          "longitude": "经度1",
-          "province": "省份1",
-          "city": "城市1",
-          "area": "区域1"
-        },
-        "customDays": [1, 3, 5]
+         "mode": "weekday",
+         "location": {
+            "address": "四川省 · 成都市 · 高新区 · 在科创十一街附近",
+            "latitude": "30.559922",
+            "longitude": "104.093023",
+            "province": "四川省",
+            "city": "成都市",
+            "area": "高新区"
+         },
+         "holidaysClockIn": false,
+         "customDays": [
+            1,
+            2,
+            3,
+            4,
+            5
+         ],
+         "time": {
+            "start": "08:45",
+            "float": 10
+         }
       },
       "smtp": {
-        "enable": true,
-        "host": "smtp服务地址",
-        "port": 465,
-        "username": "发件人邮箱",
-        "password": "smtp密码",
-        "from": "发件人名称",
-        "to": ["收件人邮箱"]
-      }
-    }
-  },
-  {
-    "config": {
-      "user": {
-        "phone": "工学云手机号2",
-        "password": "工学云密码2"
+         "enable": true,
+         "host": "smtp.163.com",
+         "port": 465,
+         "username": "发件人邮箱",
+         "password": "smtp密码",
+         "from": "极星科技研发部助理机器人零号",
+         "to": [
+            "1880000000@163.com",
+            "18800000000@qq.com"
+         ]
       },
-      "clockIn": {
-        "mode": "daily",
-        "location": {
-          "address": "打卡地址2",
-          "latitude": "纬度2",
-          "longitude": "经度2",
-          "province": "省份2",
-          "city": "城市2",
-          "area": "区域2"
-        },
-        "customDays": [2, 4]
-      },
-      "smtp": {
-        "enable": true,
-        "host": "smtp服务地址",
-        "port": 465,
-        "username": "发件人邮箱",
-        "password": "smtp密码",
-        "from": "发件人名称",
-        "to": ["收件人邮箱"]
-      }
-    }
-  }
-]
+      "device": "{brand: Xiaomi 17Pro, systemVersion: 16, Platform: Android, isPhysicalDevice: true, incremental: 25098PN5AC}"
+   }
+}
 ```
 
-### 完整环境变量列表
+##### 消息推送
 
-| 环境变量 | 描述 | 示例值 |
-|---------|------|--------|
-| **用户认证信息** | | |
-| `GX_USER_PHONE` | 工学云账号手机号（单用户） | 13800138000 |
-| `GX_USER_PASSWORD` | 工学云账号密码（单用户） | yourpassword |
-| `GX_USER_PHONES` | 多用户手机号列表（逗号分隔） | 13800138000,13900139000 |
-| `GX_USER_PASSWORDS` | 多用户密码列表（逗号分隔） | password1,password2 |
-| **打卡位置信息** | | |
-| `GX_LOCATION_ADDRESS` | 打卡地址 | 四川省 · 资阳市 · 乐至县 · 友谊路南段与川西环线交叉口东北300米 |
-| `GX_LOCATION_LATITUDE` | 纬度 | 30.428727249834488 |
-| `GX_LOCATION_LONGITUDE` | 经度 | 104.90286311986283 |
-| `GX_LOCATION_PROVINCE` | 省份 | 四川省 |
-| `GX_LOCATION_CITY` | 城市 | 资阳市 |
-| `GX_LOCATION_AREA` | 区域 | 乐至县 |
-| **打卡设置** | | |
-| `GX_CLOCKIN_MODE` | 打卡模式 | weekday/everyday/customize |
-| `GX_HOLIDAYS_CLOCKIN` | 节假日是否打卡 | true/false |
-| `GX_TIME_START` | 上班打卡时间 | 08:30 |
-| `GX_TIME_END` | 下班打卡时间 | 18:00 |
-| `GX_TIME_FLOAT` | 时间浮动范围（分钟） | 1 |
-| **邮件通知设置**（可选） | | |
-| `GX_SMTP_ENABLE` | 是否启用邮件通知 | true/false |
-| `GX_SMTP_HOST` | SMTP服务器地址 | smtp.qq.com |
-| `GX_SMTP_PORT` | SMTP端口 | 465 |
-| `GX_SMTP_USERNAME` | SMTP用户名 | youremail@example.com |
-| `GX_SMTP_PASSWORD` | SMTP密码 | yourpassword |
-| `GX_SMTP_FROM` | 发件人名称 | gongxueyun |
-| `GX_SMTP_TO` | 收件人列表 | 2154335573@qq.com |
-| **JSON格式SMTP配置**（可选） | | |
-| `SEND` | JSON格式的SMTP配置 | 参见下方示例 |
+支持：
 
-#### SEND环境变量JSON格式示例：
+- SMTP
+
+#### 手动运行
+
+```bash
+python gong_xue_yun.py
+```
+
+## 🆕 功能使用指南
+
+项目新增了两个重要功能，让您的使用体验更加便捷和智能。
+
+### 1. 智能日志管理 📝
+
+程序可以更好地追踪操作记录，让您清楚地知道执行情况。
+
+#### 💡 这对您意味着什么？
+
+- **清晰标识**：每个用户的日志都有专属标签，再也不用担心多个账号混淆
+- **问题追踪**：出现问题时，可以快速定位是哪个账号出了状况
+- **执行状态**：实时了解每个账号的打卡、报告提交状态
+
+#### 📋 日志示例
+
+当您运行程序时，会看到类似这样的日志：
+
+```
+2025-12-14 02:17:57,222 - INFO - ════════════════  自动打卡功能启动  ════════════════
+2025-12-14 02:17:57,223 - INFO - 打卡模式为【每天】
+
+2025-12-14 02:17:57,223 - INFO - 当前时间：02:17
+2025-12-14 02:18:57,229 - INFO - 当前时间：02:18
+2025-12-14 02:19:57,235 - INFO - 当前时间：02:19
+2025-12-14 02:20:57,242 - INFO - 当前时间：02:20
+```
+
+
+### 2. 自动定时执行 ⏰
+
+**重磅功能！** 不用每天手动运行打卡程序
+
+#### 🎯 功能亮点
+
+- **全自动运行**：设置好后完全无需人工干预
+- **智能时间**：每天自动在上班和下班时间执行打卡
+- **防检测设计**：每次执行时间都有随机偏移，避免被系统识别为机器操作
+- **稳定可靠**：支持长期运行，自动处理日期变更
+
+#### 📊 运行效果
+
+启动后，您会看到这样的提示：
+
+```
+2025-12-14 02:17:57,222 - INFO - ════════════════  自动打卡功能启动  ════════════════
+2025-12-14 02:17:57,223 - INFO - 打卡模式为【每天】
+
+2025-12-14 02:17:57,223 - INFO - 当前时间：02:17
+2025-12-14 02:18:57,229 - INFO - 当前时间：02:18
+2025-12-14 02:19:57,235 - INFO - 当前时间：02:19
+2025-12-14 02:20:57,242 - INFO - 当前时间：02:20
+2025-12-14 02:20:57,253 - INFO - 
+-------------今日计划打卡时间: 02:30-------------
+
+2025-12-14 02:21:57,255 - INFO - 当前时间：02:21
+2025-12-14 02:22:57,262 - INFO - 当前时间：02:22
+```
+
+这表示：
+
+- 今天上午会在 9:07 执行打卡（原定 02:25 + 5分钟随机偏移）
+
+### 3. 自定义执行时间 ⚙️
+
+默认的执行时间是上午8:00，但您可以根据自己的需求轻松修改。
+
+#### 🛠️ 快速修改教程
+
+**步骤1：打开配置文件**
+
+使用任意文本编辑器（如记事本、VS Code）打开 `config.json` 文件。
+
+**步骤2：找到配置区域**
+
+在文件中找到这几行：
+
 ```json
 {
-  "smtp": {
-    "enable": true,
-    "host": "smtp.qq.com",
-    "port": 465,
-    "username": "your-email@qq.com",
-    "password": "your-smtp-password",
-    "from": "gongxueyun",
-    "to": ["recipient@example.com"]
+  "time": {
+    "start": "08:45",
+    "float": 10
   }
 }
 ```
-| **设备信息** | | |
-| `GX_DEVICE_INFO` | 模拟设备信息 | {brand: phone, systemVersion: 16, Platform: Android, isPhysicalDevice: true, incremental: V2352A} |
-### 配置步骤：
 
-1. 登录GitHub仓库
-2. 进入 **Settings** -> **Secrets and variables** -> **Actions**
-3. 点击 **New repository secret** 添加环境变量
-4. 根据您的需求选择配置方式：
-   - **单用户配置**：添加 `GX_USER_PHONE` 和 `GX_USER_PASSWORD`
-   - **多用户配置**：添加 `GX_USER_PHONES` 和 `GX_USER_PASSWORDS`（多个用户用逗号分隔）
-   - **JSON格式配置（推荐）**：添加 `USER` 环境变量，值为完整的JSON配置
-5. 根据需要添加其他可选环境变量（位置信息、邮件通知等）
-   - 对于邮件通知，可以选择使用单独的SMTP环境变量或使用 `SEND` 环境变量提供JSON格式的SMTP配置
-6. 提交并推送修改后的`.github/workflows/auto-checkin.yml`文件到仓库
+#### ⚠️ 重要提醒
 
-### 注意事项：
+- **时间格式**：必须使用 24小时制，格式为 "HH:MM"
+- **合理时间**：选择符合常理的上下班时间
+- **适度偏移**：建议保持 3-10 分钟的随机偏移
+- **测试验证**：修改后先观察一天，确认时间合适
 
-- 配置文件不会被提交到仓库，所有敏感信息都通过GitHub Secrets管理
-- 定时任务在北京时间8:30和18:00执行，可在工作流文件中修改
-- GitHub Actions运行在UTC时间，配置中的cron表达式已考虑时区转换
-- 多用户配置时，确保手机号和密码的顺序一致，且数量相同
-- 如果同时配置了单用户和多用户环境变量，系统将优先使用多用户配置
-## 安全性考虑
+### 4. 实用操作技巧 💡
 
-- 用户密码使用AES加密存储
-- 请求参数加密处理
-- 自动处理各种验证机制
-- 本地存储敏感信息，避免泄露
+#### 🖥️ Windows 用户：后台运行
 
-## 扩展性
+想让程序在后台悄悄运行，不影响您使用电脑？
 
-- 模块化设计，易于扩展功能
-- 配置化管理，灵活调整参数
-- 日志记录完整，便于调试
+```powershell
+# 隐藏窗口运行，完全后台执行
+Start-Process python -ArgumentList "gong_xue_yun.py" -WindowStyle Hidden
+```
 
-有问题需要讨论
+#### ⏹️ 停止自动执行
 
+需要暂停自动打卡时，只需按 `Ctrl + C` 即可安全退出。
 
-| 交流讨论 | 赞赏 |
-|-------|-------|
-| <img src="/image/1.png" width="200" alt="alt text"> | <img src="/image/2.jpg" width="200" alt="alt text"> |
+#### 📱 配合消息推送
+
+建议开启消息推送功能，这样即使程序在后台运行，您也能及时收到打卡成功的通知。
+
+### 5. 常见使用问题 ❓
+
+#### 问：自动定时器启动失败怎么办？
+
+**答：** 请先确认：
+
+1. 手动运行 `python main.py` 是否正常
+2. 配置文件是否正确设置
+3. Python 环境是否安装完整
+
+#### 问：时间不准确怎么办？
+
+**答：** 检查您的电脑系统时间是否正确，程序会基于系统时间执行。
+
+#### 问：程序会一直运行吗？
+
+**答：** 是的，一旦启动定时器，程序会持续运行，每天自动执行打卡任务，直到您手动停止。
+
+### 6. 升级使用建议 ⬆️
+
+#### 🔄 从手动到自动
+
+如果您之前一直手动运行 `python main.py`：
+
+1. **先测试**：运行一次 `python gong_xue_yun.py` 确认正常
+2. **观察一天**：让程序自动运行一天，确认执行时间合适
+3. **放心使用**：确认无误后就可以完全依赖自动执行了
+
+#### ✅ 兼容性保证
+
+- 所有现有配置继续有效，无需修改
+- 仍然可以随时手动运行 `python main.py`
+- 自动定时功能是额外增加的，不影响原有使用方式
+
+---
+
+💡 **温馨提示**：建议初次使用时先观察几天，确认执行时间和效果符合预期后再长期使用。有任何问题都可以随时停止并手动执行。
+

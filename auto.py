@@ -1,406 +1,209 @@
-import json
-import os
-import logging
-import sys
-from datetime import datetime
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+工学云自动签到脚本
+支持多用户配置，可在GitHub Actions上运行
+"""
 
-from manager.ConfigManager import ConfigManager
+import json
+import logging
+import os
+import sys
+import tempfile
+from datetime import datetime
+from pathlib import Path
+# 在文件顶部的导入部分添加
+import yaml
+# 导入现有模块
+from manager.ConfigManager import ConfigManager, CONFIG_PATH as ORIGINAL_CONFIG_PATH
+from manager.UserInfoManager import UserInfoManager, USER_INFO_PATH as ORIGINAL_USER_INFO_PATH
+from manager.PlanInfoManager import PlanInfoManager, PLAN_INFO_PATH as ORIGINAL_PLAN_INFO_PATH
 from step.clockIn import clock_in
 from step.fetchPlan import fetch_plan
 from step.login import login
-from manager.UserInfoManager import UserInfoManager
 from step.sendEmail import send_email
+from util.HelperFunctions import get_checkin_type
 
+# ======================
 # 日志配置
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+# ======================
+def setup_logging():
+    """设置日志配置"""
+    log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "auto.log")
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(log_file, encoding='utf-8'),  # 写入日志文件
+            logging.StreamHandler(sys.stdout)  # 控制台输出
+        ]
+    )
 
-def safe_get_env_var(var_name, default_value=""):
-    """安全获取环境变量，带有错误处理和日志记录"""
-    try:
-        value = os.getenv(var_name, default_value)
-        if value is None or value == "":
-            if var_name in ["GX_USER"]:
-                logging.error(f"关键环境变量 {var_name} 未设置或为空")
-                logging.error(f"请在GitHub仓库的Settings > Secrets and variables > Actions中添加 {var_name}")
-            elif var_name == "SEND":
-                logging.error(f"SMTP配置环境变量 {var_name} 未设置或为空")
-                logging.error(f"请在GitHub仓库的Settings > Secrets and variables > Actions中添加 {var_name}")
-                logging.error(f"SEND环境变量应包含以下格式的JSON:")
-                logging.error('{ "smtp": { "enable": true, "host": "smtp.qq.com", "port": 465, "username": "your_email@qq.com", "password": "your_password", "from": "gongxueyun", "to": ["your_email@qq.com"] } }')
-            else:
-                logging.warning(f"环境变量 {var_name} 未设置，使用默认值: {default_value}")
-            return default_value
-        return value
-    except Exception as e:
-        logging.error(f"获取环境变量 {var_name} 时出错: {str(e)}")
-        return default_value
-
-def create_config_from_env():
-    """从环境变量创建配置文件"""
-    try:
-        # 尝试从GX_USER环境变量获取JSON格式的配置
-        user_json_str = safe_get_env_var("GX_USER")
-        
-        # 尝试从SEND环境变量获取SMTP配置
-        logging.info("正在检查SEND环境变量...")
-        send_json_str = safe_get_env_var("SEND")
-        if send_json_str and send_json_str.strip():
-            logging.info(f"SEND环境变量已设置，内容长度: {len(send_json_str)} 字符")
-            logging.info(f"SEND环境变量前100个字符: {send_json_str[:100]}")
-        else:
-            logging.warning("SEND环境变量未设置或为空")
-        
-        # 解析SMTP配置
-        smtp_config = None
-        if send_json_str and send_json_str.strip():
-            try:
-                smtp_config = json.loads(send_json_str)
-                logging.info("已从SEND环境变量获取SMTP配置")
-                logging.info(f"SMTP配置: {json.dumps(smtp_config, ensure_ascii=False)}")
-                
-                # 检查SEND环境变量的格式
-                # 格式1: {"smtp": {...}}
-                # 格式2: 直接是SMTP配置对象 {...}
-                if "smtp" in smtp_config:
-                    smtp_config = smtp_config["smtp"]
-                    logging.info("检测到SEND环境变量为格式1: {\"smtp\": {...}}")
-                else:
-                    logging.info("检测到SEND环境变量为格式2: 直接SMTP配置对象")
-                
-                # 验证必需字段
-                required_fields = ["enable", "host", "port", "username", "password", "from", "to"]
-                for field in required_fields:
-                    if field not in smtp_config:
-                        logging.error(f"SMTP配置中缺少必需字段: {field}")
-                        raise ValueError(f"SMTP配置中缺少必需字段: {field}")
-                
-                logging.info("SMTP配置验证通过")
-                logging.info(f"SMTP配置详情:")
-                logging.info(f"  启用状态: {smtp_config.get('enable')}")
-                logging.info(f"  服务器: {smtp_config.get('host')}:{smtp_config.get('port')}")
-                logging.info(f"  用户名: {smtp_config.get('username')}")
-                logging.info(f"  发件人: {smtp_config.get('from')}")
-                logging.info(f"  收件人: {smtp_config.get('to')}")
-                logging.info(f"  密码已设置: {'是' if smtp_config.get('password') else '否'}")
-            except json.JSONDecodeError as e:
-                logging.error(f"SEND环境变量JSON格式错误: {str(e)}")
-                logging.error(f"SEND环境变量内容: {send_json_str}")
-                logging.error("请检查SEND环境变量是否为有效的JSON格式")
-                raise ValueError(f"SEND环境变量不是有效的JSON格式: {str(e)}")
-            except ValueError as e:
-                # 重新抛出我们自己的验证错误
-                raise e
-            except Exception as e:
-                logging.error(f"解析SEND环境变量时出错: {str(e)}")
-                raise ValueError(f"解析SEND环境变量时出错: {str(e)}")
-        
-        # 检查GX_USER环境变量是否存在
-        if not user_json_str or not user_json_str.strip():
-            logging.error("未找到有效的用户配置")
-            logging.error("请设置以下环境变量：")
-            logging.error("1. JSON格式用户配置：USER (包含JSON格式的用户信息)")
-            logging.error("2. JSON格式SMTP配置：SEND (可选，用于邮件通知)")
-            logging.error("请在GitHub仓库的Settings > Secrets and variables > Actions中添加这些环境变量")
-            raise ValueError("未找到有效的用户配置")
-        
-        # 解析GX_USER环境变量
+def load_users_config():
+    """从环境变量或配置文件加载用户配置"""
+    # 尝试从环境变量获取用户配置
+    users_json = os.environ.get('USERS', None)
+    
+    if users_json:
         try:
-            # 解析JSON字符串
-            user_configs = json.loads(user_json_str)
-            
-            # 处理三种JSON格式：
-            # 1. 完整配置格式：{"config": {...}}
-            # 2. 用户配置格式：{"phone": "...", "password": "..."}
-            # 3. 多用户配置格式：[{"config": {...}}, {"config": {...}}]
-            
-            configs = []
-            
-            # 如果是单个完整配置格式（包含config字段），直接使用
-            if isinstance(user_configs, dict) and "config" in user_configs:
-                configs = [user_configs]
-            # 如果是单个用户配置（字典格式，不包含config字段），转换为完整配置
-            elif isinstance(user_configs, dict):
-                if not isinstance(user_configs, dict):
-                    raise ValueError("GX_USER环境变量中的每个用户配置必须是JSON对象")
-                
-                # 验证必需字段
-                if "phone" not in user_configs or "password" not in user_configs:
-                    raise ValueError("每个用户配置必须包含phone和password字段")
-                
-                # 创建完整配置
-                config = {
-                    "config": {
-                        "user": {
-                            "phone": user_configs["phone"],
-                            "password": user_configs["password"]
-                        },
-                        "clockIn": {
-                            "mode": user_configs.get("mode", safe_get_env_var("GX_CLOCKIN_MODE", "everyday")),
-                            "location": {
-                                "address": user_configs.get("address", safe_get_env_var("GX_LOCATION_ADDRESS")),
-                                "latitude": user_configs.get("latitude", safe_get_env_var("GX_LOCATION_LATITUDE")),
-                                "longitude": user_configs.get("longitude", safe_get_env_var("GX_LOCATION_LONGITUDE")),
-                                "province": user_configs.get("province", safe_get_env_var("GX_LOCATION_PROVINCE")),
-                                "city": user_configs.get("city", safe_get_env_var("GX_LOCATION_CITY")),
-                                "area": user_configs.get("area", safe_get_env_var("GX_LOCATION_AREA"))
-                            },
-                            "holidaysClockIn": user_configs.get("holidaysClockIn", safe_get_env_var("GX_HOLIDAYS_CLOCKIN", "false").lower() == "true"),
-                            "customDays": user_configs.get("customDays", [int(day) for day in safe_get_env_var("GX_CUSTOM_DAYS", "1,2,3,4,5").split(",")] if safe_get_env_var("GX_CUSTOM_DAYS") else []),
-                            "time": {
-                                "start": user_configs.get("startTime", safe_get_env_var("GX_TIME_START", "8:30")),
-                                "end": user_configs.get("endTime", safe_get_env_var("GX_TIME_END", "18:00")),
-                                "float": user_configs.get("timeFloat", int(safe_get_env_var("GX_TIME_FLOAT", "1")))
-                            }
-                        },
-                        # 如果用户配置中包含smtp字段，直接使用；否则使用SEND环境变量或默认配置
-                        "smtp": user_configs.get("smtp", {
-                            "enable": smtp_config.get("enable", user_configs.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true")) if smtp_config else user_configs.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true"),
-                            "host": smtp_config.get("host", user_configs.get("smtpHost", safe_get_env_var("GX_SMTP_HOST"))) if smtp_config else user_configs.get("smtpHost", safe_get_env_var("GX_SMTP_HOST")),
-                            "port": smtp_config.get("port", user_configs.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465")))) if smtp_config else user_configs.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465"))),
-                            "username": smtp_config.get("username", user_configs.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME"))) if smtp_config else user_configs.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME")),
-                            "password": smtp_config.get("password", user_configs.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD"))) if smtp_config else user_configs.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD")),
-                            "from": smtp_config.get("from", user_configs.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun"))) if smtp_config else user_configs.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun")),
-                            "to": smtp_config.get("to", user_configs.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])) if smtp_config else user_configs.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])
-                        }),
-                        "device": user_configs.get("device", safe_get_env_var("GX_DEVICE_INFO", "{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}"))
-                    }
-                }
-                configs = [config]
-            # 如果是列表格式，检查每个元素
-            elif isinstance(user_configs, list):
-                for item in user_configs:
-                    # 如果是完整配置格式（包含config字段），直接使用
-                    if isinstance(item, dict) and "config" in item:
-                        configs.append(item)
-                    # 如果是用户配置格式（不包含config字段），转换为完整配置
-                    elif isinstance(item, dict):
-                        # 验证必需字段
-                        if "phone" not in item or "password" not in item:
-                            raise ValueError("每个用户配置必须包含phone和password字段")
-                        
-                        # 创建完整配置
-                        config = {
-                            "config": {
-                                "user": {
-                                    "phone": item["phone"],
-                                    "password": item["password"]
-                                },
-                                "clockIn": {
-                                    "mode": item.get("mode", safe_get_env_var("GX_CLOCKIN_MODE", "everyday")),
-                                    "location": {
-                                        "address": item.get("address", safe_get_env_var("GX_LOCATION_ADDRESS")),
-                                        "latitude": item.get("latitude", safe_get_env_var("GX_LOCATION_LATITUDE")),
-                                        "longitude": item.get("longitude", safe_get_env_var("GX_LOCATION_LONGITUDE")),
-                                        "province": item.get("province", safe_get_env_var("GX_LOCATION_PROVINCE")),
-                                        "city": item.get("city", safe_get_env_var("GX_LOCATION_CITY")),
-                                        "area": item.get("area", safe_get_env_var("GX_LOCATION_AREA"))
-                                    },
-                                    "holidaysClockIn": item.get("holidaysClockIn", safe_get_env_var("GX_HOLIDAYS_CLOCKIN", "false").lower() == "true"),
-                                    "customDays": item.get("customDays", [int(day) for day in safe_get_env_var("GX_CUSTOM_DAYS", "1,2,3,4,5").split(",")] if safe_get_env_var("GX_CUSTOM_DAYS") else []),
-                                    "time": {
-                                        "start": item.get("startTime", safe_get_env_var("GX_TIME_START", "8:30")),
-                                        "end": item.get("endTime", safe_get_env_var("GX_TIME_END", "18:00")),
-                                        "float": item.get("timeFloat", int(safe_get_env_var("GX_TIME_FLOAT", "1")))
-                                    }
-                                },
-                                # 如果用户配置中包含smtp字段，直接使用；否则使用SEND环境变量或默认配置
-                                "smtp": item.get("smtp", {
-                                    "enable": smtp_config.get("enable", item.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true")) if smtp_config else item.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true"),
-                                    "host": smtp_config.get("host", item.get("smtpHost", safe_get_env_var("GX_SMTP_HOST"))) if smtp_config else item.get("smtpHost", safe_get_env_var("GX_SMTP_HOST")),
-                                    "port": smtp_config.get("port", item.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465")))) if smtp_config else item.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465"))),
-                                    "username": smtp_config.get("username", item.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME"))) if smtp_config else item.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME")),
-                                    "password": smtp_config.get("password", item.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD"))) if smtp_config else item.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD")),
-                                    "from": smtp_config.get("from", item.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun"))) if smtp_config else item.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun")),
-                                    "to": smtp_config.get("to", item.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])) if smtp_config else item.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])
-                                }),
-                                "device": item.get("device", safe_get_env_var("GX_DEVICE_INFO", "{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}"))
-                            }
-                        }
-                        configs.append(config)
-                    else:
-                        raise ValueError("GX_USER环境变量中的每个用户配置必须是JSON对象")
-            else:
-                raise ValueError("GX_USER环境变量格式不正确，应为JSON对象或JSON对象数组")
-            
-            # 保存配置到文件
-            with open("config.json", "w", encoding="utf-8") as f:
-                # 如果是单个配置，直接保存
-                if len(configs) == 1:
-                    json.dump(configs[0], f, ensure_ascii=False, indent=4)
-                # 如果是多个配置，保存为列表
-                else:
-                    json.dump(configs, f, ensure_ascii=False, indent=4)
-            
-            logging.info("配置文件已从GX_USER环境变量生成")
-            return
+            users = json.loads(users_json)
+            logging.info(f"从环境变量加载了 {len(users)} 个用户配置")
+            return users
         except json.JSONDecodeError as e:
-            logging.error(f"GX_USER环境变量JSON格式错误: {str(e)}")
-            raise ValueError(f"GX_USER环境变量不是有效的JSON格式: {str(e)}")
+            logging.error(f"解析环境变量中的用户配置失败: {e}")
+            return None
+    
+    # 如果环境变量中没有配置，尝试从配置文件加载
+    config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "auto.yaml")
+    if os.path.exists(config_file):
+        try:
+             
+            with open(config_file, 'r', encoding='utf-8') as f:
+                config = yaml.safe_load(f)
+                users = config.get('users', [])
+                logging.info(f"从配置文件加载了 {len(users)} 个用户配置")
+                return users
         except Exception as e:
-            logging.error(f"处理GX_USER环境变量时出错: {str(e)}")
-            raise
-    except Exception as e:
-        logging.error(f"创建配置文件时出错: {str(e)}")
-        raise
+            logging.error(f"从配置文件加载用户配置失败: {e}")
+            return None
+    
+    logging.error("未找到用户配置")
+    return None
 
-def execute_checkin(checkin_type, user_index=None):
-    """执行指定类型的打卡"""
+def setup_user_config(user_config):
+    """为单个用户设置配置"""
+    # 创建临时目录存储用户配置
+    temp_dir = tempfile.mkdtemp()
+    
+    # 设置配置文件路径
+    config_path = os.path.join(temp_dir, "config.json")
+    user_dir = os.path.join(temp_dir, "user")
+    os.makedirs(user_dir, exist_ok=True)
+    
+    # 写入配置文件
+    with open(config_path, 'w', encoding='utf-8') as f:
+        json.dump(user_config, f, ensure_ascii=False, indent=4)
+    
+    # 保存原始路径
+    original_config_path = ORIGINAL_CONFIG_PATH
+    original_user_info_path = ORIGINAL_USER_INFO_PATH
+    original_plan_info_path = ORIGINAL_PLAN_INFO_PATH
+    
+    # 导入模块并修改路径常量
+    import manager.ConfigManager as cm
+    import manager.UserInfoManager as uim
+    import manager.PlanInfoManager as pim
+    
+    # 更新路径常量
+    cm.CONFIG_PATH = Path(config_path)
+    uim.USER_INFO_PATH = Path(user_dir) / "userInfo.json"
+    pim.PLAN_INFO_PATH = Path(user_dir) / "planInfo.json"
+    
+    # 清除缓存
+    ConfigManager._config_cache = None
+    UserInfoManager._userInfo_cache = None
+    PlanInfoManager._planinfo_cache = None
+    
+    # 返回临时目录和原始路径，以便后续恢复
+    return temp_dir, original_config_path, original_user_info_path, original_plan_info_path
+
+def execute_clock_in(user_config, clock_type=None):
+    """为单个用户执行打卡操作"""
+    phone = user_config.get("config", {}).get("user", {}).get("phone", "未知用户")
+    logging.info(f"开始为用户 {phone} 执行打卡任务")
+    
+    # 设置用户配置
+    temp_dir, original_config_path, original_user_info_path, original_plan_info_path = setup_user_config(user_config)
+    
     try:
-        if user_index is not None:
-            logging.info(f"开始执行用户{user_index+1}的{checkin_type}打卡")
-        else:
-            logging.info(f"开始执行{checkin_type}打卡")
+        # 判断打卡类型
+        if clock_type is None:
+            current_time = datetime.now()
+            hour = current_time.hour
+            clock_type = "上班" if hour < 12 else "下班"
+        
+        logging.info(f"执行{clock_type}卡打卡")
         
         # 登录
-        isLogin = login()
-        if not isLogin:
-            logging.warning("登录失败")
+        is_login = login()
+        if not is_login:
+            logging.warning(f"用户 {phone} 登录失败")
             return False
         
-        # 脱敏处理用户数据
-        user_data = UserInfoManager.load()
-        if user_data and 'phone' in user_data:
-            phone = user_data['phone']
-            user_data['phone'] = phone[:3] + '*' * (len(phone) - 7) + phone[-4:] if len(phone) > 7 else '*' * len(phone)
-        
-        logging.info(f"用户数据：{user_data}")
-        logging.info(f"用户类型：{UserInfoManager.get('roleKey')}")
-        if UserInfoManager.get("userType") != "student":
-            logging.warning("当前用户不是学生，跳过打卡任务")
-            return False
+        logging.info(f"用户 {phone} 登录成功")
         
         # 获取打卡信息
-        hasPlan = fetch_plan()
-        if not hasPlan:
-            logging.warning("未获取到打卡信息")
+        has_plan = fetch_plan()
+        if not has_plan:
+            logging.warning(f"用户 {phone} 未获取到打卡信息")
             return False
-        
-        # 强制设置打卡类型
-        import step.clockIn
-        step.clockIn.FORCED_CHECKIN_TYPE = checkin_type
         
         # 执行打卡
         result = clock_in()
-        logging.info(result)
-        
-        # 重置强制打卡类型，避免影响后续操作
-        step.clockIn.FORCED_CHECKIN_TYPE = None
+        logging.info(f"用户 {phone} 打卡结果: {result}")
         
         # 发送邮件通知
-        # 直接从配置文件读取SMTP配置，避免环境变量覆盖
-        try:
-            with open("config.json", "r", encoding="utf-8") as f:
-                config_data = json.load(f)
-            
-            # 处理单用户配置和多用户配置
-            if "config" in config_data:
-                smtp_config = config_data["config"].get("smtp", {})
-            else:
-                smtp_config = config_data.get("smtp", {})
-            
-            smtp_enabled = smtp_config.get("enable", False)
-            logging.info(f"SMTP邮件通知配置检查 - 启用状态: {smtp_enabled}")
-            
-            if smtp_enabled:
-                # 检查SMTP配置
-                smtp_host = smtp_config.get("host")
-                smtp_port = smtp_config.get("port")
-                smtp_username = smtp_config.get("username")
-                smtp_password = smtp_config.get("password")
-                smtp_from = smtp_config.get("from")
-                smtp_to = smtp_config.get("to")
-                
-                logging.info(f"SMTP配置详情:")
-                logging.info(f"  启用状态: {smtp_enabled}")
-                logging.info(f"  服务器: {smtp_host}:{smtp_port}")
-                logging.info(f"  用户名: {smtp_username}")
-                logging.info(f"  发件人: {smtp_from}")
-                logging.info(f"  收件人数量: {len(smtp_to) if smtp_to else 0}")
-                logging.info(f"  密码已设置: {'是' if smtp_password else '否'}")
-                logging.info(f"  邮件服务器类型: SSL (SMTP_SSL)")
-                logging.info(f"  调试模式: 已启用")
-                
-                if not all([smtp_host, smtp_port, smtp_username, smtp_password, smtp_to]):
-                    logging.error("SMTP配置不完整，跳过邮件发送")
-                    logging.error(f"缺失配置项: host={bool(smtp_host)}, port={bool(smtp_port)}, username={bool(smtp_username)}, password={bool(smtp_password)}, to={bool(smtp_to)}")
-                else:
-                    logging.info(f"准备发送邮件通知，标题: {result['title']}")
-                    logging.info(f"邮件内容: {result['content']}")
-                    send_email(result["title"], result["content"])
-                    logging.info("邮件发送完成")
-            else:
-                logging.info("SMTP邮件通知已禁用，跳过邮件发送")
-        except Exception as e:
-            logging.error(f"处理SMTP配置时出现错误: {str(e)}")
-            logging.warning("邮件发送失败，但打卡任务已完成")
+        if user_config.get("config", {}).get("smtp", {}).get("enable", False):
+            send_email(result["title"], result["content"])
         
         return True
+    
     except Exception as e:
-        logging.error(f"执行打卡过程中出现错误: {str(e)}")
+        logging.error(f"用户 {phone} 打卡过程中发生异常: {e}")
         return False
-
-def execute_multi_user_checkin(checkin_type):
-    """执行多用户打卡"""
-    try:
-        # 加载配置文件
-        with open("config.json", "r", encoding="utf-8") as f:
-            config_data = json.load(f)
-
-        # 检查是否为多用户配置
-        if isinstance(config_data, list):
-            # 多用户配置
-            success_count = 0
-            for i, user_config in enumerate(config_data):
-                # 保存当前用户配置到临时文件，确保格式正确
-                with open("config.json", "w", encoding="utf-8") as f:
-                    # 确保配置格式正确，包含config外层
-                    if "config" in user_config:
-                        # 如果已经有config外层，直接写入
-                        json.dump(user_config, f, ensure_ascii=False, indent=4)
-                    else:
-                        # 如果没有config外层，添加它
-                        json.dump({"config": user_config}, f, ensure_ascii=False, indent=4)
-
-                # 重置ConfigManager缓存，确保加载最新配置
-                ConfigManager._config_cache = None
-
-                # 执行打卡
-                if execute_checkin(checkin_type, i):
-                    success_count += 1
-
-                # 重置UserInfoManager缓存
-                UserInfoManager._userInfo_cache = None
-
-            logging.info(f"多用户打卡完成，成功打卡{success_count}/{len(config_data)}个用户")  
-            return success_count > 0
-        else:
-            # 单用户配置
-            return execute_checkin(checkin_type)
-    except Exception as e:
-        logging.error(f"执行多用户打卡过程中出现错误: {str(e)}")
-        import traceback
-        logging.error(f"错误堆栈: {traceback.format_exc()}")
-        return False
-
-if __name__ == "__main__":
-    try:
-        # 从环境变量获取配置
-        create_config_from_env()
+    
+    finally:
+        # 恢复原始路径
+        import manager.ConfigManager as cm
+        import manager.UserInfoManager as uim
+        import manager.PlanInfoManager as pim
         
-        # 从命令行参数获取打卡类型
-        if len(sys.argv) < 2:
-            logging.error("请指定打卡类型: START 或 END")
-            sys.exit(1)
+        cm.CONFIG_PATH = original_config_path
+        uim.USER_INFO_PATH = original_user_info_path
+        pim.PLAN_INFO_PATH = original_plan_info_path
         
-        checkin_type = sys.argv[1].upper()
-        if checkin_type not in ["START", "END"]:
-            logging.error("打卡类型必须是 START 或 END")
-            sys.exit(1)
+        # 清除缓存
+        ConfigManager._config_cache = None
+        UserInfoManager._userInfo_cache = None
+        PlanInfoManager._planinfo_cache = None
         
-        execute_multi_user_checkin(checkin_type)
-    except Exception as e:
-        logging.error(f"程序执行过程中出现错误: {str(e)}")
+        # 清理临时文件
+        import shutil
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
+def main():
+    """主函数"""
+    setup_logging()
+    
+    # 获取执行模式
+    mode = os.environ.get('MODE', 'manual')  # 默认为手动模式
+    
+    # 加载用户配置
+    users = load_users_config()
+    if not users:
+        logging.error("未找到用户配置，程序退出")
         sys.exit(1)
+    
+    # 判断打卡类型
+    clock_type = None
+    if mode == 'morning':
+        clock_type = "上班"
+    elif mode == 'evening':
+        clock_type = "下班"
+    
+    # 执行打卡
+    success_count = 0
+    total_count = len(users)
+    
+    for user_config in users:
+        if execute_clock_in(user_config, clock_type):
+            success_count += 1
+    
+    logging.info(f"打卡任务完成，成功: {success_count}/{total_count}")
+    
+    # 如果有用户打卡失败，返回非零退出码
+    if success_count < total_count:
+        sys.exit(1)
+
+if __name__ == '__main__':
+    main()

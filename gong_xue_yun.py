@@ -47,15 +47,12 @@ def should_run_today() -> bool:
     return False
 
 
-def generate_random_time(is_morning: bool = True) -> datetime:
+def generate_random_time() -> datetime:
     """
     生成一个随机的打卡时间
 
     该函数根据配置文件中的打卡时间范围，生成一个在指定时间基础上增加随机分钟数的打卡时间。
     随机分钟数的上限由配置决定，最终返回今天的具体打卡时间点。
-
-    Args:
-        is_morning (bool): 是否为上午打卡，True为上午，False为下午
 
     Returns:
         datetime: 今天的一个datetime对象，表示计划打卡的具体时间（秒和微秒都设为0）
@@ -64,12 +61,8 @@ def generate_random_time(is_morning: bool = True) -> datetime:
     float_minute = ConfigManager.get("clockIn", "time", "float", default=1)
     random_minutes = random.randint(0, float_minute)
 
-    # 根据上午/下午获取配置的打卡时间
-    if is_morning:
-        start_time_str = ConfigManager.get("clockIn", "time", "start", default="08:30")
-    else:
-        start_time_str = ConfigManager.get("clockIn", "time", "end", default="18:00")
-    
+    # 获取配置的打卡时间
+    start_time_str = ConfigManager.get("clockIn", "time", "start", default="04:30")
     config_time = datetime.strptime(start_time_str, "%H:%M")
 
     # 获取小时和分钟
@@ -108,16 +101,13 @@ if __name__ == "__main__":
         logging.info(f"当前时间：{current_time}")
         gc.collect()
 
-        # 每日 00:00 设置计划打卡任务
+        # 每日 04:29 设置计划打卡任务
         if current_time == "00:00":
             if should_run_today():  # 每天只检查一次！
-                morning_time = generate_random_time(is_morning=True)
-                evening_time = generate_random_time(is_morning=False)
-                logging.info(f"\n-------------今日计划上班打卡时间: {morning_time.strftime('%H:%M')}-------------\n")
-                logging.info(f"\n-------------今日计划下班打卡时间: {evening_time.strftime('%H:%M')}-------------\n")
+                execution_time = generate_random_time()
+                logging.info(f"\n-------------今日计划打卡时间: {execution_time.strftime('%H:%M')}-------------\n")
                 schedule.clear()
-                schedule.every().day.at(morning_time.strftime("%H:%M")).do(run)
-                schedule.every().day.at(evening_time.strftime("%H:%M")).do(run)
+                schedule.every().day.at(execution_time.strftime("%H:%M")).do(run)
             else:
                 logging.info("\n-------------今日不打卡-------------\n")
                 schedule.clear()

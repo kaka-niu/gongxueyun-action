@@ -26,58 +26,10 @@ HEADERS = {
     "host": "api.moguding.net:9000",
 }
 
-def desensitize_phone(phone: str) -> str:
-    """
-    对手机号进行脱敏处理，保留前3位和后4位，中间用*代替。
-    
-    Args:
-        phone (str): 待脱敏的手机号。
-        
-    Returns:
-        str: 脱敏后的手机号。
-    """
-    if len(phone) >= 11:
-        return f"{phone[:3]}****{phone[-4:]}"
-    elif len(phone) >= 7:
-        return f"{phone[:3]}***{phone[-3:]}"
-    else:
-        return "***"  # 对于过短的手机号，返回全隐藏
-
-def desensitize_log_data(log_data: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    对日志数据中的敏感信息进行脱敏处理。
-    
-    Args:
-        log_data (Dict[str, Any]): 包含敏感信息的日志数据。
-        
-    Returns:
-        Dict[str, Any]: 脱敏后的日志数据。
-    """
-    desensitized_data = log_data.copy()
-    
-    # 脱敏手机号
-    if 'phone' in desensitized_data:
-        desensitized_data['phone'] = desensitize_phone(desensitized_data['phone'])
-    
-    # 脱敏密码字段
-    if 'password' in desensitized_data:
-        desensitized_data['password'] = '***'
-    
-    # 脱敏token等认证信息
-    sensitive_keys = ['token', 'authorization', 'password', 'captcha', 'uuid']
-    for key in sensitive_keys:
-        if key in desensitized_data:
-            desensitized_data[key] = '***'
-    
-    return desensitized_data
 
 class ApiService:
-    """API服务类，用于处理与工学云服务器的交互。"""
-
     def __init__(self):
-        """初始化API服务实例。"""
-        self.session = requests.Session()
-        self.session.headers.update(HEADERS)
+
         self.max_retries = 5  # 控制重新尝试的次数
 
     def _post_request(
@@ -95,6 +47,7 @@ class ApiService:
             url (str): 请求的API地址（不包括BASE_URL部分）。
             headers (Dict[str, str]): 请求头信息，包括授权信息。
             data (Dict[str, Any]): POST请求的数据。
+            msg (str, optional): 如果请求失败，输出的错误信息前缀，默认为'请求失败'。
             retry_count (int, optional): 当前请求的重试次数，默认为0。
 
         Returns:
@@ -142,32 +95,6 @@ class ApiService:
             time.sleep(wait_time)
 
         return self._post_request(url, headers, data, retry_count + 1)
-
-    def _get_authenticated_headers(
-            self,
-            sign_data: Optional[List[Optional[str]]] = None  # 允许 List[str | None]
-    ) -> Dict[str, str]:
-        """
-        生成带有认证信息的请求头。
-
-        该方法会从配置管理器中获取用户的Token、用户ID及角色Key，并生成包含这些信息的请求头。
-        如果提供了sign_data，还会生成并添加签名信息。
-
-        Args:
-            sign_data (Optional[List[str]]): 用于生成签名的数据列表，默认为None。
-
-        Returns:
-            包含认证信息和签名的请求头字典。
-        """
-        headers = {
-            **HEADERS,
-            "authorization": UserInfoManager.get_token(),
-            "userid": UserInfoManager.get_userid(),
-            "rolekey": UserInfoManager.get("roleKey"),
-        }
-        if sign_data:
-            headers["sign"] = create_sign(*sign_data)
-        return headers
 
     def pass_blockPuzzle_captcha(self, max_attempts: int = 5) -> str:
         """
@@ -285,6 +212,32 @@ class ApiService:
         # 超过最大重试次数，抛出异常
         raise Exception("通过点选验证码失败")
 
+    def _get_authenticated_headers(
+            self,
+            sign_data: Optional[List[Optional[str]]] = None  # 允许 List[str | None]
+    ) -> Dict[str, str]:
+        """
+        生成带有认证信息的请求头。
+
+        该方法会从配置管理器中获取用户的Token、用户ID及角色Key，并生成包含这些信息的请求头。
+        如果提供了sign_data，还会生成并添加签名信息。
+
+        Args:
+            sign_data (Optional[List[str]]): 用于生成签名的数据列表，默认为None。
+
+        Returns:
+            包含认证信息和签名的请求头字典。
+        """
+        headers = {
+            **HEADERS,
+            "authorization": UserInfoManager.get_token(),
+            "userid": UserInfoManager.get_userid(),
+            "rolekey": UserInfoManager.get("roleKey"),
+        }
+        if sign_data:
+            headers["sign"] = create_sign(*sign_data)
+        return headers
+
     def login(self) -> bool:
         """
         执行用户登录操作，成功后将 user_info 写入 UserInfoManager 管理的缓存和文件。
@@ -307,19 +260,7 @@ class ApiService:
                 "t": aes_encrypt(str(int(time.time() * 1000))),
             }
 
-            # 使用脱敏后的数据进行日志记录
-            desensitized_data = desensitize_log_data({
-                "phone": ConfigManager.get("user", "phone"),
-                "password": "***",  # 密码已加密，但仍显示为***
-                "captcha": "***",
-                "loginType": "android",
-                "uuid": "***",
-                "device": "android",
-                "version": "5.16.0",
-                "t": "***"
-            })
-            logger.info(f"登录数据：{desensitized_data}")
-            
+            logger.info(f"登录数据：{data}")
             response = self._post_request(url, HEADERS, data)
 
             encrypted_data = response.get("data")
@@ -328,12 +269,7 @@ class ApiService:
                 return False
 
             user_info = json.loads(aes_decrypt(encrypted_data))
-            
-            # 脱敏用户信息中的敏感数据
-            desensitized_user_info = user_info.copy()
-            if 'phone' in desensitized_user_info:
-                desensitized_user_info['phone'] = desensitize_phone(desensitized_user_info['phone'])
-            logger.info(f"登录结果：{desensitized_user_info}")
+            logger.info(f"登录结果：{user_info}")
 
             # 使用 UserInfoManager 写入缓存和文件
             UserInfoManager.set_userinfo(user_info)
@@ -377,15 +313,7 @@ class ApiService:
             if not plan_info:
                 logger.warning("实习计划数据为空")
                 return False
-            
-            # 脱敏计划信息中的敏感数据
-            desensitized_plan_info = plan_info.copy()
-            sensitive_fields = ['mobile', 'teacherName', 'createName']
-            for field in sensitive_fields:
-                if field in desensitized_plan_info and desensitized_plan_info[field]:
-                    desensitized_plan_info[field] = '***'
-            
-            logger.info("获取到的实习计划数据: %s", desensitized_plan_info)
+            logger.info("获取到的实习计划数据: %s", plan_info)
             # 更新缓存和文件
             PlanInfoManager.set_planinfo(plan_info)
             logger.info("实习计划信息已更新到 PlanInfoManager")

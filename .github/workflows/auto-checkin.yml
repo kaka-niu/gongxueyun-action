@@ -1,157 +1,69 @@
-name: 自动打卡
+name: 工学云自动签到
 
 on:
-    schedule:
-    # 上班打卡 - 每天北京时间7:00执行（UTC时间23:00）
-    - cron: '0 23 * * *'
-    # 下班打卡 - 每天北京时间17:00执行（UTC时间9:00）
-    - cron: '0 9 * * *'
-    workflow_dispatch: # 允许手动触发
-      inputs:
-        checkin_type:
-          description: '打卡类型'
-          required: true
-          default: 'START'
-          type: choice
-          options:
-            - START
-            - END
+  # 手动触发
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: '打卡模式'
+        required: true
+        default: 'manual'
+        type: choice
+        options:
+        - manual
+        - morning
+        - evening
+  
+  # 定时任务 - 早上7点执行上班卡
+  schedule:
+    - cron: '0 23 * * *'  # UTC时间23点，对应北京时间7点
+  
+  # 定时任务 - 下午17点执行下班卡
+    - cron: '0 9 * * *'   # UTC时间9点，对应北京时间17点
 
 jobs:
-  checkin:
+  check-in:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode: [morning, evening]
+      fail-fast: false
+    
     steps:
     - name: 检出代码
       uses: actions/checkout@v3
-      
+    
     - name: 设置Python环境
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
-        
-    - name: 安装系统依赖
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y xvfb
-        
-    - name: 安装Python依赖
+    
+    - name: 安装依赖
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        
-    - name: 执行上班打卡
-      if: github.event.schedule == '0 23 * * *'
-      run: |
-        echo "检查SEND环境变量..."
-        if [ -z "$SEND" ]; then
-          echo "警告：未设置SEND环境变量，将使用默认SMTP配置"
-        else
-          echo "SEND环境变量已设置"
-        fi
-        python auto.py START
+        pip install pyyaml  # 添加yaml支持
+    
+    - name: 早上打卡
+      if: matrix.mode == 'morning' || (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'morning')
       env:
-        # JSON格式用户配置 - 优先级最高
-        GX_USER: ${{ secrets.USER || '' }}
-        # 其他配置 - 添加默认值防止secrets不存在
-        GX_LOCATION_ADDRESS: ${{ secrets.GX_LOCATION_ADDRESS || '' }}
-        GX_LOCATION_LATITUDE: ${{ secrets.GX_LOCATION_LATITUDE || '' }}
-        GX_LOCATION_LONGITUDE: ${{ secrets.GX_LOCATION_LONGITUDE || '' }}
-        GX_LOCATION_PROVINCE: ${{ secrets.GX_LOCATION_PROVINCE || '' }}
-        GX_LOCATION_CITY: ${{ secrets.GX_LOCATION_CITY || '' }}
-        GX_LOCATION_AREA: ${{ secrets.GX_LOCATION_AREA || '' }}
-        GX_CLOCKIN_MODE: ${{ secrets.GX_CLOCKIN_MODE || 'everyday' }}
-        GX_HOLIDAYS_CLOCKIN: ${{ secrets.GX_HOLIDAYS_CLOCKIN || 'false' }}
-        GX_TIME_START: ${{ secrets.GX_TIME_START || '8:30' }}
-        GX_TIME_END: ${{ secrets.GX_TIME_END || '18:00' }}
-        GX_TIME_FLOAT: ${{ secrets.GX_TIME_FLOAT || '1' }}
-        GX_CUSTOM_DAYS: ${{ secrets.GX_CUSTOM_DAYS || '1,2,3,4,5' }}
-        GX_SMTP_ENABLE: ${{ secrets.GX_SMTP_ENABLE || 'false' }}
-        GX_SMTP_HOST: ${{ secrets.GX_SMTP_HOST || '' }}
-        GX_SMTP_PORT: ${{ secrets.GX_SMTP_PORT || '465' }}
-        GX_SMTP_USERNAME: ${{ secrets.GX_SMTP_USERNAME || '' }}
-        GX_SMTP_PASSWORD: ${{ secrets.GX_SMTP_PASSWORD || '' }}
-        GX_SMTP_FROM: ${{ secrets.GX_SMTP_FROM || 'gongxueyun' }}
-        GX_SMTP_TO: ${{ secrets.GX_SMTP_TO || '' }}
-        GX_DEVICE_INFO: "${{ secrets.GX_DEVICE_INFO || '{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}' }}"
-        # SMTP配置也可以通过SEND环境变量提供（JSON格式）
-        SEND: ${{ secrets.SEND || vars.SEND || '' }}
-        
-    - name: 执行下班打卡
-      if: github.event.schedule == '0 9 * * *'
+        USERS: ${{ secrets.USERS }}
+        MODE: morning
       run: |
-        echo "开始执行下班打卡..."
-        echo "检查环境变量设置..."
-        if [ -z "$GX_USER" ]; then
-          echo "错误：未设置用户手机号环境变量"
-          echo "请在GitHub仓库的Settings > Secrets and variables > Actions中添加以下环境变量："
-          echo "JSON格式配置：USER (包含JSON格式的用户信息)"
-          exit 1
-        fi
-        python auto.py END
+        python auto.py
+    
+    - name: 下午打卡
+      if: matrix.mode == 'evening' || (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'evening')
       env:
-        # JSON格式用户配置 - 优先级最高
-        GX_USER: ${{ secrets.USER || '' }}
-        # 其他配置 - 添加默认值防止secrets不存在
-        GX_LOCATION_ADDRESS: ${{ secrets.GX_LOCATION_ADDRESS || '' }}
-        GX_LOCATION_LATITUDE: ${{ secrets.GX_LOCATION_LATITUDE || '' }}
-        GX_LOCATION_LONGITUDE: ${{ secrets.GX_LOCATION_LONGITUDE || '' }}
-        GX_LOCATION_PROVINCE: ${{ secrets.GX_LOCATION_PROVINCE || '' }}
-        GX_LOCATION_CITY: ${{ secrets.GX_LOCATION_CITY || '' }}
-        GX_LOCATION_AREA: ${{ secrets.GX_LOCATION_AREA || '' }}
-        GX_CLOCKIN_MODE: ${{ secrets.GX_CLOCKIN_MODE || 'everyday' }}
-        GX_HOLIDAYS_CLOCKIN: ${{ secrets.GX_HOLIDAYS_CLOCKIN || 'false' }}
-        GX_TIME_START: ${{ secrets.GX_TIME_START || '8:30' }}
-        GX_TIME_END: ${{ secrets.GX_TIME_END || '18:00' }}
-        GX_TIME_FLOAT: ${{ secrets.GX_TIME_FLOAT || '1' }}
-        GX_CUSTOM_DAYS: ${{ secrets.GX_CUSTOM_DAYS || '1,2,3,4,5' }}
-        GX_SMTP_ENABLE: ${{ secrets.GX_SMTP_ENABLE || 'false' }}
-        GX_SMTP_HOST: ${{ secrets.GX_SMTP_HOST || '' }}
-        GX_SMTP_PORT: ${{ secrets.GX_SMTP_PORT || '465' }}
-        GX_SMTP_USERNAME: ${{ secrets.GX_SMTP_USERNAME || '' }}
-        GX_SMTP_PASSWORD: ${{ secrets.GX_SMTP_PASSWORD || '' }}
-        GX_SMTP_FROM: ${{ secrets.GX_SMTP_FROM || 'gongxueyun' }}
-        GX_SMTP_TO: ${{ secrets.GX_SMTP_TO || '' }}
-        GX_DEVICE_INFO: "${{ secrets.GX_DEVICE_INFO || '{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}' }}"
-        # SMTP配置也可以通过SEND环境变量提供（JSON格式）
-        SEND: ${{ secrets.SEND || vars.SEND || '' }}
-        
-    - name: 手动触发打卡
-      if: github.event_name == 'workflow_dispatch'
+        USERS: ${{ secrets.USERS }}
+        MODE: evening
       run: |
-        echo "开始执行手动触发打卡..."
-        echo "检查环境变量设置..."
-        if [ -z "$GX_USER" ] && [ -z "$GX_USER_PHONE" ] && [ -z "$GX_USER_PHONES" ]; then
-          echo "错误：未设置用户手机号环境变量"
-          echo "请在GitHub仓库的Settings > Secrets and variables > Actions中添加以下环境变量之一："
-          echo "1. JSON格式配置：USER (包含JSON格式的用户信息)"
-          echo "2. 单用户配置：GX_USER_PHONE 和 GX_USER_PASSWORD"
-          echo "3. 多用户配置：GX_USER_PHONES 和 GX_USER_PASSWORDS"
-          exit 1
-        fi
-        python auto.py ${{ github.event.inputs.checkin_type }}
+        python auto.py
+    
+    - name: 手动打卡
+      if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'manual'
       env:
-        # JSON格式用户配置 - 优先级最高
-        GX_USER: ${{ secrets.USER || '' }}
-        # 其他配置 - 添加默认值防止secrets不存在
-        GX_LOCATION_ADDRESS: ${{ secrets.GX_LOCATION_ADDRESS || '' }}
-        GX_LOCATION_LATITUDE: ${{ secrets.GX_LOCATION_LATITUDE || '' }}
-        GX_LOCATION_LONGITUDE: ${{ secrets.GX_LOCATION_LONGITUDE || '' }}
-        GX_LOCATION_PROVINCE: ${{ secrets.GX_LOCATION_PROVINCE || '' }}
-        GX_LOCATION_CITY: ${{ secrets.GX_LOCATION_CITY || '' }}
-        GX_LOCATION_AREA: ${{ secrets.GX_LOCATION_AREA || '' }}
-        GX_CLOCKIN_MODE: ${{ secrets.GX_CLOCKIN_MODE || 'everyday' }}
-        GX_HOLIDAYS_CLOCKIN: ${{ secrets.GX_HOLIDAYS_CLOCKIN || 'false' }}
-        GX_TIME_START: ${{ secrets.GX_TIME_START || '8:30' }}
-        GX_TIME_END: ${{ secrets.GX_TIME_END || '18:00' }}
-        GX_TIME_FLOAT: ${{ secrets.GX_TIME_FLOAT || '1' }}
-        GX_CUSTOM_DAYS: ${{ secrets.GX_CUSTOM_DAYS || '1,2,3,4,5' }}
-        GX_SMTP_ENABLE: ${{ secrets.GX_SMTP_ENABLE || 'false' }}
-        GX_SMTP_HOST: ${{ secrets.GX_SMTP_HOST || '' }}
-        GX_SMTP_PORT: ${{ secrets.GX_SMTP_PORT || '465' }}
-        GX_SMTP_USERNAME: ${{ secrets.GX_SMTP_USERNAME || '' }}
-        GX_SMTP_PASSWORD: ${{ secrets.GX_SMTP_PASSWORD || '' }}
-        GX_SMTP_FROM: ${{ secrets.GX_SMTP_FROM || 'gongxueyun' }}
-        GX_SMTP_TO: ${{ secrets.GX_SMTP_TO || '' }}
-        GX_DEVICE_INFO: "${{ secrets.GX_DEVICE_INFO || '{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}' }}"
-        # SMTP配置也可以通过SEND环境变量提供（JSON格式）
-        SEND: ${{ secrets.SEND || vars.SEND || '' }}
+        USERS: ${{ secrets.USERS }}
+        MODE: manual
+      run: |
+        python auto.py

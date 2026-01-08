@@ -1,12 +1,10 @@
 import logging
 import threading
 from datetime import datetime, timedelta
-import holidays
+
 import requests
-from typing import Dict, Any, List
 
 from manager.ConfigManager import ConfigManager
-from manager.UserInfoManager import UserInfoManager
 
 # 尝试导入主模块的日志上下文，失败则创建本地版本
 try:
@@ -16,9 +14,6 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-
-# 全局变量，用于强制设置打卡类型
-FORCED_CHECKIN_TYPE = None
 
 def get_current_month_info() -> dict:
     """
@@ -130,135 +125,41 @@ def get_checkin_type() -> dict[str, str]:
     获取打卡类型。
 
     该方法根据配置文件获取打卡类型，并返回一个字典，包含打卡类型和显示名称。
-    如果设置了强制打卡类型，则忽略其他逻辑直接返回。
 
     Returns:
         dict[str, str]: 包含打卡类型和显示名称的字典。
     """
-    result = None
-    try:
-        # 检查是否有强制设置的打卡类型
-        global FORCED_CHECKIN_TYPE
-        if FORCED_CHECKIN_TYPE is not None:
-            # 确保FORCED_CHECKIN_TYPE是有效的打卡类型
-            if FORCED_CHECKIN_TYPE in ["START", "END"]:
-                checkin_type = FORCED_CHECKIN_TYPE
-                display_type = "上班" if checkin_type == "START" else "下班"
-                result = {"type": checkin_type, "display": display_type}
-                logger.debug(f"使用强制打卡类型: {result}")
-                logger.info(f"强制打卡类型返回结果类型: {type(result)}, 值: {result}")
-                return result
-            else:
-                logger.warning(f"无效的强制打卡类型: {FORCED_CHECKIN_TYPE}，忽略强制设置")
-        
-        current_hour = datetime.now().hour
-        
-        # 判断是上午还是下午
-        is_morning = current_hour < 12
-        
-        mode = ConfigManager.get("clockIn", "mode")
-        logger.info(f"从ConfigManager获取的mode值: {mode}, 类型: {type(mode)}")
-        if not isinstance(mode, str):
-            logger.warning(f"获取打卡模式失败，返回值类型为: {type(mode)}，值为: {mode}")
-            # 默认使用everyday模式
-            mode = "everyday"
-        
-        # 1. 法定工作日模式
-        if mode == "weekday":
-            # 判断今天是否为工作日
-            if is_workday_realtime():
-                if is_morning:
-                    result = {"type": "START", "display": "上班"}
-                else:
-                    result = {"type": "END", "display": "下班"}
-            else:
-                result = {"type": "HOLIDAY", "display": "休息/节假日"}
-
-        # 2. 每天执行
-        elif mode == "everyday":
-            if is_morning:
-                result = {"type": "START", "display": "上班"}
-            else:
-                result = {"type": "END", "display": "下班"}
-
-        # 3. 自定义模式
-        elif mode == "customize":
-            custom_days = ConfigManager.get("clockIn", "customDays", default=[])
-            today = datetime.today().weekday() + 1  # 1=星期一, 7=星期天
-            if today in custom_days:
-                if is_morning:
-                    result = {"type": "START", "display": "上班"}
-                else:
-                    result = {"type": "END", "display": "下班"}
-            else:
-                result = {"type": "HOLIDAY", "display": "休息/节假日"}
+    mode = ConfigManager.get("clockIn", "mode")
+    # 1. 法定工作日模式
+    if mode == "weekday":
+        # 判断今天是否为工作日
+        if is_workday_realtime():
+            return {"type": "START", "display": "上班"}
         else:
-            # 默认返回，防止mode值无效时函数没有返回值
-            logger.warning(f"无效的打卡模式: {mode}，默认使用everyday模式")
-            if is_morning:
-                result = {"type": "START", "display": "上班"}
-            else:
-                result = {"type": "END", "display": "下班"}
-        
-        logger.debug(f"打卡类型结果: {result}")
-        logger.info(f"正常逻辑返回结果类型: {type(result)}, 值: {result}")
-        
-        # 确保返回的是字典类型
-        if not isinstance(result, dict):
-            logger.error(f"get_checkin_type返回值类型不正确，原值: {result}, 类型: {type(result)}")
-            current_hour = datetime.now().hour
-            is_morning = current_hour < 12
-            result = {
-                "type": "START" if is_morning else "END", 
-                "display": "上班(类型保护)" if is_morning else "下班(类型保护)"
-            }
-            logger.info(f"类型保护后返回结果: {result}")
-        
-        return result
-    except Exception as e:
-        logger.error(f"获取打卡类型时发生异常: {e}")
-        import traceback
-        logger.error(f"异常堆栈: {traceback.format_exc()}")
-        # 发生异常时返回默认值
-        current_hour = datetime.now().hour
-        is_morning = current_hour < 12
-        result = {
-            "type": "START" if is_morning else "END", 
-            "display": "上班(异常后默认)" if is_morning else "下班(异常后默认)"
-        }
-        logger.info(f"异常处理返回结果类型: {type(result)}, 值: {result}")
-        
-        return result
+            return {"type": "HOLIDAY", "display": "休息/节假日"}
 
+    # 2. 每天执行
+    if mode == "everyday":
+        return {"type": "START", "display": "上班"}
 
-def check_attendance_status(checkin_list: List[Dict[str, Any]], current_date: datetime = None) -> Dict[str, bool]:
-    """
-    检查打卡状态，确定今天是否已经打了上班卡和下班卡。
-
-    Args:
-        checkin_list: 打卡记录列表
-        current_date: 当前日期，默认为今天
-
-    Returns:
-        dict: 包含 'has_start' 和 'has_end' 的字典，表示是否已打上班卡和下班卡
-    """
-    if current_date is None:
-        current_date = datetime.now()
+    # 3. 自定义模式
+    if mode == "customize":
+        custom_days = ConfigManager.get("clockIn", "customDays", default=[])
+        today = datetime.today().weekday() + 1  # 1=星期一, 7=星期天
+        if today in custom_days:
+            return {"type": "START", "display": "上班"}
+        else:
+            return {"type": "HOLIDAY", "display": "休息/节假日"}
     
-    has_start = False
-    has_end = False
+    # 4. 一天打两次卡模式（新增）
+    if mode == "twice_daily":
+        current_time = datetime.now()
+        hour = current_time.hour
+        # 12点前打上班卡，12点后打下班卡
+        if hour < 12:
+            return {"type": "START", "display": "上班"}
+        else:
+            return {"type": "END", "display": "下班"}
     
-    if checkin_list:
-        for checkin_info in checkin_list:
-            if checkin_info.get("type") == "START":
-                checkin_time = datetime.strptime(
-                    checkin_info["createTime"], "%Y-%m-%d %H:%M:%S")
-                if checkin_time.date() == current_date.date():
-                    has_start = True
-            elif checkin_info.get("type") == "END":
-                checkin_time = datetime.strptime(
-                    checkin_info["createTime"], "%Y-%m-%d %H:%M:%S")
-                if checkin_time.date() == current_date.date():
-                    has_end = True
-    
-    return {"has_start": has_start, "has_end": has_end}
+    # 默认返回上班卡
+    return {"type": "START", "display": "上班"}
