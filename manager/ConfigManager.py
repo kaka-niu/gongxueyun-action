@@ -64,7 +64,7 @@ class ConfigManager:
         env_key = "_".join([key.upper() for key in keys])
         env_value = os.getenv(f"GX_{env_key}")
         
-        if env_value is not None:
+        if env_value is not None and env_value != "":
             # 根据配置类型进行适当转换
             if keys[-1] in ["latitude", "longitude"]:
                 try:

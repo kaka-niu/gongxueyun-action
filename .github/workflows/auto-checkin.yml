@@ -45,12 +45,6 @@ jobs:
       env:
         # JSON格式用户配置 - 优先级最高
         GX_USER: ${{ secrets.USER || '' }}
-        # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
-        GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}
-        GX_USER_PASSWORDS: ${{ secrets.GX_USER_PASSWORDS || '' }}
-        # 单用户配置 - 如果未提供多用户配置，则使用这些
-        GX_USER_PHONE: ${{ secrets.GX_USER_PHONE || '' }}
-        GX_USER_PASSWORD: ${{ secrets.GX_USER_PASSWORD || '' }}
         # 其他配置 - 添加默认值防止secrets不存在
         GX_LOCATION_ADDRESS: ${{ secrets.GX_LOCATION_ADDRESS || '' }}
         GX_LOCATION_LATITUDE: ${{ secrets.GX_LOCATION_LATITUDE || '' }}
@@ -78,24 +72,16 @@ jobs:
       run: |
         echo "开始执行下班打卡..."
         echo "检查环境变量设置..."
-        if [ -z "$GX_USER" ] && [ -z "$GX_USER_PHONE" ] && [ -z "$GX_USER_PHONES" ]; then
+        if [ -z "$GX_USER" ]; then
           echo "错误：未设置用户手机号环境变量"
-          echo "请在GitHub仓库的Settings > Secrets and variables > Actions中添加以下环境变量之一："
-          echo "1. JSON格式配置：USER (包含JSON格式的用户信息)"
-          echo "2. 单用户配置：GX_USER_PHONE 和 GX_USER_PASSWORD"
-          echo "3. 多用户配置：GX_USER_PHONES 和 GX_USER_PASSWORDS"
+          echo "请在GitHub仓库的Settings > Secrets and variables > Actions中添加以下环境变量："
+          echo "JSON格式配置：USER (包含JSON格式的用户信息)"
           exit 1
         fi
         python auto.py END
       env:
         # JSON格式用户配置 - 优先级最高
         GX_USER: ${{ secrets.USER || '' }}
-        # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
-        GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}
-        GX_USER_PASSWORDS: ${{ secrets.GX_USER_PASSWORDS || '' }}
-        # 单用户配置 - 如果未提供多用户配置，则使用这些
-        GX_USER_PHONE: ${{ secrets.GX_USER_PHONE || '' }}
-        GX_USER_PASSWORD: ${{ secrets.GX_USER_PASSWORD || '' }}
         # 其他配置 - 添加默认值防止secrets不存在
         GX_LOCATION_ADDRESS: ${{ secrets.GX_LOCATION_ADDRESS || '' }}
         GX_LOCATION_LATITUDE: ${{ secrets.GX_LOCATION_LATITUDE || '' }}
@@ -135,12 +121,6 @@ jobs:
       env:
         # JSON格式用户配置 - 优先级最高
         GX_USER: ${{ secrets.USER || '' }}
-        # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
-        GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}
-        GX_USER_PASSWORDS: ${{ secrets.GX_USER_PASSWORDS || '' }}
-        # 单用户配置 - 如果未提供多用户配置，则使用这些
-        GX_USER_PHONE: ${{ secrets.GX_USER_PHONE || '' }}
-        GX_USER_PASSWORD: ${{ secrets.GX_USER_PASSWORD || '' }}
         # 其他配置 - 添加默认值防止secrets不存在
         GX_LOCATION_ADDRESS: ${{ secrets.GX_LOCATION_ADDRESS || '' }}
         GX_LOCATION_LATITUDE: ${{ secrets.GX_LOCATION_LATITUDE || '' }}
