@@ -8,3 +8,4 @@ pyarmor>=9.2.3
 urllib3>=2.0.0
 Pillow>=10.0.0
 pyyaml>=6.0
+holidays>=0.30
