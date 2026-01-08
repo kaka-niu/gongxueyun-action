@@ -39,6 +39,19 @@ def create_config_from_env():
         # 尝试从GX_USER环境变量获取JSON格式的配置
         user_json_str = safe_get_env_var("GX_USER")
         
+        # 尝试从SEND环境变量获取SMTP配置
+        send_json_str = safe_get_env_var("SEND")
+        
+        # 解析SMTP配置
+        smtp_config = None
+        if send_json_str and send_json_str.strip():
+            try:
+                smtp_config = json.loads(send_json_str)
+                logging.info("已从SEND环境变量获取SMTP配置")
+            except json.JSONDecodeError as e:
+                logging.error(f"SEND环境变量JSON格式错误: {str(e)}")
+                raise ValueError(f"SEND环境变量不是有效的JSON格式: {str(e)}")
+        
         # 如果GX_USER环境变量存在，则解析JSON格式的配置
         if user_json_str and user_json_str.strip():
             try:
@@ -93,7 +106,8 @@ def create_config_from_env():
                                     "float": user_configs.get("timeFloat", int(safe_get_env_var("GX_TIME_FLOAT", "1")))
                                 }
                             },
-                            "smtp": {
+                            # 如果用户配置中包含smtp字段，直接使用；否则使用环境变量或SEND环境变量
+                            "smtp": user_configs.get("smtp", smtp_config if smtp_config else {
                                 "enable": user_configs.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true"),
                                 "host": user_configs.get("smtpHost", safe_get_env_var("GX_SMTP_HOST")),
                                 "port": user_configs.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465"))),
@@ -101,7 +115,7 @@ def create_config_from_env():
                                 "password": user_configs.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD")),
                                 "from": user_configs.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun")),
                                 "to": user_configs.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])
-                            },
+                            }),
                             "device": user_configs.get("device", safe_get_env_var("GX_DEVICE_INFO", "{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}"))
                         }
                     }
@@ -143,7 +157,8 @@ def create_config_from_env():
                                             "float": item.get("timeFloat", int(safe_get_env_var("GX_TIME_FLOAT", "1")))
                                         }
                                     },
-                                    "smtp": {
+                                    # 如果用户配置中包含smtp字段，直接使用；否则使用环境变量或SEND环境变量
+                                    "smtp": item.get("smtp", smtp_config if smtp_config else {
                                         "enable": item.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true"),
                                         "host": item.get("smtpHost", safe_get_env_var("GX_SMTP_HOST")),
                                         "port": item.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465"))),
@@ -151,7 +166,7 @@ def create_config_from_env():
                                         "password": item.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD")),
                                         "from": item.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun")),
                                         "to": item.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])
-                                    },
+                                    }),
                                     "device": item.get("device", safe_get_env_var("GX_DEVICE_INFO", "{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}"))
                                 }
                             }
@@ -234,7 +249,8 @@ def create_config_from_env():
                             "float": int(safe_get_env_var("GX_TIME_FLOAT", "1"))
                         }
                     },
-                    "smtp": {
+                    # 如果SEND环境变量存在，则使用SEND环境变量中的SMTP配置；否则使用单独的环境变量
+                    "smtp": smtp_config if smtp_config else {
                         "enable": safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true",
                         "host": safe_get_env_var("GX_SMTP_HOST"),
                         "port": int(safe_get_env_var("GX_SMTP_PORT", "465")),
@@ -274,7 +290,8 @@ def create_config_from_env():
                                 "float": int(safe_get_env_var("GX_TIME_FLOAT", "1"))
                             }
                         },
-                        "smtp": {
+                        # 如果SEND环境变量存在，则使用SEND环境变量中的SMTP配置；否则使用单独的环境变量
+                        "smtp": smtp_config if smtp_config else {
                             "enable": safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true",
                             "host": safe_get_env_var("GX_SMTP_HOST"),
                             "port": int(safe_get_env_var("GX_SMTP_PORT", "465")),
