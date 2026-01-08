@@ -1,9 +1,11 @@
-# 工学云自动打卡系统实现原理
+# 工学云自动打卡系统实现
 
 ## 项目概述
 
 工学云自动打卡系统是一个基于Python的自动化工具，用于自动完成工学云平台的每日打卡任务。该项目通过模拟真实用户操作，实现自动登录、获取计划信息、执行打卡以及发送邮件通知等功能。
 
+`原作者项目地址`: https://gitee.com/gumeite-hardware-products_0/GongXueYunAutoCheckIn_CodeVersion
+在基础上增加了下班卡，工作流部署代码
 ## 项目架构
 mainn.py是单次打卡的测试文件 gong_xue_yun.py是主程序入口（带定时功能）
 ### 主要目录结构
@@ -149,38 +151,42 @@ mainn.py是单次打卡的测试文件 gong_xue_yun.py是主程序入口（带�
 5. 记录操作日志
 6. 验证成功后运行gong_xue_yun.py,设置定时任务
 
+
 ## 在GitHub Actions上部署
 
 要在GitHub Actions上自动运行打卡任务，需要配置以下环境变量作为GitHub Secrets：
 
-1. **用户认证信息**：
-   - `GX_USER_PHONE`: 工学云账号手机号
-   - `GX_USER_PASSWORD`: 工学云账号密码
-
-2. **打卡位置信息**：
-   - `GX_LOCATION_ADDRESS`: 打卡地址
-   - `GX_LOCATION_LATITUDE`: 纬度
-   - `GX_LOCATION_LONGITUDE`: 经度
-   - `GX_LOCATION_PROVINCE`: 省份
-   - `GX_LOCATION_CITY`: 城市
-   - `GX_LOCATION_AREA`: 区域
-
-3. **打卡设置**：
-   - `GX_CLOCKIN_MODE`: 打卡模式（weekday/everyday/customize）
-   - `GX_HOLIDAYS_CLOCKIN`: 节假日是否打卡（true/false）
-   - `GX_TIME_START`: 上班打卡时间（格式：HH:MM）
-   - `GX_TIME_END`: 下班打卡时间（格式：HH:MM）
-   - `GX_TIME_FLOAT`: 时间浮动范围（单位：分钟）
-
-4. **邮件通知设置**（可选）：
-   - `GX_SMTP_ENABLE`: 是否启用邮件通知（true/false）
-   - `GX_SMTP_HOST`: SMTP服务器地址
-   - `GX_SMTP_PORT`: SMTP端口
-   - `GX_SMTP_USERNAME`: SMTP用户名
-   - `GX_SMTP_PASSWORD`: SMTP密码
-   - `GX_SMTP_FROM`: 发件人名称
-   - `GX_SMTP_TO`: 收件人列表，用逗号分隔
-
+| 环境变量 | 描述 | 示例值 |
+|---------|------|--------|
+| **用户认证信息** | | |
+| `GX_USER_PHONE` | 工学云账号手机号 | 13800138000 |
+| `GX_USER_PASSWORD` | 工学云账号密码 | yourpassword |
+| **打卡位置信息** | | |
+| `GX_LOCATION_ADDRESS` | 打卡地址 | 四川省 · 资阳市 · 乐至县 · 友谊路南段与川西环线交叉口东北300米 |
+| `GX_LOCATION_LATITUDE` | 纬度 | 30.428727249834488 |
+| `GX_LOCATION_LONGITUDE` | 经度 | 104.90286311986283 |
+| `GX_LOCATION_PROVINCE` | 省份 | 四川省 |
+| `GX_LOCATION_CITY` | 城市 | 资阳市 |
+| `GX_LOCATION_AREA` | 区域 | 乐至县 |
+| **打卡设置** | | |
+| `GX_CLOCKIN_MODE` | 打卡模式 | weekday/everyday/customize |
+| `GX_HOLIDAYS_CLOCKIN` | 节假日是否打卡 | true/false |
+| `GX_TIME_START` | 上班打卡时间 | 08:30 |
+| `GX_TIME_END` | 下班打卡时间 | 18:00 |
+| `GX_TIME_FLOAT` | 时间浮动范围（分钟） | 1 |
+| **邮件通知设置**（可选） | | |
+| `GX_SMTP_ENABLE` | 是否启用邮件通知 | true/false |
+| `GX_SMTP_HOST` | SMTP服务器地址 | smtp.qq.com |
+| `GX_SMTP_PORT` | SMTP端口 | 465 |
+| `GX_SMTP_USERNAME` | SMTP用户名 | youremail@example.com |
+| `GX_SMTP_PASSWORD` | SMTP密码 | yourpassword |
+| `GX_SMTP_FROM` | 发件人名称 | gongxueyun |
+| `GX_SMTP_TO` | 收件人列表 | 2154335573@qq.com |
+| **设备信息** | | |
+| `GX_DEVICE_INFO` | 模拟设备信息 | {brand: phone, systemVersion: 16, Platform: Android, isPhysicalDevice: true, incremental: V2352A} |
+| **多用户设置** | | |
+| `GX_USER_PHONES` | 多用户手机号列表（逗号分隔） | zhang,hao |
+| `GX_USER_PASSWORDS` | 多用户密码列表（逗号分隔） | 密码,密码 |
 ### 配置步骤：
 
 1. 在仓库的Settings -> Secrets and variables -> Actions中添加上述环境变量

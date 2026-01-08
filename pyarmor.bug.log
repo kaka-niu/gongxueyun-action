@@ -1,0 +1,25 @@
+[BUG]: No module named 'PyInstaller'
+
+## Command Line
+E:\Download1\conda\envs\ocr\Scripts\pyarmor gen --pack onefile --output D:\disk\new\obfuscated auto.py
+
+## Environments
+Python 3.10.19
+Pyarmor 9.2.3 (trial), 000000, non-profits
+Platform windows.x86_64
+Native windows.amd64
+Home C:\Users\HP\.pyarmor
+
+## Traceback
+Traceback (most recent call last):
+  File "E:\Download1\conda\envs\ocr\lib\site-packages\pyarmor\cli\__main__.py", line 796, in main
+    main_entry(sys.argv[1:])
+  File "E:\Download1\conda\envs\ocr\lib\site-packages\pyarmor\cli\__main__.py", line 789, in main_entry
+    return args.func(ctx, args)
+  File "E:\Download1\conda\envs\ocr\lib\site-packages\pyarmor\cli\__main__.py", line 240, in cmd_gen
+    from .repack import find_packer
+  File "E:\Download1\conda\envs\ocr\lib\site-packages\pyarmor\cli\repack.py", line 14, in <module>
+    from PyInstaller.archive.writers import ZlibArchiveWriter, CArchiveWriter
+ModuleNotFoundError: No module named 'PyInstaller'
+
+

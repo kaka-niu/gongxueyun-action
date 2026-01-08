@@ -244,3 +244,68 @@ ValueError: 加密失败: 'NoneType' object has no attribute 'encode'
 2026-01-07 15:07:29,322 - INFO - 登录成功，正在发送邮件...
 2026-01-07 15:07:29,949 - INFO - 邮件发送成功: lx15808462201@gmail.com
 2026-01-07 15:07:30,031 - WARNING - 邮件发送失败，但打卡任务已完成
+2026-01-07 16:25:47,772 - INFO - 检查登录状态
+2026-01-07 16:25:47,773 - WARNING - config.json 不存在: D:\disk\new\config.json
+2026-01-07 16:25:47,774 - INFO - 检测到用户信息不一致，执行重新登录
+2026-01-07 16:25:47,774 - INFO - 执行登录
+2026-01-07 16:25:47,775 - WARNING - config.json 不存在: D:\disk\new\config.json
+2026-01-07 16:25:47,796 - ERROR - 加密失败: 'NoneType' object has no attribute 'encode'
+2026-01-07 16:25:47,797 - ERROR - 登录过程发生异常：加密失败: 'NoneType' object has no attribute 'encode'
+Traceback (most recent call last):
+  File "d:\disk\new\util\CryptoUtils.py", line 59, in aes_encrypt
+    ciphertext = cipher.encrypt(plaintext)
+  File "E:\Download1\conda\envs\ocr\lib\site-packages\aes_pkcs5\algorithms\__init__.py", line 32, in encrypt
+    message = message.encode()
+AttributeError: 'NoneType' object has no attribute 'encode'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "d:\disk\new\util\ApiService.py", line 253, in login
+    "phone": aes_encrypt(ConfigManager.get("user", "phone")),
+  File "d:\disk\new\util\CryptoUtils.py", line 64, in aes_encrypt
+    raise ValueError(f"加密失败: {str(e)}")
+ValueError: 加密失败: 'NoneType' object has no attribute 'encode'
+2026-01-07 16:25:47,799 - WARNING - 登录失败
+2026-01-07 16:25:47,799 - WARNING - 登录失败
+2026-01-07 16:26:12,288 - INFO - 检查登录状态
+2026-01-07 16:26:12,289 - INFO - 检测到本地 token，跳过登录
+2026-01-07 16:26:12,289 - INFO - 用户数据：{'authType': 2, 'expiredTime': 2083388843000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10483118', 'msgConfig': {}, 'neteaseImId': 'ea2f4c263d204b5a924d4a12a1d9fdd1', 'nikeName': '雷家圆', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': 'c443e48b0d8c9f993442ce000e5dc448', 'studentNumber': '202301149', 'userName': '雷家圆'}, 'phone': '15681220905', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyODkyNjJ9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzODg4NDMsIm5iZiI6MTc2Nzc2ODc0MywiaWF0IjoxNzY3NzY5NjQzfQ.5ge73GAgiPom2zY-4e6A4Fm9LfCP1qbnCboGMnLG6msjYshUNcTCkLvuwgShx91oxd4IHBBnmtuNf_mR5_zHZQ', 'userId': '108289262', 'userType': 'student'}
+2026-01-07 16:26:12,289 - INFO - 用户类型：student
+2026-01-07 16:26:12,289 - INFO - 检查打卡信息
+2026-01-07 16:26:12,291 - INFO - 检测到本地已有打卡信息 ，跳过获取打卡信息
+2026-01-07 16:26:12,291 - INFO - 执行签到打卡
+2026-01-07 16:26:13,691 - WARNING - Token失效，正在重新登录...
+2026-01-07 16:26:13,691 - INFO - 执行登录
+2026-01-07 16:26:14,309 - INFO - 滑块匹配成功，最大相似度: 0.23029054701328278
+2026-01-07 16:26:14,309 - INFO - 提取PNG宽度成功: 47
+2026-01-07 16:26:14,309 - INFO - 计算滑块距离成功: 165.9
+2026-01-07 16:26:14,310 - INFO - 验证码识别成功: {'x': 165.9, 'y': 5}
+2026-01-07 16:26:14,545 - INFO - 登录数据：{'phone': 'b8d4c5b4c3e4e8952067b0509d9c1846', 'password': '9ad64af7d5357ecf006304509470cbab', 'captcha': 'qsObh+XEY9I12QHy+fvXR7IUoy+dI5dtbB74Mg9ZxezgktNa5v6rVhPqrw3nRct4jTWfKZImz3cGyHQdxFeM5A==', 'loginType': 'android', 'uuid': 'e6f52722f31947e18d7edc9ef4746941', 'device': 'android', 'version': '5.16.0', 't': 'c53886ac6d8b09cfb345d14301f60ebf'}
+2026-01-07 16:26:14,835 - INFO - 登录结果：{'authType': 2, 'expiredTime': 2083393574000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10483118', 'msgConfig': {}, 'neteaseImId': 'ea2f4c263d204b5a924d4a12a1d9fdd1', 'nikeName': '雷家圆', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': 'c443e48b0d8c9f993442ce000e5dc448', 'studentNumber': '202301149', 'userName': '雷家圆'}, 'phone': '15681220905', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyODkyNjJ9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzOTM1NzQsIm5iZiI6MTc2Nzc3MzQ3NCwiaWF0IjoxNzY3Nzc0Mzc0fQ.isCAA1rG91RkkIv6B0mkd7WkcWZlZ35nvQEI1AOgkl0fWWkEpkaPf_gqjm2VXqyuxW9ZAdWB5M157jRQRXjYtA', 'userId': '108289262', 'userType': 'student'}
+2026-01-07 16:26:14,838 - INFO - userInfo.json 已更新: D:\disk\new\user\userInfo.json
+2026-01-07 16:26:14,838 - INFO - 用户信息已保存到 UserInfoManager 管理的文件和缓存中
+2026-01-07 16:26:14,838 - INFO - 已更新 Authorization Token，重试请求
+2026-01-07 16:26:15,101 - INFO - 今日[下班]卡已打，无需重复打卡
+2026-01-07 16:26:15,101 - INFO - {'title': '工学云签到任务通知', 'content': '今日[下班]卡已打，无需重复打卡'}
+2026-01-07 16:26:15,102 - INFO - 准备发送邮件，SMTP服务器: smtp.qq.com:465
+2026-01-07 16:26:15,102 - INFO - 正在连接到SMTP服务器 smtp.qq.com:465...
+2026-01-07 16:26:15,501 - INFO - SMTP_SSL服务器连接成功，正在登录用户 2154335573@qq.com...
+2026-01-07 16:26:15,946 - INFO - 登录成功，正在发送邮件...
+2026-01-07 16:26:16,750 - INFO - 邮件发送成功: 2154335573@qq.com
+2026-01-07 16:26:16,825 - WARNING - 邮件发送失败，但打卡任务已完成
+2026-01-07 19:31:57,692 - INFO - 检查登录状态
+2026-01-07 19:31:57,693 - INFO - 检测到本地 token，跳过登录
+2026-01-07 19:31:57,693 - INFO - 用户数据：{'authType': 2, 'expiredTime': 2083393574000, 'gender': 1, 'headImg': 'f005585371b08470a447374c1a8e85c7.png', 'isAccount': 0, 'moguNo': '10483118', 'msgConfig': {}, 'neteaseImId': 'ea2f4c263d204b5a924d4a12a1d9fdd1', 'nikeName': '雷家圆', 'orgJson': {'classId': '0ee0171f13a3208cc2db586efe299271', 'className': '智能231', 'depId': 'ef9deebb84b530d2f1c9de3db5af5cdb', 'depName': '电子信息学院', 'grade': '2023', 'majorField': '', 'majorId': 'e96d2943ce7d4fd9baf262843450ce41', 'majorName': '智能产品开发与应用', 'schoolId': 'f217a719d8f5c8b1dd1d628b17da70d0', 'schoolName': '绵阳职业技术学院', 'snowFlakeId': '1000373', 'studentId': 'c443e48b0d8c9f993442ce000e5dc448', 'studentNumber': '202301149', 'userName': '雷家圆'}, 'phone': '15681220905', 'roleGroup': [{'currPage': 1, 'orderBy': 'create_time', 'pageSize': 10, 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'sort': 'desc', 'totalCount': 0, 'totalPage': 0}], 'roleId': '1123121137695158273', 'roleKey': 'student', 'roleLevel': '0', 'roleName': '学生', 'token': 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtb2d1ZGluZy11c2VyIiwic3ViIjoie1wibG9naW5UeXBlXCI6XCJhbmRyb2lkXCIsXCJ1c2VySWRcIjoxMDgyODkyNjJ9IiwiYXVkIjoibW9ndWRpbmciLCJleHAiOjIwODMzOTM1NzQsIm5iZiI6MTc2Nzc3MzQ3NCwiaWF0IjoxNzY3Nzc0Mzc0fQ.isCAA1rG91RkkIv6B0mkd7WkcWZlZ35nvQEI1AOgkl0fWWkEpkaPf_gqjm2VXqyuxW9ZAdWB5M157jRQRXjYtA', 'userId': '108289262', 'userType': 'student'}
+2026-01-07 19:31:57,694 - INFO - 用户类型：student
+2026-01-07 19:31:57,694 - INFO - 检查打卡信息
+2026-01-07 19:31:57,695 - INFO - 检测到本地已有打卡信息 ，跳过获取打卡信息
+2026-01-07 19:31:57,695 - INFO - 执行签到打卡
+2026-01-07 19:31:57,933 - INFO - 今日[下班]卡已打，无需重复打卡
+2026-01-07 19:31:57,936 - INFO - {'title': '工学云签到任务通知', 'content': '今日[下班]卡已打，无需重复打卡'}
+2026-01-07 19:31:57,936 - INFO - 准备发送邮件，SMTP服务器: smtp.qq.com:465
+2026-01-07 19:31:57,937 - INFO - 正在连接到SMTP服务器 smtp.qq.com:465...
+2026-01-07 19:31:58,095 - INFO - SMTP_SSL服务器连接成功，正在登录用户 2154335573@qq.com...
+2026-01-07 19:31:58,359 - INFO - 登录成功，正在发送邮件...
+2026-01-07 19:31:58,865 - INFO - 邮件发送成功: 2154335573@qq.com
+2026-01-07 19:31:58,900 - WARNING - 邮件发送失败，但打卡任务已完成

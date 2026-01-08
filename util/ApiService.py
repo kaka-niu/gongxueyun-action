@@ -26,191 +26,81 @@ HEADERS = {
     "host": "api.moguding.net:9000",
 }
 
+def desensitize_phone(phone: str) -> str:
+    """
+    对手机号进行脱敏处理，保留前3位和后4位，中间用*代替。
+    
+    Args:
+        phone (str): 待脱敏的手机号。
+        
+    Returns:
+        str: 脱敏后的手机号。
+    """
+    if len(phone) >= 11:
+        return f"{phone[:3]}****{phone[-4:]}"
+    elif len(phone) >= 7:
+        return f"{phone[:3]}***{phone[-3:]}"
+    else:
+        return "***"  # 对于过短的手机号，返回全隐藏
+
+def desensitize_log_data(log_data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    对日志数据中的敏感信息进行脱敏处理。
+    
+    Args:
+        log_data (Dict[str, Any]): 包含敏感信息的日志数据。
+        
+    Returns:
+        Dict[str, Any]: 脱敏后的日志数据。
+    """
+    desensitized_data = log_data.copy()
+    
+    # 脱敏手机号
+    if 'phone' in desensitized_data:
+        desensitized_data['phone'] = desensitize_phone(desensitized_data['phone'])
+    
+    # 脱敏密码字段
+    if 'password' in desensitized_data:
+        desensitized_data['password'] = '***'
+    
+    # 脱敏token等认证信息
+    sensitive_keys = ['token', 'authorization', 'password', 'captcha', 'uuid']
+    for key in sensitive_keys:
+        if key in desensitized_data:
+            desensitized_data[key] = '***'
+    
+    return desensitized_data
 
 class ApiService:
+    """API服务类，用于处理与工学云服务器的交互。"""
+
     def __init__(self):
+        """初始化API服务实例。"""
+        self.session = requests.Session()
+        self.session.headers.update(HEADERS)
 
-        self.max_retries = 5  # 控制重新尝试的次数
-
-    def _post_request(
-            self,
-            url: str,
-            headers: Dict[str, str],
-            data: Dict[str, Any],
-            retry_count: int = 0,
-    ) -> Dict[str, Any]:
+    def _post_request(self, url: str, headers: Dict[str, str], data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        发送POST请求，并处理请求过程中可能发生的错误。
-        包括自动重试机制和Token失效处理。
+        发送POST请求到指定的URL。
 
         Args:
-            url (str): 请求的API地址（不包括BASE_URL部分）。
-            headers (Dict[str, str]): 请求头信息，包括授权信息。
-            data (Dict[str, Any]): POST请求的数据。
-            msg (str, optional): 如果请求失败，输出的错误信息前缀，默认为'请求失败'。
-            retry_count (int, optional): 当前请求的重试次数，默认为0。
+            url (str): 请求的URL。
+            headers (Dict[str, str]): 请求头。
+            data (Dict[str, Any]): 请求数据。
 
         Returns:
-            Dict[str, Any]: 如果请求成功，返回响应的JSON数据。
+            Dict[str, Any]: 响应数据。
 
         Raises:
-            ValueError: 如果请求失败或响应包含错误信息，则抛出包含详细错误信息的异常。
+            ValueError: 如果请求失败或返回错误状态码，抛出包含详细错误信息的异常。
         """
         try:
-            response = requests.post(f"{BASE_URL}{url}",
-                                     headers=headers,
-                                     json=data,
-                                     timeout=10)
+            response = self.session.post(BASE_URL + url, headers=headers, json=data, timeout=30)
             response.raise_for_status()
-            rsp = response.json()
-
-            if rsp.get("code") == 200 and rsp.get("msg", "未知错误") == "302":
-                raise ValueError("打卡失败，触发行为验证码")
-
-            if rsp.get("code") == 200 or rsp.get("code") == 6111:
-                return rsp
-
-            if ("token失效" in rsp.get("msg", "未知错误")
-                    and retry_count < self.max_retries):
-                wait_time = 1 * (2 ** retry_count)
-                time.sleep(wait_time)
-                logger.warning("Token失效，正在重新登录...")
-                if self.login():
-                    new_token = UserInfoManager.get_token()
-                    headers["authorization"] = new_token
-                    logger.info("已更新 Authorization Token，重试请求")
-                    return self._post_request(url, headers, data, retry_count + 1)
-            else:
-                raise ValueError(rsp.get("msg", "未知错误"))
-
-        except (requests.RequestException, ValueError) as e:
-            if re.search(r"[\u4e00-\u9fff]",
-                         str(e)) or retry_count >= self.max_retries:
-                raise ValueError(f"{str(e)}")
-
-            wait_time = 1 * (2 ** retry_count)
-            logger.warning(
-                f"重试 {retry_count + 1}/{self.max_retries}，等待 {wait_time:.2f} 秒"
-            )
-            time.sleep(wait_time)
-
-        return self._post_request(url, headers, data, retry_count + 1)
-
-    def pass_blockPuzzle_captcha(self, max_attempts: int = 5) -> str:
-        """
-        通过行为验证码（验证码类型为blockPuzzle）。
-
-        Args:
-            max_attempts (Optional[int]): 最大尝试次数，默认为5次。
-
-        Returns:
-            str: 验证参数。
-
-        Raises:
-            Exception: 当达到最大尝试次数时抛出异常。
-        """
-        attempts = 0
-        while attempts < max_attempts:
-            captcha_url = "session/captcha/v1/get"
-            request_data = {
-                "clientUid": str(uuid.uuid4()).replace("-", ""),
-                "captchaType": "blockPuzzle",
-            }
-            captcha_info = self._post_request(
-                captcha_url,
-                HEADERS,
-                request_data,
-            )
-            slider_data = recognize_blockPuzzle_captcha(
-                captcha_info["data"]["jigsawImageBase64"],
-                captcha_info["data"]["originalImageBase64"],
-            )
-            check_slider_url = "session/captcha/v1/check"
-            check_slider_data = {
-                "pointJson":
-                    aes_encrypt(slider_data, captcha_info["data"]["secretKey"],
-                                "b64"),
-                "token":
-                    captcha_info["data"]["token"],
-                "captchaType":
-                    "blockPuzzle",
-            }
-            check_result = self._post_request(
-                check_slider_url,
-                HEADERS,
-                check_slider_data,
-            )
-            if check_result.get("code") != 6111:
-                return aes_encrypt(
-                    captcha_info["data"]["token"] + "---" + slider_data,
-                    captcha_info["data"]["secretKey"],
-                    "b64",
-                )
-            attempts += 1
-            time.sleep(random.uniform(1, 3))
-        raise Exception("通过滑块验证码失败")
-
-    def solve_click_word_captcha(self, max_retries: int = 5) -> str:
-        retry_count = 0
-        while retry_count < max_retries:
-
-            # 获取验证码的接口地址
-            captcha_endpoint = "/attendence/clock/v1/get"
-            captcha_request_payload = {
-                "clientUid": str(uuid.uuid4()).replace("-", ""),  # 生成唯一客户端标识
-                "captchaType": "clickWord",  # 验证码类型
-            }
-
-            # 向服务器请求验证码信息
-            captcha_response = self._post_request(
-                captcha_endpoint,
-                self._get_authenticated_headers(),
-                captcha_request_payload,
-            )
-
-            # 解析验证码图片数据
-            captcha_solution = recognize_clickWord_captcha(
-                captcha_response["data"]["originalImageBase64"],
-                captcha_response["data"]["wordList"],
-            )
-
-            # 验证验证码的接口地址
-            verification_endpoint = "/attendence/clock/v1/check"
-            verification_payload = {
-                "pointJson":
-                    aes_encrypt(captcha_solution,
-                                captcha_response["data"]["secretKey"],
-                                "b64"),  # 加密的点位数据
-                "token":
-                    captcha_response["data"]["token"],  # 验证码令牌
-                "captchaType":
-                    "clickWord",  # 验证码类型
-            }
-
-            # 验证用户点击结果
-            verification_response = self._post_request(
-                verification_endpoint,
-                self._get_authenticated_headers(),
-                verification_payload,
-            )
-
-            # 如果验证码验证成功，则返回加密结果
-            if verification_response.get("code") != 6111:  # 6111 表示验证码验证失败
-                encrypted_result = aes_encrypt(
-                    captcha_response["data"]["token"] + "---" +
-                    captcha_solution,
-                    captcha_response["data"]["secretKey"],
-                    "b64",
-                )
-                return encrypted_result
-
-            # 验证失败，增加重试次数
-            retry_count += 1
-            # 随机等待以模拟正常用户行为
-            time.sleep(random.uniform(1, 3))
-
-        # 超过最大重试次数，抛出异常
-        raise Exception("通过点选验证码失败")
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            logger.error(f"请求失败: {e}")
+            raise ValueError(f"请求失败: {str(e)}")
 
     def _get_authenticated_headers(
             self,
@@ -260,7 +150,19 @@ class ApiService:
                 "t": aes_encrypt(str(int(time.time() * 1000))),
             }
 
-            logger.info(f"登录数据：{data}")
+            # 使用脱敏后的数据进行日志记录
+            desensitized_data = desensitize_log_data({
+                "phone": ConfigManager.get("user", "phone"),
+                "password": "***",  # 密码已加密，但仍显示为***
+                "captcha": "***",
+                "loginType": "android",
+                "uuid": "***",
+                "device": "android",
+                "version": "5.16.0",
+                "t": "***"
+            })
+            logger.info(f"登录数据：{desensitized_data}")
+            
             response = self._post_request(url, HEADERS, data)
 
             encrypted_data = response.get("data")
@@ -269,7 +171,12 @@ class ApiService:
                 return False
 
             user_info = json.loads(aes_decrypt(encrypted_data))
-            logger.info(f"登录结果：{user_info}")
+            
+            # 脱敏用户信息中的敏感数据
+            desensitized_user_info = user_info.copy()
+            if 'phone' in desensitized_user_info:
+                desensitized_user_info['phone'] = desensitize_phone(desensitized_user_info['phone'])
+            logger.info(f"登录结果：{desensitized_user_info}")
 
             # 使用 UserInfoManager 写入缓存和文件
             UserInfoManager.set_userinfo(user_info)
@@ -313,7 +220,15 @@ class ApiService:
             if not plan_info:
                 logger.warning("实习计划数据为空")
                 return False
-            logger.info("获取到的实习计划数据: %s", plan_info)
+            
+            # 脱敏计划信息中的敏感数据
+            desensitized_plan_info = plan_info.copy()
+            sensitive_fields = ['mobile', 'teacherName', 'createName']
+            for field in sensitive_fields:
+                if field in desensitized_plan_info and desensitized_plan_info[field]:
+                    desensitized_plan_info[field] = '***'
+            
+            logger.info("获取到的实习计划数据: %s", desensitized_plan_info)
             # 更新缓存和文件
             PlanInfoManager.set_planinfo(plan_info)
             logger.info("实习计划信息已更新到 PlanInfoManager")

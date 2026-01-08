@@ -9,6 +9,24 @@ from util.HelperFunctions import get_checkin_type, desensitize_name, FORCED_CHEC
 logger = logging.getLogger(__name__)
 
 FORCED_CHECKIN_TYPE = FORCED_CHECKIN_TYPE
+
+def desensitize_phone(phone: str) -> str:
+    """
+    对手机号进行脱敏处理，保留前3位和后4位，中间用*代替。
+    
+    Args:
+        phone (str): 待脱敏的手机号。
+        
+    Returns:
+        str: 脱敏后的手机号。
+    """
+    if len(phone) >= 11:
+        return f"{phone[:3]}****{phone[-4:]}"
+    elif len(phone) >= 7:
+        return f"{phone[:3]}***{phone[-3:]}"
+    else:
+        return "***"  # 对于过短的手机号，返回全隐藏
+
 def clock_in() -> dict[str, str]:
     logging.info("执行签到打卡")
 
@@ -69,8 +87,9 @@ def clock_in() -> dict[str, str]:
     # 记录获取结果
     if success.get("result"):
         logger.info("打卡成功")
-        content = f"签到账号：{ConfigManager.get('user', 'phone')}\n签到类型：{display_type}\n签到地点：{ConfigManager.get('clockIn', 'location', 'address')}"
-        # content = f"签到账号：{ConfigManager.get("user", "phone")}\n签到类型：{display_type}\n签到地点：{ConfigManager.get("clockIn", "location", "address")}"
+        # 使用脱敏后的手机号
+        desensitized_phone = desensitize_phone(ConfigManager.get('user', 'phone'))
+        content = f"签到账号：{desensitized_phone}\n签到类型：{display_type}\n签到地点：{ConfigManager.get('clockIn', 'location', 'address')}"
         return {"title": "工学云签到成功通知", "content": content}
     else:
         logger.warning(f"打卡失败：{success.get('data')}")
