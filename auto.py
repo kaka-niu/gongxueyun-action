@@ -287,22 +287,31 @@ def execute_checkin(checkin_type, user_index=None):
         logging.info(result)
         
         # 发送邮件通知
-        smtp_enabled = ConfigManager.get("smtp", "enable")
-        logging.info(f"SMTP邮件通知配置检查 - 启用状态: {smtp_enabled}")
-        
-        if smtp_enabled:
-            try:
+        # 直接从配置文件读取SMTP配置，避免环境变量覆盖
+        try:
+            with open("config.json", "r", encoding="utf-8") as f:
+                config_data = json.load(f)
+            
+            # 处理单用户配置和多用户配置
+            if "config" in config_data:
+                smtp_config = config_data["config"].get("smtp", {})
+            else:
+                smtp_config = config_data.get("smtp", {})
+            
+            smtp_enabled = smtp_config.get("enable", False)
+            logging.info(f"SMTP邮件通知配置检查 - 启用状态: {smtp_enabled}")
+            
+            if smtp_enabled:
                 # 检查SMTP配置
-                smtp_host = ConfigManager.get("smtp", "host")
-                smtp_port = ConfigManager.get("smtp", "port")
-                smtp_username = ConfigManager.get("smtp", "username")
-                smtp_password = ConfigManager.get("smtp", "password")
-                smtp_from = ConfigManager.get("smtp", "from")
-                smtp_to = ConfigManager.get("smtp", "to")
-                smtp_enable = ConfigManager.get("smtp", "enable")
+                smtp_host = smtp_config.get("host")
+                smtp_port = smtp_config.get("port")
+                smtp_username = smtp_config.get("username")
+                smtp_password = smtp_config.get("password")
+                smtp_from = smtp_config.get("from")
+                smtp_to = smtp_config.get("to")
                 
                 logging.info(f"SMTP配置详情:")
-                logging.info(f"  启用状态: {smtp_enable}")
+                logging.info(f"  启用状态: {smtp_enabled}")
                 logging.info(f"  服务器: {smtp_host}:{smtp_port}")
                 logging.info(f"  用户名: {smtp_username}")
                 logging.info(f"  发件人: {smtp_from}")
@@ -319,13 +328,11 @@ def execute_checkin(checkin_type, user_index=None):
                     logging.info(f"邮件内容: {result['content']}")
                     send_email(result["title"], result["content"])
                     logging.info("邮件发送完成")
-            except Exception as e:
-                logging.error(f"邮件发送过程中出现错误: {str(e)}")
-                import traceback
-                logging.error(f"错误堆栈: {traceback.format_exc()}")
-                logging.warning("邮件发送失败，但打卡任务已完成")
-        else:
-            logging.info("SMTP邮件通知已禁用，跳过邮件发送")
+            else:
+                logging.info("SMTP邮件通知已禁用，跳过邮件发送")
+        except Exception as e:
+            logging.error(f"处理SMTP配置时出现错误: {str(e)}")
+            logging.warning("邮件发送失败，但打卡任务已完成")
         
         return True
     except Exception as e:
