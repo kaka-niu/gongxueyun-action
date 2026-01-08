@@ -61,31 +61,63 @@ class ConfigManager:
         优先从环境变量读取，其次从配置文件读取
         """
         # 1. 尝试从环境变量读取（优先级最高）
-        env_key = "_".join([key.upper() for key in keys])
-        env_value = os.getenv(f"GX_{env_key}")
-        
-        if env_value is not None and env_value != "":
-            logger.info(f"从环境变量 GX_{env_key} 读取配置: {env_value}")
-            # 根据配置类型进行适当转换
-            if keys[-1] in ["latitude", "longitude"]:
-                try:
-                    return float(env_value)
-                except ValueError:
-                    pass
-            elif keys[-1] in ["port", "float"]:
-                try:
-                    return int(env_value)
-                except ValueError:
-                    pass
-            elif keys[-1] == "enable":
-                result = env_value.lower() == "true"
-                logger.info(f"将字符串 '{env_value}' 转换为布尔值: {result}")
-                return result
-            elif keys[-1] == "customDays":
-                if env_value:
-                    return [int(day) for day in env_value.split(",")]
-            return env_value
-        
+        # 对于单个键的情况，使用对应的环境变量
+        # 对于多个键的情况，检查是否存在特定的环境变量，否则从配置文件读取
+        if len(keys) == 1:
+            # 单个键，直接对应环境变量
+            env_key = keys[0].upper()
+            env_value = os.getenv(f"GX_{env_key}")
+            
+            if env_value is not None and env_value != "":
+                logger.info(f"从环境变量 GX_{env_key} 读取配置: {env_value}")
+                # 根据配置类型进行适当转换
+                if keys[-1] in ["latitude", "longitude"]:
+                    try:
+                        return float(env_value)
+                    except ValueError:
+                        pass
+                elif keys[-1] in ["port", "float"]:
+                    try:
+                        return int(env_value)
+                    except ValueError:
+                        pass
+                elif keys[-1] == "enable":
+                    result = env_value.lower() == "true"
+                    logger.info(f"将字符串 '{env_value}' 转换为布尔值: {result}")
+                    return result
+                elif keys[-1] == "customDays":
+                    if env_value:
+                        return [int(day) for day in env_value.split(",")]
+                return env_value
+        elif len(keys) > 1:
+            # 多个键，检查是否存在组合的环境变量（如GX_CLOCKIN_MODE）
+            env_key = "_".join([key.upper() for key in keys])
+            env_value = os.getenv(f"GX_{env_key}")
+            
+            if env_value is not None and env_value != "":
+                logger.info(f"从环境变量 GX_{env_key} 读取配置: {env_value}")
+                # 如果存在组合环境变量，则使用它
+                last_key = keys[-1]
+                # 根据配置类型进行适当转换
+                if last_key in ["latitude", "longitude"]:
+                    try:
+                        return float(env_value)
+                    except ValueError:
+                        pass
+                elif last_key in ["port", "float"]:
+                    try:
+                        return int(env_value)
+                    except ValueError:
+                        pass
+                elif last_key == "enable":
+                    result = env_value.lower() == "true"
+                    logger.info(f"将字符串 '{env_value}' 转换为布尔值: {result}")
+                    return result
+                elif last_key == "customDays":
+                    if env_value:
+                        return [int(day) for day in env_value.split(",")]
+                return env_value
+ 
         # 2. 从配置文件读取
         config_data = cls.load()
         if not config_data:
