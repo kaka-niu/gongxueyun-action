@@ -48,14 +48,8 @@ jobs:
         pip install pyarmor==9.2.3
         
     - name: 执行上班打卡
-<<<<<<< HEAD
       if: github.event.schedule == '0 23 * * *'
       run: python auto.py START
-=======
-      if: github.event.schedule == '0 2 * * *'
-      run: python obfuscated\auto.py START
-
->>>>>>> 73c8a122d26baf6f2b2572e09bb354d808c88d2f
       env:
         # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
         GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}
@@ -85,13 +79,8 @@ jobs:
         GX_DEVICE_INFO: "${{ secrets.GX_DEVICE_INFO || '{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}' }}"
         
     - name: 执行下班打卡
-<<<<<<< HEAD
       if: github.event.schedule == '0 9 * * *'
       run: python auto.py END
-=======
-      if: github.event.schedule == '0 10 * * *'
-      run: python obfuscated\auto.py END
->>>>>>> 73c8a122d26baf6f2b2572e09bb354d808c88d2f
       env:
         # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
         GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}
