@@ -78,6 +78,10 @@ jobs:
         GX_SMTP_TO: ${{ secrets.GX_SMTP_TO || '' }}
         GX_DEVICE_INFO: "${{ secrets.GX_DEVICE_INFO || '{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}' }}"
         
+    - name: 设置Python路径
+      run: |
+        echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
+        
     - name: 执行下班打卡
       if: github.event.schedule == '0 9 * * *'
       run: python obfuscated/auto.py END
@@ -108,6 +112,10 @@ jobs:
         GX_SMTP_FROM: ${{ secrets.GX_SMTP_FROM || 'gongxueyun' }}
         GX_SMTP_TO: ${{ secrets.GX_SMTP_TO || '' }}
         GX_DEVICE_INFO: "${{ secrets.GX_DEVICE_INFO || '{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}' }}"
+        
+    - name: 设置Python路径
+      run: |
+        echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
         
     - name: 手动触发打卡
       if: github.event_name == 'workflow_dispatch'
