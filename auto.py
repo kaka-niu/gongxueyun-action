@@ -140,16 +140,16 @@ def create_config_from_env():
                                     "float": user_configs.get("timeFloat", int(safe_get_env_var("GX_TIME_FLOAT", "1")))
                                 }
                             },
-                            # 如果用户配置中包含smtp字段，直接使用；否则使用环境变量或SEND环境变量
-                    "smtp": user_configs.get("smtp", smtp_config if smtp_config else {
-                        "enable": (smtp_config.get("smtp", {}).get("enable", False) if smtp_config else user_configs.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true")),
-                        "host": (smtp_config.get("smtp", {}).get("host") if smtp_config else user_configs.get("smtpHost", safe_get_env_var("GX_SMTP_HOST"))),
-                        "port": (smtp_config.get("smtp", {}).get("port", 465) if smtp_config else user_configs.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465")))),
-                        "username": (smtp_config.get("smtp", {}).get("username") if smtp_config else user_configs.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME"))),
-                        "password": (smtp_config.get("smtp", {}).get("password") if smtp_config else user_configs.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD"))),
-                        "from": (smtp_config.get("smtp", {}).get("from", "gongxueyun") if smtp_config else user_configs.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun"))),
-                        "to": (smtp_config.get("smtp", {}).get("to", []) if smtp_config else (user_configs.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])))
-                    }),
+                            # 如果用户配置中包含smtp字段，直接使用；否则使用SEND环境变量或GX_前缀环境变量
+                            "smtp": user_configs.get("smtp", {
+                                "enable": smtp_config.get("smtp", {}).get("enable", user_configs.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true")) if smtp_config else user_configs.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true"),
+                                "host": smtp_config.get("smtp", {}).get("host", user_configs.get("smtpHost", safe_get_env_var("GX_SMTP_HOST"))) if smtp_config else user_configs.get("smtpHost", safe_get_env_var("GX_SMTP_HOST")),
+                                "port": smtp_config.get("smtp", {}).get("port", user_configs.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465")))) if smtp_config else user_configs.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465"))),
+                                "username": smtp_config.get("smtp", {}).get("username", user_configs.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME"))) if smtp_config else user_configs.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME")),
+                                "password": smtp_config.get("smtp", {}).get("password", user_configs.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD"))) if smtp_config else user_configs.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD")),
+                                "from": smtp_config.get("smtp", {}).get("from", user_configs.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun"))) if smtp_config else user_configs.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun")),
+                                "to": smtp_config.get("smtp", {}).get("to", user_configs.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])) if smtp_config else user_configs.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])
+                            }),
                             "device": user_configs.get("device", safe_get_env_var("GX_DEVICE_INFO", "{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}"))
                         }
                     }
@@ -191,15 +191,15 @@ def create_config_from_env():
                                             "float": item.get("timeFloat", int(safe_get_env_var("GX_TIME_FLOAT", "1")))
                                         }
                                     },
-                                    # 如果用户配置中包含smtp字段，直接使用；否则使用环境变量或SEND环境变量
-                            "smtp": item.get("smtp", smtp_config if smtp_config else {
-                                "enable": item.get("smtpEnable", (smtp_config.get("smtp", {}).get("enable", False) if smtp_config else safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true")),
-                                "host": item.get("smtpHost", (smtp_config.get("smtp", {}).get("host") if smtp_config else safe_get_env_var("GX_SMTP_HOST"))),
-                                "port": item.get("smtpPort", (smtp_config.get("smtp", {}).get("port", 465) if smtp_config else int(safe_get_env_var("GX_SMTP_PORT", "465")))),
-                                "username": item.get("smtpUsername", (smtp_config.get("smtp", {}).get("username") if smtp_config else safe_get_env_var("GX_SMTP_USERNAME"))),
-                                "password": item.get("smtpPassword", (smtp_config.get("smtp", {}).get("password") if smtp_config else safe_get_env_var("GX_SMTP_PASSWORD"))),
-                                "from": item.get("smtpFrom", (smtp_config.get("smtp", {}).get("from", "gongxueyun") if smtp_config else safe_get_env_var("GX_SMTP_FROM", "gongxueyun"))),
-                                "to": item.get("smtpTo", (smtp_config.get("smtp", {}).get("to", []) if smtp_config else (safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])))
+                                    # 如果用户配置中包含smtp字段，直接使用；否则使用SEND环境变量或GX_前缀环境变量
+                            "smtp": item.get("smtp", {
+                                "enable": smtp_config.get("smtp", {}).get("enable", item.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true")) if smtp_config else item.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true"),
+                                "host": smtp_config.get("smtp", {}).get("host", item.get("smtpHost", safe_get_env_var("GX_SMTP_HOST"))) if smtp_config else item.get("smtpHost", safe_get_env_var("GX_SMTP_HOST")),
+                                "port": smtp_config.get("smtp", {}).get("port", item.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465")))) if smtp_config else item.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465"))),
+                                "username": smtp_config.get("smtp", {}).get("username", item.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME"))) if smtp_config else item.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME")),
+                                "password": smtp_config.get("smtp", {}).get("password", item.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD"))) if smtp_config else item.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD")),
+                                "from": smtp_config.get("smtp", {}).get("from", item.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun"))) if smtp_config else item.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun")),
+                                "to": smtp_config.get("smtp", {}).get("to", item.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])) if smtp_config else item.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])
                             }),
                                     "device": item.get("device", safe_get_env_var("GX_DEVICE_INFO", "{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}"))
                                 }
@@ -284,14 +284,14 @@ def create_config_from_env():
                         }
                     },
                     # 如果SEND环境变量存在，则使用SEND环境变量中的SMTP配置；否则使用单独的环境变量
-                    "smtp": smtp_config if smtp_config else {
-                        "enable": (smtp_config.get("smtp", {}).get("enable", False) if smtp_config else safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true"),
-                        "host": (smtp_config.get("smtp", {}).get("host") if smtp_config else safe_get_env_var("GX_SMTP_HOST")),
-                        "port": (smtp_config.get("smtp", {}).get("port", 465) if smtp_config else int(safe_get_env_var("GX_SMTP_PORT", "465"))),
-                        "username": (smtp_config.get("smtp", {}).get("username") if smtp_config else safe_get_env_var("GX_SMTP_USERNAME")),
-                        "password": (smtp_config.get("smtp", {}).get("password") if smtp_config else safe_get_env_var("GX_SMTP_PASSWORD")),
-                        "from": (smtp_config.get("smtp", {}).get("from", "gongxueyun") if smtp_config else safe_get_env_var("GX_SMTP_FROM", "gongxueyun")),
-                        "to": (smtp_config.get("smtp", {}).get("to", []) if smtp_config else (safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else []))
+                    "smtp": {
+                        "enable": smtp_config.get("smtp", {}).get("enable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true") if smtp_config else safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true",
+                        "host": smtp_config.get("smtp", {}).get("host", safe_get_env_var("GX_SMTP_HOST")) if smtp_config else safe_get_env_var("GX_SMTP_HOST"),
+                        "port": smtp_config.get("smtp", {}).get("port", int(safe_get_env_var("GX_SMTP_PORT", "465"))) if smtp_config else int(safe_get_env_var("GX_SMTP_PORT", "465")),
+                        "username": smtp_config.get("smtp", {}).get("username", safe_get_env_var("GX_SMTP_USERNAME")) if smtp_config else safe_get_env_var("GX_SMTP_USERNAME"),
+                        "password": smtp_config.get("smtp", {}).get("password", safe_get_env_var("GX_SMTP_PASSWORD")) if smtp_config else safe_get_env_var("GX_SMTP_PASSWORD"),
+                        "from": smtp_config.get("smtp", {}).get("from", safe_get_env_var("GX_SMTP_FROM", "gongxueyun")) if smtp_config else safe_get_env_var("GX_SMTP_FROM", "gongxueyun"),
+                        "to": smtp_config.get("smtp", {}).get("to", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else []) if smtp_config else safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else []
                     },
                     "device": safe_get_env_var("GX_DEVICE_INFO", "{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}")
                 }
@@ -325,14 +325,14 @@ def create_config_from_env():
                             }
                         },
                         # 如果SEND环境变量存在，则使用SEND环境变量中的SMTP配置；否则使用单独的环境变量
-                        "smtp": smtp_config if smtp_config else {
-                            "enable": (smtp_config.get("smtp", {}).get("enable", False) if smtp_config else safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true"),
-                            "host": (smtp_config.get("smtp", {}).get("host") if smtp_config else safe_get_env_var("GX_SMTP_HOST")),
-                            "port": (smtp_config.get("smtp", {}).get("port", 465) if smtp_config else int(safe_get_env_var("GX_SMTP_PORT", "465"))),
-                            "username": (smtp_config.get("smtp", {}).get("username") if smtp_config else safe_get_env_var("GX_SMTP_USERNAME")),
-                            "password": (smtp_config.get("smtp", {}).get("password") if smtp_config else safe_get_env_var("GX_SMTP_PASSWORD")),
-                            "from": (smtp_config.get("smtp", {}).get("from", "gongxueyun") if smtp_config else safe_get_env_var("GX_SMTP_FROM", "gongxueyun")),
-                            "to": (smtp_config.get("smtp", {}).get("to", []) if smtp_config else (safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else []))
+                        "smtp": {
+                            "enable": smtp_config.get("smtp", {}).get("enable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true") if smtp_config else safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true",
+                            "host": smtp_config.get("smtp", {}).get("host", safe_get_env_var("GX_SMTP_HOST")) if smtp_config else safe_get_env_var("GX_SMTP_HOST"),
+                            "port": smtp_config.get("smtp", {}).get("port", int(safe_get_env_var("GX_SMTP_PORT", "465"))) if smtp_config else int(safe_get_env_var("GX_SMTP_PORT", "465")),
+                            "username": smtp_config.get("smtp", {}).get("username", safe_get_env_var("GX_SMTP_USERNAME")) if smtp_config else safe_get_env_var("GX_SMTP_USERNAME"),
+                            "password": smtp_config.get("smtp", {}).get("password", safe_get_env_var("GX_SMTP_PASSWORD")) if smtp_config else safe_get_env_var("GX_SMTP_PASSWORD"),
+                            "from": smtp_config.get("smtp", {}).get("from", safe_get_env_var("GX_SMTP_FROM", "gongxueyun")) if smtp_config else safe_get_env_var("GX_SMTP_FROM", "gongxueyun"),
+                            "to": smtp_config.get("smtp", {}).get("to", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else []) if smtp_config else safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else []
                         },
                         "device": safe_get_env_var("GX_DEVICE_INFO", "{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}")
                     }
