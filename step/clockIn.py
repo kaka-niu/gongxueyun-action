@@ -40,14 +40,17 @@ def clock_in() -> dict[str, str]:
     # 调用API服务
     api_client = ApiService()
     # 获取打卡信息
-    checkin_list = api_client.get_checkin_info()
+    checkin_info = api_client.get_checkin_info()
+    
+    # 将打卡信息转换为列表格式，以便后续处理
+    checkin_list = [checkin_info] if checkin_info else []
     
     # 检查是否已经打过相同类型的卡
     if checkin_list:
-        for checkin_info in checkin_list:
-            if checkin_info.get("type") == checkin_type:
+        for info in checkin_list:
+            if info.get("type") == checkin_type:
                 checkin_time = datetime.strptime(
-                    checkin_info["createTime"], "%Y-%m-%d %H:%M:%S")
+                    info["createTime"], "%Y-%m-%d %H:%M:%S")
                 if checkin_time.date() == current_time.date():
                     log = f"今日[{display_type}]卡已打，无需重复打卡"
                     logger.info(log)
@@ -57,10 +60,10 @@ def clock_in() -> dict[str, str]:
     if checkin_type == "END":
         has_start_checkin = False
         if checkin_list:
-            for checkin_info in checkin_list:
-                if checkin_info.get("type") == "START":
+            for info in checkin_list:
+                if info.get("type") == "START":
                     checkin_time = datetime.strptime(
-                        checkin_info["createTime"], "%Y-%m-%d %H:%M:%S")
+                        info["createTime"], "%Y-%m-%d %H:%M:%S")
                     if checkin_time.date() == current_time.date():
                         has_start_checkin = True
                         break
