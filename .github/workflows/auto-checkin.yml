@@ -49,7 +49,7 @@ jobs:
         
     - name: 执行上班打卡
       if: github.event.schedule == '0 23 * * *'
-      run: python obfuscated\auto.py START
+      run: python obfuscated/auto.py START
       env:
         # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
         GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}
@@ -80,7 +80,7 @@ jobs:
         
     - name: 执行下班打卡
       if: github.event.schedule == '0 9 * * *'
-      run: python obfuscated\auto.py END
+      run: python obfuscated/auto.py END
       env:
         # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
         GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}
@@ -111,7 +111,7 @@ jobs:
         
     - name: 手动触发打卡
       if: github.event_name == 'workflow_dispatch'
-      run: python obfuscated\auto.py ${{ github.event.inputs.checkin_type }}
+      run: python obfuscated/auto.py ${{ github.event.inputs.checkin_type }}
       env:
         # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
         GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}
