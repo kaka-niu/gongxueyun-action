@@ -43,6 +43,8 @@ jobs:
       if: github.event.schedule == '0 23 * * *'
       run: python auto.py START
       env:
+        # JSON格式用户配置 - 优先级最高
+        GX_USER: ${{ secrets.USER || '' }}
         # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
         GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}
         GX_USER_PASSWORDS: ${{ secrets.GX_USER_PASSWORDS || '' }}
@@ -61,6 +63,7 @@ jobs:
         GX_TIME_START: ${{ secrets.GX_TIME_START || '8:30' }}
         GX_TIME_END: ${{ secrets.GX_TIME_END || '18:00' }}
         GX_TIME_FLOAT: ${{ secrets.GX_TIME_FLOAT || '1' }}
+        GX_CUSTOM_DAYS: ${{ secrets.GX_CUSTOM_DAYS || '1,2,3,4,5' }}
         GX_SMTP_ENABLE: ${{ secrets.GX_SMTP_ENABLE || 'false' }}
         GX_SMTP_HOST: ${{ secrets.GX_SMTP_HOST || '' }}
         GX_SMTP_PORT: ${{ secrets.GX_SMTP_PORT || '465' }}
@@ -75,15 +78,18 @@ jobs:
       run: |
         echo "开始执行下班打卡..."
         echo "检查环境变量设置..."
-        if [ -z "$GX_USER_PHONE" ] && [ -z "$GX_USER_PHONES" ]; then
+        if [ -z "$GX_USER" ] && [ -z "$GX_USER_PHONE" ] && [ -z "$GX_USER_PHONES" ]; then
           echo "错误：未设置用户手机号环境变量"
           echo "请在GitHub仓库的Settings > Secrets and variables > Actions中添加以下环境变量之一："
-          echo "1. 单用户配置：GX_USER_PHONE 和 GX_USER_PASSWORD"
-          echo "2. 多用户配置：GX_USER_PHONES 和 GX_USER_PASSWORDS"
+          echo "1. JSON格式配置：USER (包含JSON格式的用户信息)"
+          echo "2. 单用户配置：GX_USER_PHONE 和 GX_USER_PASSWORD"
+          echo "3. 多用户配置：GX_USER_PHONES 和 GX_USER_PASSWORDS"
           exit 1
         fi
         python auto.py END
       env:
+        # JSON格式用户配置 - 优先级最高
+        GX_USER: ${{ secrets.USER || '' }}
         # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
         GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}
         GX_USER_PASSWORDS: ${{ secrets.GX_USER_PASSWORDS || '' }}
@@ -102,6 +108,7 @@ jobs:
         GX_TIME_START: ${{ secrets.GX_TIME_START || '8:30' }}
         GX_TIME_END: ${{ secrets.GX_TIME_END || '18:00' }}
         GX_TIME_FLOAT: ${{ secrets.GX_TIME_FLOAT || '1' }}
+        GX_CUSTOM_DAYS: ${{ secrets.GX_CUSTOM_DAYS || '1,2,3,4,5' }}
         GX_SMTP_ENABLE: ${{ secrets.GX_SMTP_ENABLE || 'false' }}
         GX_SMTP_HOST: ${{ secrets.GX_SMTP_HOST || '' }}
         GX_SMTP_PORT: ${{ secrets.GX_SMTP_PORT || '465' }}
@@ -116,15 +123,18 @@ jobs:
       run: |
         echo "开始执行手动触发打卡..."
         echo "检查环境变量设置..."
-        if [ -z "$GX_USER_PHONE" ] && [ -z "$GX_USER_PHONES" ]; then
+        if [ -z "$GX_USER" ] && [ -z "$GX_USER_PHONE" ] && [ -z "$GX_USER_PHONES" ]; then
           echo "错误：未设置用户手机号环境变量"
           echo "请在GitHub仓库的Settings > Secrets and variables > Actions中添加以下环境变量之一："
-          echo "1. 单用户配置：GX_USER_PHONE 和 GX_USER_PASSWORD"
-          echo "2. 多用户配置：GX_USER_PHONES 和 GX_USER_PASSWORDS"
+          echo "1. JSON格式配置：USER (包含JSON格式的用户信息)"
+          echo "2. 单用户配置：GX_USER_PHONE 和 GX_USER_PASSWORD"
+          echo "3. 多用户配置：GX_USER_PHONES 和 GX_USER_PASSWORDS"
           exit 1
         fi
         python auto.py ${{ github.event.inputs.checkin_type }}
       env:
+        # JSON格式用户配置 - 优先级最高
+        GX_USER: ${{ secrets.USER || '' }}
         # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
         GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}
         GX_USER_PASSWORDS: ${{ secrets.GX_USER_PASSWORDS || '' }}
@@ -143,6 +153,7 @@ jobs:
         GX_TIME_START: ${{ secrets.GX_TIME_START || '8:30' }}
         GX_TIME_END: ${{ secrets.GX_TIME_END || '18:00' }}
         GX_TIME_FLOAT: ${{ secrets.GX_TIME_FLOAT || '1' }}
+        GX_CUSTOM_DAYS: ${{ secrets.GX_CUSTOM_DAYS || '1,2,3,4,5' }}
         GX_SMTP_ENABLE: ${{ secrets.GX_SMTP_ENABLE || 'false' }}
         GX_SMTP_HOST: ${{ secrets.GX_SMTP_HOST || '' }}
         GX_SMTP_PORT: ${{ secrets.GX_SMTP_PORT || '465' }}
