@@ -22,7 +22,7 @@ def safe_get_env_var(var_name, default_value=""):
     try:
         value = os.getenv(var_name, default_value)
         if value is None or value == "":
-            if var_name in ["GX_USER_PHONE", "GX_USER_PASSWORD", "GX_USER_PHONES", "GX_USER_PASSWORDS", "GX_USER"]:
+            if var_name in ["GX_USER"]:
                 logging.error(f"关键环境变量 {var_name} 未设置或为空")
                 logging.error(f"请在GitHub仓库的Settings > Secrets and variables > Actions中添加 {var_name}")
             elif var_name == "SEND":
@@ -86,267 +86,151 @@ def create_config_from_env():
                 logging.error(f"解析SEND环境变量时出错: {str(e)}")
                 raise ValueError(f"解析SEND环境变量时出错: {str(e)}")
         
-        # 如果GX_USER环境变量存在，则解析JSON格式的配置
-        if user_json_str and user_json_str.strip():
-            try:
-                # 解析JSON字符串
-                user_configs = json.loads(user_json_str)
-                
-                # 处理两种格式：
-                # 1. 完整配置格式：{"config": {...}}
-                # 2. 用户配置格式：{"phone": "...", "password": "..."} 或 [{"phone": "...", "password": "..."}, ...]
-                
-                # 处理三种JSON格式：
-                # 1. 完整配置格式：{"config": {...}}
-                # 2. 用户配置格式：{"phone": "...", "password": "..."}
-                # 3. 多用户配置格式：[{"config": {...}}, {"config": {...}}]
-                
-                configs = []
-                
-                # 如果是单个完整配置格式（包含config字段），直接使用
-                if isinstance(user_configs, dict) and "config" in user_configs:
-                    configs = [user_configs]
-                # 如果是单个用户配置（字典格式，不包含config字段），转换为完整配置
-                elif isinstance(user_configs, dict):
-                    if not isinstance(user_configs, dict):
-                        raise ValueError("GX_USER环境变量中的每个用户配置必须是JSON对象")
-                    
-                    # 验证必需字段
-                    if "phone" not in user_configs or "password" not in user_configs:
-                        raise ValueError("每个用户配置必须包含phone和password字段")
-                    
-                    # 创建完整配置
-                    config = {
-                        "config": {
-                            "user": {
-                                "phone": user_configs["phone"],
-                                "password": user_configs["password"]
-                            },
-                            "clockIn": {
-                                "mode": user_configs.get("mode", safe_get_env_var("GX_CLOCKIN_MODE", "everyday")),
-                                "location": {
-                                    "address": user_configs.get("address", safe_get_env_var("GX_LOCATION_ADDRESS")),
-                                    "latitude": user_configs.get("latitude", safe_get_env_var("GX_LOCATION_LATITUDE")),
-                                    "longitude": user_configs.get("longitude", safe_get_env_var("GX_LOCATION_LONGITUDE")),
-                                    "province": user_configs.get("province", safe_get_env_var("GX_LOCATION_PROVINCE")),
-                                    "city": user_configs.get("city", safe_get_env_var("GX_LOCATION_CITY")),
-                                    "area": user_configs.get("area", safe_get_env_var("GX_LOCATION_AREA"))
-                                },
-                                "holidaysClockIn": user_configs.get("holidaysClockIn", safe_get_env_var("GX_HOLIDAYS_CLOCKIN", "false").lower() == "true"),
-                                "customDays": user_configs.get("customDays", [int(day) for day in safe_get_env_var("GX_CUSTOM_DAYS", "1,2,3,4,5").split(",")] if safe_get_env_var("GX_CUSTOM_DAYS") else []),
-                                "time": {
-                                    "start": user_configs.get("startTime", safe_get_env_var("GX_TIME_START", "8:30")),
-                                    "end": user_configs.get("endTime", safe_get_env_var("GX_TIME_END", "18:00")),
-                                    "float": user_configs.get("timeFloat", int(safe_get_env_var("GX_TIME_FLOAT", "1")))
-                                }
-                            },
-                            # 如果用户配置中包含smtp字段，直接使用；否则使用SEND环境变量或GX_前缀环境变量
-                            "smtp": user_configs.get("smtp", {
-                                "enable": smtp_config.get("smtp", {}).get("enable", user_configs.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true")) if smtp_config else user_configs.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true"),
-                                "host": smtp_config.get("smtp", {}).get("host", user_configs.get("smtpHost", safe_get_env_var("GX_SMTP_HOST"))) if smtp_config else user_configs.get("smtpHost", safe_get_env_var("GX_SMTP_HOST")),
-                                "port": smtp_config.get("smtp", {}).get("port", user_configs.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465")))) if smtp_config else user_configs.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465"))),
-                                "username": smtp_config.get("smtp", {}).get("username", user_configs.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME"))) if smtp_config else user_configs.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME")),
-                                "password": smtp_config.get("smtp", {}).get("password", user_configs.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD"))) if smtp_config else user_configs.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD")),
-                                "from": smtp_config.get("smtp", {}).get("from", user_configs.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun"))) if smtp_config else user_configs.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun")),
-                                "to": smtp_config.get("smtp", {}).get("to", user_configs.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])) if smtp_config else user_configs.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])
-                            }),
-                            "device": user_configs.get("device", safe_get_env_var("GX_DEVICE_INFO", "{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}"))
-                        }
-                    }
-                    configs = [config]
-                # 如果是列表格式，检查每个元素
-                elif isinstance(user_configs, list):
-                    for item in user_configs:
-                        # 如果是完整配置格式（包含config字段），直接使用
-                        if isinstance(item, dict) and "config" in item:
-                            configs.append(item)
-                        # 如果是用户配置格式（不包含config字段），转换为完整配置
-                        elif isinstance(item, dict):
-                            # 验证必需字段
-                            if "phone" not in item or "password" not in item:
-                                raise ValueError("每个用户配置必须包含phone和password字段")
-                            
-                            # 创建完整配置
-                            config = {
-                                "config": {
-                                    "user": {
-                                        "phone": item["phone"],
-                                        "password": item["password"]
-                                    },
-                                    "clockIn": {
-                                        "mode": item.get("mode", safe_get_env_var("GX_CLOCKIN_MODE", "everyday")),
-                                        "location": {
-                                            "address": item.get("address", safe_get_env_var("GX_LOCATION_ADDRESS")),
-                                            "latitude": item.get("latitude", safe_get_env_var("GX_LOCATION_LATITUDE")),
-                                            "longitude": item.get("longitude", safe_get_env_var("GX_LOCATION_LONGITUDE")),
-                                            "province": item.get("province", safe_get_env_var("GX_LOCATION_PROVINCE")),
-                                            "city": item.get("city", safe_get_env_var("GX_LOCATION_CITY")),
-                                            "area": item.get("area", safe_get_env_var("GX_LOCATION_AREA"))
-                                        },
-                                        "holidaysClockIn": item.get("holidaysClockIn", safe_get_env_var("GX_HOLIDAYS_CLOCKIN", "false").lower() == "true"),
-                                        "customDays": item.get("customDays", [int(day) for day in safe_get_env_var("GX_CUSTOM_DAYS", "1,2,3,4,5").split(",")] if safe_get_env_var("GX_CUSTOM_DAYS") else []),
-                                        "time": {
-                                            "start": item.get("startTime", safe_get_env_var("GX_TIME_START", "8:30")),
-                                            "end": item.get("endTime", safe_get_env_var("GX_TIME_END", "18:00")),
-                                            "float": item.get("timeFloat", int(safe_get_env_var("GX_TIME_FLOAT", "1")))
-                                        }
-                                    },
-                                    # 如果用户配置中包含smtp字段，直接使用；否则使用SEND环境变量或GX_前缀环境变量
-                            "smtp": item.get("smtp", {
-                                "enable": smtp_config.get("smtp", {}).get("enable", item.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true")) if smtp_config else item.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true"),
-                                "host": smtp_config.get("smtp", {}).get("host", item.get("smtpHost", safe_get_env_var("GX_SMTP_HOST"))) if smtp_config else item.get("smtpHost", safe_get_env_var("GX_SMTP_HOST")),
-                                "port": smtp_config.get("smtp", {}).get("port", item.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465")))) if smtp_config else item.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465"))),
-                                "username": smtp_config.get("smtp", {}).get("username", item.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME"))) if smtp_config else item.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME")),
-                                "password": smtp_config.get("smtp", {}).get("password", item.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD"))) if smtp_config else item.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD")),
-                                "from": smtp_config.get("smtp", {}).get("from", item.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun"))) if smtp_config else item.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun")),
-                                "to": smtp_config.get("smtp", {}).get("to", item.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])) if smtp_config else item.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])
-                            }),
-                                    "device": item.get("device", safe_get_env_var("GX_DEVICE_INFO", "{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}"))
-                                }
-                            }
-                            configs.append(config)
-                        else:
-                            raise ValueError("GX_USER环境变量中的每个用户配置必须是JSON对象")
-                else:
-                    raise ValueError("GX_USER环境变量格式不正确，应为JSON对象或JSON对象数组")
-                
-                # 保存配置到文件
-                with open("config.json", "w", encoding="utf-8") as f:
-                    # 如果是单个配置，直接保存
-                    if len(configs) == 1:
-                        json.dump(configs[0], f, ensure_ascii=False, indent=4)
-                    # 如果是多个配置，保存为列表
-                    else:
-                        json.dump(configs, f, ensure_ascii=False, indent=4)
-                
-                logging.info("配置文件已从GX_USER环境变量生成")
-                return
-            except json.JSONDecodeError as e:
-                logging.error(f"GX_USER环境变量JSON格式错误: {str(e)}")
-                raise ValueError(f"GX_USER环境变量不是有效的JSON格式: {str(e)}")
-            except Exception as e:
-                logging.error(f"处理GX_USER环境变量时出错: {str(e)}")
-                raise
-        
-        # 获取用户配置列表
-        user_phones_str = safe_get_env_var("GX_USER_PHONES")
-        user_passwords_str = safe_get_env_var("GX_USER_PASSWORDS")
-        
-        # 获取单用户配置
-        user_phone = safe_get_env_var("GX_USER_PHONE")
-        user_password = safe_get_env_var("GX_USER_PASSWORD")
-        
-        # 验证环境变量
-        user_phones = user_phones_str.split(",") if user_phones_str else []
-        user_passwords = user_passwords_str.split(",") if user_passwords_str else []
-        
-        # 检查是否有多用户配置
-        has_multi_user = user_phones and user_passwords and len(user_phones) == len(user_passwords)
-        
-        # 检查是否有单用户配置
-        has_single_user = user_phone and user_password
-        
-        # 如果既没有多用户配置也没有单用户配置，则报错
-        if not has_multi_user and not has_single_user:
+        # 检查GX_USER环境变量是否存在
+        if not user_json_str or not user_json_str.strip():
             logging.error("未找到有效的用户配置")
-            logging.error("请设置以下环境变量之一：")
-            logging.error("1. 多用户配置：GX_USER_PHONES 和 GX_USER_PASSWORDS")
-            logging.error("2. 单用户配置：GX_USER_PHONE 和 GX_USER_PASSWORD")
-            logging.error("3. JSON格式配置：GX_USER (包含JSON格式的用户信息)")
+            logging.error("请设置以下环境变量：")
+            logging.error("1. JSON格式用户配置：USER (包含JSON格式的用户信息)")
+            logging.error("2. JSON格式SMTP配置：SEND (可选，用于邮件通知)")
             logging.error("请在GitHub仓库的Settings > Secrets and variables > Actions中添加这些环境变量")
             raise ValueError("未找到有效的用户配置")
         
-        # 如果没有提供多用户配置，则使用单个用户配置
-        if not has_multi_user:
-            # 单用户配置
-            config = {
-                "config": {
-                    "user": {
-                        "phone": user_phone,
-                        "password": user_password
-                    },
-                    "clockIn": {
-                        "mode": safe_get_env_var("GX_CLOCKIN_MODE", "everyday"),
-                        "location": {
-                            "address": safe_get_env_var("GX_LOCATION_ADDRESS"),
-                            "latitude": safe_get_env_var("GX_LOCATION_LATITUDE"),
-                            "longitude": safe_get_env_var("GX_LOCATION_LONGITUDE"),
-                            "province": safe_get_env_var("GX_LOCATION_PROVINCE"),
-                            "city": safe_get_env_var("GX_LOCATION_CITY"),
-                            "area": safe_get_env_var("GX_LOCATION_AREA")
-                        },
-                        "holidaysClockIn": safe_get_env_var("GX_HOLIDAYS_CLOCKIN", "false").lower() == "true",
-                        "customDays": [int(day) for day in safe_get_env_var("GX_CUSTOM_DAYS", "1,2,3,4,5").split(",")] if safe_get_env_var("GX_CUSTOM_DAYS") else [],
-                        "time": {
-                            "start": safe_get_env_var("GX_TIME_START", "8:30"),
-                            "end": safe_get_env_var("GX_TIME_END", "18:00"),
-                            "float": int(safe_get_env_var("GX_TIME_FLOAT", "1"))
-                        }
-                    },
-                    # 如果SEND环境变量存在，则使用SEND环境变量中的SMTP配置；否则使用单独的环境变量
-                    "smtp": {
-                        "enable": smtp_config.get("smtp", {}).get("enable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true") if smtp_config else safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true",
-                        "host": smtp_config.get("smtp", {}).get("host", safe_get_env_var("GX_SMTP_HOST")) if smtp_config else safe_get_env_var("GX_SMTP_HOST"),
-                        "port": smtp_config.get("smtp", {}).get("port", int(safe_get_env_var("GX_SMTP_PORT", "465"))) if smtp_config else int(safe_get_env_var("GX_SMTP_PORT", "465")),
-                        "username": smtp_config.get("smtp", {}).get("username", safe_get_env_var("GX_SMTP_USERNAME")) if smtp_config else safe_get_env_var("GX_SMTP_USERNAME"),
-                        "password": smtp_config.get("smtp", {}).get("password", safe_get_env_var("GX_SMTP_PASSWORD")) if smtp_config else safe_get_env_var("GX_SMTP_PASSWORD"),
-                        "from": smtp_config.get("smtp", {}).get("from", safe_get_env_var("GX_SMTP_FROM", "gongxueyun")) if smtp_config else safe_get_env_var("GX_SMTP_FROM", "gongxueyun"),
-                        "to": smtp_config.get("smtp", {}).get("to", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else []) if smtp_config else safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else []
-                    },
-                    "device": safe_get_env_var("GX_DEVICE_INFO", "{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}")
-                }
-            }
-        else:
-            # 多用户配置
+        # 解析GX_USER环境变量
+        try:
+            # 解析JSON字符串
+            user_configs = json.loads(user_json_str)
+            
+            # 处理三种JSON格式：
+            # 1. 完整配置格式：{"config": {...}}
+            # 2. 用户配置格式：{"phone": "...", "password": "..."}
+            # 3. 多用户配置格式：[{"config": {...}}, {"config": {...}}]
+            
             configs = []
-            for i, (phone, password) in enumerate(zip(user_phones, user_passwords)):
+            
+            # 如果是单个完整配置格式（包含config字段），直接使用
+            if isinstance(user_configs, dict) and "config" in user_configs:
+                configs = [user_configs]
+            # 如果是单个用户配置（字典格式，不包含config字段），转换为完整配置
+            elif isinstance(user_configs, dict):
+                if not isinstance(user_configs, dict):
+                    raise ValueError("GX_USER环境变量中的每个用户配置必须是JSON对象")
+                
+                # 验证必需字段
+                if "phone" not in user_configs or "password" not in user_configs:
+                    raise ValueError("每个用户配置必须包含phone和password字段")
+                
+                # 创建完整配置
                 config = {
                     "config": {
                         "user": {
-                            "phone": phone.strip(),
-                            "password": password.strip()
+                            "phone": user_configs["phone"],
+                            "password": user_configs["password"]
                         },
                         "clockIn": {
-                            "mode": safe_get_env_var("GX_CLOCKIN_MODE", "everyday"),
+                            "mode": user_configs.get("mode", safe_get_env_var("GX_CLOCKIN_MODE", "everyday")),
                             "location": {
-                                "address": safe_get_env_var("GX_LOCATION_ADDRESS"),
-                                "latitude": safe_get_env_var("GX_LOCATION_LATITUDE"),
-                                "longitude": safe_get_env_var("GX_LOCATION_LONGITUDE"),
-                                "province": safe_get_env_var("GX_LOCATION_PROVINCE"),
-                                "city": safe_get_env_var("GX_LOCATION_CITY"),
-                                "area": safe_get_env_var("GX_LOCATION_AREA")
+                                "address": user_configs.get("address", safe_get_env_var("GX_LOCATION_ADDRESS")),
+                                "latitude": user_configs.get("latitude", safe_get_env_var("GX_LOCATION_LATITUDE")),
+                                "longitude": user_configs.get("longitude", safe_get_env_var("GX_LOCATION_LONGITUDE")),
+                                "province": user_configs.get("province", safe_get_env_var("GX_LOCATION_PROVINCE")),
+                                "city": user_configs.get("city", safe_get_env_var("GX_LOCATION_CITY")),
+                                "area": user_configs.get("area", safe_get_env_var("GX_LOCATION_AREA"))
                             },
-                            "holidaysClockIn": safe_get_env_var("GX_HOLIDAYS_CLOCKIN", "false").lower() == "true",
-                            "customDays": [int(day) for day in safe_get_env_var("GX_CUSTOM_DAYS", "1,2,3,4,5").split(",")] if safe_get_env_var("GX_CUSTOM_DAYS") else [],
+                            "holidaysClockIn": user_configs.get("holidaysClockIn", safe_get_env_var("GX_HOLIDAYS_CLOCKIN", "false").lower() == "true"),
+                            "customDays": user_configs.get("customDays", [int(day) for day in safe_get_env_var("GX_CUSTOM_DAYS", "1,2,3,4,5").split(",")] if safe_get_env_var("GX_CUSTOM_DAYS") else []),
                             "time": {
-                                "start": safe_get_env_var("GX_TIME_START", "8:30"),
-                                "end": safe_get_env_var("GX_TIME_END", "18:00"),
-                                "float": int(safe_get_env_var("GX_TIME_FLOAT", "1"))
+                                "start": user_configs.get("startTime", safe_get_env_var("GX_TIME_START", "8:30")),
+                                "end": user_configs.get("endTime", safe_get_env_var("GX_TIME_END", "18:00")),
+                                "float": user_configs.get("timeFloat", int(safe_get_env_var("GX_TIME_FLOAT", "1")))
                             }
                         },
-                        # 如果SEND环境变量存在，则使用SEND环境变量中的SMTP配置；否则使用单独的环境变量
-                        "smtp": {
-                            "enable": smtp_config.get("smtp", {}).get("enable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true") if smtp_config else safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true",
-                            "host": smtp_config.get("smtp", {}).get("host", safe_get_env_var("GX_SMTP_HOST")) if smtp_config else safe_get_env_var("GX_SMTP_HOST"),
-                            "port": smtp_config.get("smtp", {}).get("port", int(safe_get_env_var("GX_SMTP_PORT", "465"))) if smtp_config else int(safe_get_env_var("GX_SMTP_PORT", "465")),
-                            "username": smtp_config.get("smtp", {}).get("username", safe_get_env_var("GX_SMTP_USERNAME")) if smtp_config else safe_get_env_var("GX_SMTP_USERNAME"),
-                            "password": smtp_config.get("smtp", {}).get("password", safe_get_env_var("GX_SMTP_PASSWORD")) if smtp_config else safe_get_env_var("GX_SMTP_PASSWORD"),
-                            "from": smtp_config.get("smtp", {}).get("from", safe_get_env_var("GX_SMTP_FROM", "gongxueyun")) if smtp_config else safe_get_env_var("GX_SMTP_FROM", "gongxueyun"),
-                            "to": smtp_config.get("smtp", {}).get("to", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else []) if smtp_config else safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else []
-                        },
-                        "device": safe_get_env_var("GX_DEVICE_INFO", "{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}")
+                        # 如果用户配置中包含smtp字段，直接使用；否则使用SEND环境变量或默认配置
+                        "smtp": user_configs.get("smtp", {
+                            "enable": smtp_config.get("smtp", {}).get("enable", user_configs.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true")) if smtp_config else user_configs.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true"),
+                            "host": smtp_config.get("smtp", {}).get("host", user_configs.get("smtpHost", safe_get_env_var("GX_SMTP_HOST"))) if smtp_config else user_configs.get("smtpHost", safe_get_env_var("GX_SMTP_HOST")),
+                            "port": smtp_config.get("smtp", {}).get("port", user_configs.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465")))) if smtp_config else user_configs.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465"))),
+                            "username": smtp_config.get("smtp", {}).get("username", user_configs.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME"))) if smtp_config else user_configs.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME")),
+                            "password": smtp_config.get("smtp", {}).get("password", user_configs.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD"))) if smtp_config else user_configs.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD")),
+                            "from": smtp_config.get("smtp", {}).get("from", user_configs.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun"))) if smtp_config else user_configs.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun")),
+                            "to": smtp_config.get("smtp", {}).get("to", user_configs.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])) if smtp_config else user_configs.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])
+                        }),
+                        "device": user_configs.get("device", safe_get_env_var("GX_DEVICE_INFO", "{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}"))
                     }
                 }
-                configs.append(config)
+                configs = [config]
+            # 如果是列表格式，检查每个元素
+            elif isinstance(user_configs, list):
+                for item in user_configs:
+                    # 如果是完整配置格式（包含config字段），直接使用
+                    if isinstance(item, dict) and "config" in item:
+                        configs.append(item)
+                    # 如果是用户配置格式（不包含config字段），转换为完整配置
+                    elif isinstance(item, dict):
+                        # 验证必需字段
+                        if "phone" not in item or "password" not in item:
+                            raise ValueError("每个用户配置必须包含phone和password字段")
+                        
+                        # 创建完整配置
+                        config = {
+                            "config": {
+                                "user": {
+                                    "phone": item["phone"],
+                                    "password": item["password"]
+                                },
+                                "clockIn": {
+                                    "mode": item.get("mode", safe_get_env_var("GX_CLOCKIN_MODE", "everyday")),
+                                    "location": {
+                                        "address": item.get("address", safe_get_env_var("GX_LOCATION_ADDRESS")),
+                                        "latitude": item.get("latitude", safe_get_env_var("GX_LOCATION_LATITUDE")),
+                                        "longitude": item.get("longitude", safe_get_env_var("GX_LOCATION_LONGITUDE")),
+                                        "province": item.get("province", safe_get_env_var("GX_LOCATION_PROVINCE")),
+                                        "city": item.get("city", safe_get_env_var("GX_LOCATION_CITY")),
+                                        "area": item.get("area", safe_get_env_var("GX_LOCATION_AREA"))
+                                    },
+                                    "holidaysClockIn": item.get("holidaysClockIn", safe_get_env_var("GX_HOLIDAYS_CLOCKIN", "false").lower() == "true"),
+                                    "customDays": item.get("customDays", [int(day) for day in safe_get_env_var("GX_CUSTOM_DAYS", "1,2,3,4,5").split(",")] if safe_get_env_var("GX_CUSTOM_DAYS") else []),
+                                    "time": {
+                                        "start": item.get("startTime", safe_get_env_var("GX_TIME_START", "8:30")),
+                                        "end": item.get("endTime", safe_get_env_var("GX_TIME_END", "18:00")),
+                                        "float": item.get("timeFloat", int(safe_get_env_var("GX_TIME_FLOAT", "1")))
+                                    }
+                                },
+                                # 如果用户配置中包含smtp字段，直接使用；否则使用SEND环境变量或默认配置
+                                "smtp": item.get("smtp", {
+                                    "enable": smtp_config.get("smtp", {}).get("enable", item.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true")) if smtp_config else item.get("smtpEnable", safe_get_env_var("GX_SMTP_ENABLE", "false").lower() == "true"),
+                                    "host": smtp_config.get("smtp", {}).get("host", item.get("smtpHost", safe_get_env_var("GX_SMTP_HOST"))) if smtp_config else item.get("smtpHost", safe_get_env_var("GX_SMTP_HOST")),
+                                    "port": smtp_config.get("smtp", {}).get("port", item.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465")))) if smtp_config else item.get("smtpPort", int(safe_get_env_var("GX_SMTP_PORT", "465"))),
+                                    "username": smtp_config.get("smtp", {}).get("username", item.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME"))) if smtp_config else item.get("smtpUsername", safe_get_env_var("GX_SMTP_USERNAME")),
+                                    "password": smtp_config.get("smtp", {}).get("password", item.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD"))) if smtp_config else item.get("smtpPassword", safe_get_env_var("GX_SMTP_PASSWORD")),
+                                    "from": smtp_config.get("smtp", {}).get("from", item.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun"))) if smtp_config else item.get("smtpFrom", safe_get_env_var("GX_SMTP_FROM", "gongxueyun")),
+                                    "to": smtp_config.get("smtp", {}).get("to", item.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])) if smtp_config else item.get("smtpTo", safe_get_env_var("GX_SMTP_TO", "").split(",") if safe_get_env_var("GX_SMTP_TO") else [])
+                                }),
+                                "device": item.get("device", safe_get_env_var("GX_DEVICE_INFO", "{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}"))
+                            }
+                        }
+                        configs.append(config)
+                    else:
+                        raise ValueError("GX_USER环境变量中的每个用户配置必须是JSON对象")
+            else:
+                raise ValueError("GX_USER环境变量格式不正确，应为JSON对象或JSON对象数组")
             
-            # 将多个配置组合成一个列表
-            config = configs
-        
-        # 保存配置到文件
-        with open("config.json", "w", encoding="utf-8") as f:
-            json.dump(config, f, ensure_ascii=False, indent=4)
-        
-        logging.info("配置文件已从环境变量生成")
+            # 保存配置到文件
+            with open("config.json", "w", encoding="utf-8") as f:
+                # 如果是单个配置，直接保存
+                if len(configs) == 1:
+                    json.dump(configs[0], f, ensure_ascii=False, indent=4)
+                # 如果是多个配置，保存为列表
+                else:
+                    json.dump(configs, f, ensure_ascii=False, indent=4)
+            
+            logging.info("配置文件已从GX_USER环境变量生成")
+            return
+        except json.JSONDecodeError as e:
+            logging.error(f"GX_USER环境变量JSON格式错误: {str(e)}")
+            raise ValueError(f"GX_USER环境变量不是有效的JSON格式: {str(e)}")
+        except Exception as e:
+            logging.error(f"处理GX_USER环境变量时出错: {str(e)}")
+            raise
     except Exception as e:
         logging.error(f"创建配置文件时出错: {str(e)}")
         raise
