@@ -40,8 +40,7 @@ jobs:
         
     - name: 执行上班打卡
       if: github.event.schedule == '0 2 * * *'
-      # run: python obfuscated\auto.py START
-      run: python auto.py START
+      run: python obfuscated\auto.py START
 
       env:
         # 多用户配置 - 使用逗号分隔多个用户
@@ -73,7 +72,7 @@ jobs:
         
     - name: 执行下班打卡
       if: github.event.schedule == '0 10 * * *'
-      run: python auto.py END
+      run: python obfuscated\auto.py END
       env:
         # 多用户配置 - 使用逗号分隔多个用户
         GX_USER_PHONES: ${{ secrets.GX_USER_PHONES }}
