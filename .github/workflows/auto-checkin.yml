@@ -72,7 +72,17 @@ jobs:
         
     - name: 执行下班打卡
       if: github.event.schedule == '0 9 * * *'
-      run: python auto.py END
+      run: |
+        echo "开始执行下班打卡..."
+        echo "检查环境变量设置..."
+        if [ -z "$GX_USER_PHONE" ] && [ -z "$GX_USER_PHONES" ]; then
+          echo "错误：未设置用户手机号环境变量"
+          echo "请在GitHub仓库的Settings > Secrets and variables > Actions中添加以下环境变量之一："
+          echo "1. 单用户配置：GX_USER_PHONE 和 GX_USER_PASSWORD"
+          echo "2. 多用户配置：GX_USER_PHONES 和 GX_USER_PASSWORDS"
+          exit 1
+        fi
+        python auto.py END
       env:
         # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
         GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}
@@ -103,7 +113,17 @@ jobs:
         
     - name: 手动触发打卡
       if: github.event_name == 'workflow_dispatch'
-      run: python auto.py ${{ github.event.inputs.checkin_type }}
+      run: |
+        echo "开始执行手动触发打卡..."
+        echo "检查环境变量设置..."
+        if [ -z "$GX_USER_PHONE" ] && [ -z "$GX_USER_PHONES" ]; then
+          echo "错误：未设置用户手机号环境变量"
+          echo "请在GitHub仓库的Settings > Secrets and variables > Actions中添加以下环境变量之一："
+          echo "1. 单用户配置：GX_USER_PHONE 和 GX_USER_PASSWORD"
+          echo "2. 多用户配置：GX_USER_PHONES 和 GX_USER_PASSWORDS"
+          exit 1
+        fi
+        python auto.py ${{ github.event.inputs.checkin_type }}
       env:
         # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
         GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}

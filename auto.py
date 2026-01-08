@@ -21,8 +21,12 @@ def safe_get_env_var(var_name, default_value=""):
     """安全获取环境变量，带有错误处理和日志记录"""
     try:
         value = os.getenv(var_name, default_value)
-        if value is None:
-            logging.warning(f"环境变量 {var_name} 未设置，使用默认值: {default_value}")
+        if value is None or value == "":
+            if var_name in ["GX_USER_PHONE", "GX_USER_PASSWORD", "GX_USER_PHONES", "GX_USER_PASSWORDS"]:
+                logging.error(f"关键环境变量 {var_name} 未设置或为空")
+                logging.error(f"请在GitHub仓库的Settings > Secrets and variables > Actions中添加 {var_name}")
+            else:
+                logging.warning(f"环境变量 {var_name} 未设置，使用默认值: {default_value}")
             return default_value
         return value
     except Exception as e:
@@ -36,17 +40,37 @@ def create_config_from_env():
         user_phones_str = safe_get_env_var("GX_USER_PHONES")
         user_passwords_str = safe_get_env_var("GX_USER_PASSWORDS")
         
+        # 获取单用户配置
+        user_phone = safe_get_env_var("GX_USER_PHONE")
+        user_password = safe_get_env_var("GX_USER_PASSWORD")
+        
+        # 验证环境变量
         user_phones = user_phones_str.split(",") if user_phones_str else []
         user_passwords = user_passwords_str.split(",") if user_passwords_str else []
         
+        # 检查是否有多用户配置
+        has_multi_user = user_phones and user_passwords and len(user_phones) == len(user_passwords)
+        
+        # 检查是否有单用户配置
+        has_single_user = user_phone and user_password
+        
+        # 如果既没有多用户配置也没有单用户配置，则报错
+        if not has_multi_user and not has_single_user:
+            logging.error("未找到有效的用户配置")
+            logging.error("请设置以下环境变量之一：")
+            logging.error("1. 多用户配置：GX_USER_PHONES 和 GX_USER_PASSWORDS")
+            logging.error("2. 单用户配置：GX_USER_PHONE 和 GX_USER_PASSWORD")
+            logging.error("请在GitHub仓库的Settings > Secrets and variables > Actions中添加这些环境变量")
+            raise ValueError("未找到有效的用户配置")
+        
         # 如果没有提供多用户配置，则使用单个用户配置
-        if not user_phones or not user_passwords or len(user_phones) != len(user_passwords):
+        if not has_multi_user:
             # 单用户配置
             config = {
                 "config": {
                     "user": {
-                        "phone": safe_get_env_var("GX_USER_PHONE"),
-                        "password": safe_get_env_var("GX_USER_PASSWORD")
+                        "phone": user_phone,
+                        "password": user_password
                     },
                     "clockIn": {
                         "mode": safe_get_env_var("GX_CLOCKIN_MODE", "everyday"),

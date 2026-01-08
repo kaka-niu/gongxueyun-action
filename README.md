@@ -156,11 +156,29 @@ mainn.py是单次打卡的测试文件 gong_xue_yun.py是主程序入口（带�
 
 要在GitHub Actions上自动运行打卡任务，需要配置以下环境变量作为GitHub Secrets：
 
+### 用户配置方式
+
+您可以选择以下两种配置方式之一：
+
+#### 1. 单用户配置
+添加以下环境变量：
+- `GX_USER_PHONE` - 工学云账号手机号
+- `GX_USER_PASSWORD` - 工学云账号密码
+
+#### 2. 多用户配置
+添加以下环境变量（多个用户用逗号分隔）：
+- `GX_USER_PHONES` - 多用户手机号列表（逗号分隔）
+- `GX_USER_PASSWORDS` - 多用户密码列表（逗号分隔）
+
+### 完整环境变量列表
+
 | 环境变量 | 描述 | 示例值 |
 |---------|------|--------|
 | **用户认证信息** | | |
-| `GX_USER_PHONE` | 工学云账号手机号 | 13800138000 |
-| `GX_USER_PASSWORD` | 工学云账号密码 | yourpassword |
+| `GX_USER_PHONE` | 工学云账号手机号（单用户） | 13800138000 |
+| `GX_USER_PASSWORD` | 工学云账号密码（单用户） | yourpassword |
+| `GX_USER_PHONES` | 多用户手机号列表（逗号分隔） | 13800138000,13900139000 |
+| `GX_USER_PASSWORDS` | 多用户密码列表（逗号分隔） | password1,password2 |
 | **打卡位置信息** | | |
 | `GX_LOCATION_ADDRESS` | 打卡地址 | 四川省 · 资阳市 · 乐至县 · 友谊路南段与川西环线交叉口东北300米 |
 | `GX_LOCATION_LATITUDE` | 纬度 | 30.428727249834488 |
@@ -184,19 +202,24 @@ mainn.py是单次打卡的测试文件 gong_xue_yun.py是主程序入口（带�
 | `GX_SMTP_TO` | 收件人列表 | 2154335573@qq.com |
 | **设备信息** | | |
 | `GX_DEVICE_INFO` | 模拟设备信息 | {brand: phone, systemVersion: 16, Platform: Android, isPhysicalDevice: true, incremental: V2352A} |
-| **多用户设置** | | |
-| `GX_USER_PHONES` | 多用户手机号列表（逗号分隔） | zhang,hao |
-| `GX_USER_PASSWORDS` | 多用户密码列表（逗号分隔） | 密码,密码 |
 ### 配置步骤：
 
-1. 在仓库的Settings -> Secrets and variables -> Actions中添加上述环境变量
-2. 提交并推送修改后的`.github/workflows/auto-checkin.yml`文件到仓库
+1. 登录GitHub仓库
+2. 进入 **Settings** -> **Secrets and variables** -> **Actions**
+3. 点击 **New repository secret** 添加环境变量
+4. 根据您的需求选择配置方式：
+   - **单用户配置**：添加 `GX_USER_PHONE` 和 `GX_USER_PASSWORD`
+   - **多用户配置**：添加 `GX_USER_PHONES` 和 `GX_USER_PASSWORDS`（多个用户用逗号分隔）
+5. 根据需要添加其他可选环境变量（位置信息、邮件通知等）
+6. 提交并推送修改后的`.github/workflows/auto-checkin.yml`文件到仓库
 
 ### 注意事项：
 
 - 配置文件不会被提交到仓库，所有敏感信息都通过GitHub Secrets管理
 - 定时任务在北京时间8:30和18:00执行，可在工作流文件中修改
 - GitHub Actions运行在UTC时间，配置中的cron表达式已考虑时区转换
+- 多用户配置时，确保手机号和密码的顺序一致，且数量相同
+- 如果同时配置了单用户和多用户环境变量，系统将优先使用多用户配置
 ## 安全性考虑
 
 - 用户密码使用AES加密存储
