@@ -95,6 +95,12 @@ def clock_in() -> dict[str, str]:
                     logger.info("上班卡补打成功")
                     # 更新has_start状态
                     has_start = True
+                    
+                    # 重新获取下班打卡类型，确保使用最新的配置
+                    checkin = get_checkin_type()
+                    checkin_type = checkin.get("type")
+                    display_type = checkin.get("display")
+                    logger.info(f"补打上班卡后重新获取的打卡类型: {checkin}, 类型: {type(checkin)}")
                 else:
                     logger.warning(f"上班卡补打失败：{temp_success.get('data')}")
                     # 即使上班卡补打失败，也继续尝试下班打卡

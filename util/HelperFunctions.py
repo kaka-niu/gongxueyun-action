@@ -198,6 +198,18 @@ def get_checkin_type() -> dict[str, str]:
         
         logger.debug(f"打卡类型结果: {result}")
         logger.info(f"正常逻辑返回结果类型: {type(result)}, 值: {result}")
+        
+        # 确保返回的是字典类型
+        if not isinstance(result, dict):
+            logger.error(f"get_checkin_type返回值类型不正确，原值: {result}, 类型: {type(result)}")
+            current_hour = datetime.now().hour
+            is_morning = current_hour < 12
+            result = {
+                "type": "START" if is_morning else "END", 
+                "display": "上班(类型保护)" if is_morning else "下班(类型保护)"
+            }
+            logger.info(f"类型保护后返回结果: {result}")
+        
         return result
     except Exception as e:
         logger.error(f"获取打卡类型时发生异常: {e}")
@@ -213,30 +225,6 @@ def get_checkin_type() -> dict[str, str]:
         logger.info(f"异常处理返回结果类型: {type(result)}, 值: {result}")
         
         return result
-    finally:
-        # 最后的保护措施，确保函数始终返回字典
-        # 注意：在finally中修改result并返回是不正确的，因为try/except中的return会被覆盖
-        # 我们只需要在result不是字典的情况下修正它
-        if result is not None and not isinstance(result, dict):
-            current_hour = datetime.now().hour
-            is_morning = current_hour < 12
-            result = {
-                "type": "START" if is_morning else "END", 
-                "display": "上班(类型保护)" if is_morning else "下班(类型保护)"
-            }
-            logger.error(f"get_checkin_type返回值类型不正确，已转换为字典: {result}")
-            logger.info(f"finally保护后返回结果类型: {type(result)}, 值: {result}")
-        else:
-            # 如果result为None，也设置默认值
-            if result is None:
-                current_hour = datetime.now().hour
-                is_morning = current_hour < 12
-                result = {
-                    "type": "START" if is_morning else "END", 
-                    "display": "上班(None保护)" if is_morning else "下班(None保护)"
-                }
-                logger.error(f"get_checkin_type返回None，已转换为字典: {result}")
-                logger.info(f"finally保护后返回结果类型: {type(result)}, 值: {result}")
 
 
 def check_attendance_status(checkin_list: List[Dict[str, Any]], current_date: datetime = None) -> Dict[str, bool]:
