@@ -19,7 +19,7 @@ on:
 
 jobs:
   checkin:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
     - name: 检出代码
       uses: actions/checkout@v3
@@ -29,6 +29,11 @@ jobs:
       with:
         python-version: '3.10'
         
+    - name: 安装系统依赖
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y xvfb
+        
     - name: 安装Python依赖
       run: |
         python -m pip install --upgrade pip
@@ -36,7 +41,7 @@ jobs:
         
     - name: 执行上班打卡
       if: github.event.schedule == '0 23 * * *'
-      run: python obfuscated/auto.py START
+      run: python auto.py START
       env:
         # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
         GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}
@@ -67,7 +72,7 @@ jobs:
         
     - name: 执行下班打卡
       if: github.event.schedule == '0 9 * * *'
-      run: python obfuscated/auto.py END
+      run: python auto.py END
       env:
         # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
         GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}
@@ -98,7 +103,7 @@ jobs:
         
     - name: 手动触发打卡
       if: github.event_name == 'workflow_dispatch'
-      run: python obfuscated/auto.py ${{ github.event.inputs.checkin_type }}
+      run: python auto.py ${{ github.event.inputs.checkin_type }}
       env:
         # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
         GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}
