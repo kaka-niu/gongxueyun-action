@@ -2,11 +2,20 @@ name: 自动打卡
 
 on:
     schedule:
-    # 上班打卡 - 每天北京时间10:00执行（UTC时间2:00）
-    - cron: '0 2 * * *'
-    # 下班打卡 - 每天北京时间18:00执行（UTC时间10:00）
-    - cron: '0 10 * * *'
+    # 上班打卡 - 每天北京时间7:00执行（UTC时间23:00）
+    - cron: '0 23 * * *'
+    # 下班打卡 - 每天北京时间17:00执行（UTC时间9:00）
+    - cron: '0 9 * * *'
     workflow_dispatch: # 允许手动触发
+      inputs:
+        checkin_type:
+          description: '打卡类型'
+          required: true
+          default: 'START'
+          type: choice
+          options:
+            - START
+            - END
 
 jobs:
   checkin:
@@ -39,65 +48,94 @@ jobs:
         pip install pyarmor==9.2.3
         
     - name: 执行上班打卡
-      if: github.event.schedule == '0 2 * * *'
-      # run: python obfuscated\auto.py START
+      if: github.event.schedule == '0 23 * * *'
       run: python auto.py START
-
       env:
-        # 多用户配置 - 使用逗号分隔多个用户
-        GX_USER_PHONES: ${{ secrets.GX_USER_PHONES }}
-        GX_USER_PASSWORDS: ${{ secrets.GX_USER_PASSWORDS }}
+        # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
+        GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}
+        GX_USER_PASSWORDS: ${{ secrets.GX_USER_PASSWORDS || '' }}
         # 单用户配置 - 如果未提供多用户配置，则使用这些
-        GX_USER_PHONE: ${{ secrets.GX_USER_PHONE }}
-        GX_USER_PASSWORD: ${{ secrets.GX_USER_PASSWORD }}
-        # 其他配置
-        GX_LOCATION_ADDRESS: ${{ secrets.GX_LOCATION_ADDRESS }}
-        GX_LOCATION_LATITUDE: ${{ secrets.GX_LOCATION_LATITUDE }}
-        GX_LOCATION_LONGITUDE: ${{ secrets.GX_LOCATION_LONGITUDE }}
-        GX_LOCATION_PROVINCE: ${{ secrets.GX_LOCATION_PROVINCE }}
-        GX_LOCATION_CITY: ${{ secrets.GX_LOCATION_CITY }}
-        GX_LOCATION_AREA: ${{ secrets.GX_LOCATION_AREA }}
-        GX_CLOCKIN_MODE: ${{ secrets.GX_CLOCKIN_MODE }}
-        GX_HOLIDAYS_CLOCKIN: ${{ secrets.GX_HOLIDAYS_CLOCKIN }}
-        GX_TIME_START: ${{ secrets.GX_TIME_START }}
-        GX_TIME_END: ${{ secrets.GX_TIME_END }}
-        GX_TIME_FLOAT: ${{ secrets.GX_TIME_FLOAT }}
-        GX_SMTP_ENABLE: ${{ secrets.GX_SMTP_ENABLE }}
-        GX_SMTP_HOST: ${{ secrets.GX_SMTP_HOST }}
-        GX_SMTP_PORT: ${{ secrets.GX_SMTP_PORT }}
-        GX_SMTP_USERNAME: ${{ secrets.GX_SMTP_USERNAME }}
-        GX_SMTP_PASSWORD: ${{ secrets.GX_SMTP_PASSWORD }}
-        GX_SMTP_FROM: ${{ secrets.GX_SMTP_FROM }}
-        GX_SMTP_TO: ${{ secrets.GX_SMTP_TO }}
-        GX_DEVICE_INFO: ${{ secrets.GX_DEVICE_INFO }}
+        GX_USER_PHONE: ${{ secrets.GX_USER_PHONE || '' }}
+        GX_USER_PASSWORD: ${{ secrets.GX_USER_PASSWORD || '' }}
+        # 其他配置 - 添加默认值防止secrets不存在
+        GX_LOCATION_ADDRESS: ${{ secrets.GX_LOCATION_ADDRESS || '' }}
+        GX_LOCATION_LATITUDE: ${{ secrets.GX_LOCATION_LATITUDE || '' }}
+        GX_LOCATION_LONGITUDE: ${{ secrets.GX_LOCATION_LONGITUDE || '' }}
+        GX_LOCATION_PROVINCE: ${{ secrets.GX_LOCATION_PROVINCE || '' }}
+        GX_LOCATION_CITY: ${{ secrets.GX_LOCATION_CITY || '' }}
+        GX_LOCATION_AREA: ${{ secrets.GX_LOCATION_AREA || '' }}
+        GX_CLOCKIN_MODE: ${{ secrets.GX_CLOCKIN_MODE || 'everyday' }}
+        GX_HOLIDAYS_CLOCKIN: ${{ secrets.GX_HOLIDAYS_CLOCKIN || 'false' }}
+        GX_TIME_START: ${{ secrets.GX_TIME_START || '8:30' }}
+        GX_TIME_END: ${{ secrets.GX_TIME_END || '18:00' }}
+        GX_TIME_FLOAT: ${{ secrets.GX_TIME_FLOAT || '1' }}
+        GX_SMTP_ENABLE: ${{ secrets.GX_SMTP_ENABLE || 'false' }}
+        GX_SMTP_HOST: ${{ secrets.GX_SMTP_HOST || '' }}
+        GX_SMTP_PORT: ${{ secrets.GX_SMTP_PORT || '465' }}
+        GX_SMTP_USERNAME: ${{ secrets.GX_SMTP_USERNAME || '' }}
+        GX_SMTP_PASSWORD: ${{ secrets.GX_SMTP_PASSWORD || '' }}
+        GX_SMTP_FROM: ${{ secrets.GX_SMTP_FROM || 'gongxueyun' }}
+        GX_SMTP_TO: ${{ secrets.GX_SMTP_TO || '' }}
+        GX_DEVICE_INFO: "${{ secrets.GX_DEVICE_INFO || '{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}' }}"
         
     - name: 执行下班打卡
-      if: github.event.schedule == '0 10 * * *'
+      if: github.event.schedule == '0 9 * * *'
       run: python auto.py END
       env:
-        # 多用户配置 - 使用逗号分隔多个用户
-        GX_USER_PHONES: ${{ secrets.GX_USER_PHONES }}
-        GX_USER_PASSWORDS: ${{ secrets.GX_USER_PASSWORDS }}
+        # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
+        GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}
+        GX_USER_PASSWORDS: ${{ secrets.GX_USER_PASSWORDS || '' }}
         # 单用户配置 - 如果未提供多用户配置，则使用这些
-        GX_USER_PHONE: ${{ secrets.GX_USER_PHONE }}
-        GX_USER_PASSWORD: ${{ secrets.GX_USER_PASSWORD }}
-        # 其他配置
-        GX_LOCATION_ADDRESS: ${{ secrets.GX_LOCATION_ADDRESS }}
-        GX_LOCATION_LATITUDE: ${{ secrets.GX_LOCATION_LATITUDE }}
-        GX_LOCATION_LONGITUDE: ${{ secrets.GX_LOCATION_LONGITUDE }}
-        GX_LOCATION_PROVINCE: ${{ secrets.GX_LOCATION_PROVINCE }}
-        GX_LOCATION_CITY: ${{ secrets.GX_LOCATION_CITY }}
-        GX_LOCATION_AREA: ${{ secrets.GX_LOCATION_AREA }}
-        GX_CLOCKIN_MODE: ${{ secrets.GX_CLOCKIN_MODE }}
-        GX_HOLIDAYS_CLOCKIN: ${{ secrets.GX_HOLIDAYS_CLOCKIN }}
-        GX_TIME_START: ${{ secrets.GX_TIME_START }}
-        GX_TIME_END: ${{ secrets.GX_TIME_END }}
-        GX_TIME_FLOAT: ${{ secrets.GX_TIME_FLOAT }}
-        GX_SMTP_ENABLE: ${{ secrets.GX_SMTP_ENABLE }}
-        GX_SMTP_HOST: ${{ secrets.GX_SMTP_HOST }}
-        GX_SMTP_PORT: ${{ secrets.GX_SMTP_PORT }}
-        GX_SMTP_USERNAME: ${{ secrets.GX_SMTP_USERNAME }}
-        GX_SMTP_PASSWORD: ${{ secrets.GX_SMTP_PASSWORD }}
-        GX_SMTP_FROM: ${{ secrets.GX_SMTP_FROM }}
-        GX_SMTP_TO: ${{ secrets.GX_SMTP_TO }}
-        GX_DEVICE_INFO: ${{ secrets.GX_DEVICE_INFO }}
+        GX_USER_PHONE: ${{ secrets.GX_USER_PHONE || '' }}
+        GX_USER_PASSWORD: ${{ secrets.GX_USER_PASSWORD || '' }}
+        # 其他配置 - 添加默认值防止secrets不存在
+        GX_LOCATION_ADDRESS: ${{ secrets.GX_LOCATION_ADDRESS || '' }}
+        GX_LOCATION_LATITUDE: ${{ secrets.GX_LOCATION_LATITUDE || '' }}
+        GX_LOCATION_LONGITUDE: ${{ secrets.GX_LOCATION_LONGITUDE || '' }}
+        GX_LOCATION_PROVINCE: ${{ secrets.GX_LOCATION_PROVINCE || '' }}
+        GX_LOCATION_CITY: ${{ secrets.GX_LOCATION_CITY || '' }}
+        GX_LOCATION_AREA: ${{ secrets.GX_LOCATION_AREA || '' }}
+        GX_CLOCKIN_MODE: ${{ secrets.GX_CLOCKIN_MODE || 'everyday' }}
+        GX_HOLIDAYS_CLOCKIN: ${{ secrets.GX_HOLIDAYS_CLOCKIN || 'false' }}
+        GX_TIME_START: ${{ secrets.GX_TIME_START || '8:30' }}
+        GX_TIME_END: ${{ secrets.GX_TIME_END || '18:00' }}
+        GX_TIME_FLOAT: ${{ secrets.GX_TIME_FLOAT || '1' }}
+        GX_SMTP_ENABLE: ${{ secrets.GX_SMTP_ENABLE || 'false' }}
+        GX_SMTP_HOST: ${{ secrets.GX_SMTP_HOST || '' }}
+        GX_SMTP_PORT: ${{ secrets.GX_SMTP_PORT || '465' }}
+        GX_SMTP_USERNAME: ${{ secrets.GX_SMTP_USERNAME || '' }}
+        GX_SMTP_PASSWORD: ${{ secrets.GX_SMTP_PASSWORD || '' }}
+        GX_SMTP_FROM: ${{ secrets.GX_SMTP_FROM || 'gongxueyun' }}
+        GX_SMTP_TO: ${{ secrets.GX_SMTP_TO || '' }}
+        GX_DEVICE_INFO: "${{ secrets.GX_DEVICE_INFO || '{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}' }}"
+        
+    - name: 手动触发打卡
+      if: github.event_name == 'workflow_dispatch'
+      run: python auto.py ${{ github.event.inputs.checkin_type }}
+      env:
+        # 多用户配置 - 使用逗号分隔多个用户，添加默认值防止secrets不存在
+        GX_USER_PHONES: ${{ secrets.GX_USER_PHONES || '' }}
+        GX_USER_PASSWORDS: ${{ secrets.GX_USER_PASSWORDS || '' }}
+        # 单用户配置 - 如果未提供多用户配置，则使用这些
+        GX_USER_PHONE: ${{ secrets.GX_USER_PHONE || '' }}
+        GX_USER_PASSWORD: ${{ secrets.GX_USER_PASSWORD || '' }}
+        # 其他配置 - 添加默认值防止secrets不存在
+        GX_LOCATION_ADDRESS: ${{ secrets.GX_LOCATION_ADDRESS || '' }}
+        GX_LOCATION_LATITUDE: ${{ secrets.GX_LOCATION_LATITUDE || '' }}
+        GX_LOCATION_LONGITUDE: ${{ secrets.GX_LOCATION_LONGITUDE || '' }}
+        GX_LOCATION_PROVINCE: ${{ secrets.GX_LOCATION_PROVINCE || '' }}
+        GX_LOCATION_CITY: ${{ secrets.GX_LOCATION_CITY || '' }}
+        GX_LOCATION_AREA: ${{ secrets.GX_LOCATION_AREA || '' }}
+        GX_CLOCKIN_MODE: ${{ secrets.GX_CLOCKIN_MODE || 'everyday' }}
+        GX_HOLIDAYS_CLOCKIN: ${{ secrets.GX_HOLIDAYS_CLOCKIN || 'false' }}
+        GX_TIME_START: ${{ secrets.GX_TIME_START || '8:30' }}
+        GX_TIME_END: ${{ secrets.GX_TIME_END || '18:00' }}
+        GX_TIME_FLOAT: ${{ secrets.GX_TIME_FLOAT || '1' }}
+        GX_SMTP_ENABLE: ${{ secrets.GX_SMTP_ENABLE || 'false' }}
+        GX_SMTP_HOST: ${{ secrets.GX_SMTP_HOST || '' }}
+        GX_SMTP_PORT: ${{ secrets.GX_SMTP_PORT || '465' }}
+        GX_SMTP_USERNAME: ${{ secrets.GX_SMTP_USERNAME || '' }}
+        GX_SMTP_PASSWORD: ${{ secrets.GX_SMTP_PASSWORD || '' }}
+        GX_SMTP_FROM: ${{ secrets.GX_SMTP_FROM || 'gongxueyun' }}
+        GX_SMTP_TO: ${{ secrets.GX_SMTP_TO || '' }}
+        GX_DEVICE_INFO: "${{ secrets.GX_DEVICE_INFO || '{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}' }}"
