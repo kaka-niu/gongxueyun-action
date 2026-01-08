@@ -19,7 +19,7 @@ on:
 
 jobs:
   checkin:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
     - name: 检出代码
       uses: actions/checkout@v3
@@ -29,23 +29,10 @@ jobs:
       with:
         python-version: '3.10'
         
-    - name: 安装系统依赖
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y --no-install-recommends \
-          build-essential \
-          libglib2.0-0 \
-          libsm6 \
-          libxext6 \
-          libxrender-dev \
-          libfontconfig1 \
-          libgl1
-        
     - name: 安装Python依赖
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pyarmor==9.2.3
         
     - name: 执行上班打卡
       if: github.event.schedule == '0 23 * * *'
@@ -77,14 +64,6 @@ jobs:
         GX_SMTP_FROM: ${{ secrets.GX_SMTP_FROM || 'gongxueyun' }}
         GX_SMTP_TO: ${{ secrets.GX_SMTP_TO || '' }}
         GX_DEVICE_INFO: "${{ secrets.GX_DEVICE_INFO || '{brand: iOOZ9 Turbo, systemVersion: 15, Platform: Android, isPhysicalDevice: true, incremental: V2352A}' }}"
-        
-    - name: 设置Python路径
-      run: |
-        echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
-        
-    - name: 设置Python路径
-      run: |
-        echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
         
     - name: 执行下班打卡
       if: github.event.schedule == '0 9 * * *'
