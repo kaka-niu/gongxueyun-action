@@ -309,3 +309,23 @@ ValueError: 加密失败: 'NoneType' object has no attribute 'encode'
 2026-01-07 19:31:58,359 - INFO - 登录成功，正在发送邮件...
 2026-01-07 19:31:58,865 - INFO - 邮件发送成功: 2154335573@qq.com
 2026-01-07 19:31:58,900 - WARNING - 邮件发送失败，但打卡任务已完成
+2026-01-08 10:39:38,660 - INFO - 检查登录状态
+2026-01-08 10:39:38,660 - INFO - 检测到用户信息不一致，执行重新登录
+2026-01-08 10:39:38,660 - INFO - 执行登录
+2026-01-08 10:39:38,693 - ERROR - 登录过程发生异常：'ApiService' object has no attribute 'pass_blockPuzzle_captcha'
+Traceback (most recent call last):
+  File "d:\disk\new\util\ApiService.py", line 145, in login
+    "captcha": self.pass_blockPuzzle_captcha(),
+AttributeError: 'ApiService' object has no attribute 'pass_blockPuzzle_captcha'
+2026-01-08 10:39:38,696 - WARNING - 登录失败
+2026-01-08 10:39:38,696 - WARNING - 登录失败
+2026-01-08 10:39:55,012 - INFO - 检查登录状态
+2026-01-08 10:39:55,012 - INFO - 检测到用户信息不一致，执行重新登录
+2026-01-08 10:39:55,012 - INFO - 执行登录
+2026-01-08 10:39:55,026 - ERROR - 登录过程发生异常：'ApiService' object has no attribute 'pass_blockPuzzle_captcha'
+Traceback (most recent call last):
+  File "d:\disk\new\util\ApiService.py", line 145, in login
+    "captcha": self.pass_blockPuzzle_captcha(),
+AttributeError: 'ApiService' object has no attribute 'pass_blockPuzzle_captcha'
+2026-01-08 10:39:55,027 - WARNING - 登录失败
+2026-01-08 10:39:55,027 - WARNING - 登录失败
