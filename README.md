@@ -8,10 +8,13 @@
 在基础上增加了下班卡，工作流部署代码
 ## 项目架构
 mainn.py是单次打卡的测试文件 gong_xue_yun.py是主程序入口（带定时功能）
+auto.py是GitHub Actions部署的主要文件
 ### 主要目录结构
 
 ```
 .
+├── .github/workflows/  # GitHub Actions工作流配置
+│   └── auto-checkin.yml
 ├── manager/           # 配置和数据管理模块
 │   ├── ConfigManager.py      # 系统配置管理
 │   ├── PlanInfoManager.py    # 计划信息管理
@@ -28,10 +31,14 @@ mainn.py是单次打卡的测试文件 gong_xue_yun.py是主程序入口（带�
 │   ├── ApiService.py      # API服务接口
 │   ├── CaptchaUtils.py    # 验证码处理
 │   ├── CryptoUtils.py     # 加密解密工具
-│   └── HelperFunctions.py # 辅助函数
+│   ├── HelperFunctions.py # 辅助函数
+│   └── generate_send_config.py  # 生成SEND环境变量配置的脚本
 ├── config.json        # 系统配置文件
 ├── gong_xue_yun.py    # 主程序入口（带定时功能）
 ├── main.py           # 主执行流程
+├── auto.py           # GitHub Actions部署的主要文件
+├── test_send_env.py  # 测试SEND环境变量的脚本
+├── SMTP_CONFIG.md    # SMTP配置详细说明
 └── README.md
 ```
 
@@ -158,7 +165,7 @@ mainn.py是单次打卡的测试文件 gong_xue_yun.py是主程序入口（带�
 
 ### 用户配置方式
 
-您可以选择以下两种配置方式之一：
+您可以选择以下三种配置方式之一：
 
 #### 1. 单用户配置
 添加以下环境变量：
@@ -169,6 +176,196 @@ mainn.py是单次打卡的测试文件 gong_xue_yun.py是主程序入口（带�
 添加以下环境变量（多个用户用逗号分隔）：
 - `GX_USER_PHONES` - 多用户手机号列表（逗号分隔）
 - `GX_USER_PASSWORDS` - 多用户密码列表（逗号分隔）
+
+#### 3. JSON格式配置（推荐）
+添加以下环境变量：
+- `USER` - 完整的JSON格式配置（支持单用户和多用户）
+
+JSON格式示例：
+
+**单用户配置**：
+```json
+{
+  "config": {
+    "user": {
+      "phone": "工学云手机号",
+      "password": "工学云密码"
+    },
+    "clockIn": {
+      "mode": "daily",
+      "location": {
+        "address": "打卡地址",
+        "latitude": "纬度",
+        "longitude": "经度",
+        "province": "省份",
+        "city": "城市",
+        "area": "区域"
+      },
+      "customDays": [1, 3, 5]
+    },
+    "smtp": {
+      "enable": true,
+      "host": "smtp.qq.com",
+      "port": 465,
+      "username": "your_email@qq.com",
+      "password": "your_password",
+      "from": "gongxueyun",
+      "to": ["your_email@qq.com"]
+    }
+  }
+}
+```
+
+### SMTP邮件通知配置
+
+系统支持两种方式配置SMTP邮件通知：
+
+#### 方式一：使用SEND环境变量（推荐）
+
+在GitHub仓库的Settings > Secrets and variables > Actions中添加SEND环境变量，值为以下格式的JSON：
+
+```json
+{
+  "smtp": {
+    "enable": true,
+    "host": "smtp.qq.com",
+    "port": 465,
+    "username": "your_email@qq.com",
+    "password": "your_password",
+    "from": "gongxueyun",
+    "to": ["your_email@qq.com"]
+  }
+}
+```
+
+#### 方式二：使用单独的SMTP环境变量
+
+在GitHub仓库的Settings > Secrets and variables > Actions中添加以下环境变量：
+
+- `GX_SMTP_ENABLE`: 是否启用SMTP（true/false）
+- `GX_SMTP_HOST`: SMTP服务器地址（如：smtp.qq.com）
+- `GX_SMTP_PORT`: SMTP服务器端口（如：465）
+- `GX_SMTP_USERNAME`: SMTP用户名（邮箱地址）
+- `GX_SMTP_PASSWORD`: SMTP密码（QQ邮箱使用授权码）
+- `GX_SMTP_FROM`: 发件人名称（如：gongxueyun）
+- `GX_SMTP_TO`: 收件人邮箱地址（多个地址用逗号分隔）
+
+### 位置信息配置
+
+添加以下环境变量（可选）：
+- `GX_LOCATION_ADDRESS`: 打卡地址
+- `GX_LOCATION_LATITUDE`: 纬度
+- `GX_LOCATION_LONGITUDE`: 经度
+- `GX_LOCATION_PROVINCE`: 省份
+- `GX_LOCATION_CITY`: 城市
+- `GX_LOCATION_AREA`: 区域
+
+### 其他配置
+
+添加以下环境变量（可选）：
+- `GX_CLOCKIN_MODE`: 打卡模式（everyday/weekday/customize）
+- `GX_HOLIDAYS_CLOCKIN`: 节假日是否打卡（true/false）
+- `GX_TIME_START`: 上班打卡时间（默认：8:30）
+- `GX_TIME_END`: 下班打卡时间（默认：18:00）
+- `GX_TIME_FLOAT`: 打卡时间浮动（分钟，默认：1）
+- `GX_CUSTOM_DAYS`: 自定义打卡日（逗号分隔，如：1,2,3,4,5）
+- `GX_DEVICE_INFO`: 设备信息
+
+## 故障排除
+
+如果系统日志显示"环境变量 SEND 未设置"，请检查：
+
+1. 确保已在GitHub仓库的Settings > Secrets and variables > Actions中添加了SEND环境变量
+2. 确保SEND环境变量的值是有效的JSON格式
+3. 确保JSON中包含了所有必需的字段：enable, host, port, username, password, from, to
+
+可以使用提供的测试脚本验证配置：
+
+```bash
+python test_send_env.py
+```
+
+也可以使用配置生成器创建正确的SEND环境变量：
+
+```bash
+python util/generate_send_config.py
+```
+
+更多详细信息请参考 [SMTP_CONFIG.md](SMTP_CONFIG.md) 文件。
+      "host": "smtp服务地址",
+      "port": 465,
+      "username": "发件人邮箱",
+      "password": "smtp密码",
+      "from": "发件人名称",
+      "to": ["收件人邮箱"]
+    }
+  }
+}
+```
+
+**多用户配置**：
+```json
+[
+  {
+    "config": {
+      "user": {
+        "phone": "工学云手机号1",
+        "password": "工学云密码1"
+      },
+      "clockIn": {
+        "mode": "daily",
+        "location": {
+          "address": "打卡地址1",
+          "latitude": "纬度1",
+          "longitude": "经度1",
+          "province": "省份1",
+          "city": "城市1",
+          "area": "区域1"
+        },
+        "customDays": [1, 3, 5]
+      },
+      "smtp": {
+        "enable": true,
+        "host": "smtp服务地址",
+        "port": 465,
+        "username": "发件人邮箱",
+        "password": "smtp密码",
+        "from": "发件人名称",
+        "to": ["收件人邮箱"]
+      }
+    }
+  },
+  {
+    "config": {
+      "user": {
+        "phone": "工学云手机号2",
+        "password": "工学云密码2"
+      },
+      "clockIn": {
+        "mode": "daily",
+        "location": {
+          "address": "打卡地址2",
+          "latitude": "纬度2",
+          "longitude": "经度2",
+          "province": "省份2",
+          "city": "城市2",
+          "area": "区域2"
+        },
+        "customDays": [2, 4]
+      },
+      "smtp": {
+        "enable": true,
+        "host": "smtp服务地址",
+        "port": 465,
+        "username": "发件人邮箱",
+        "password": "smtp密码",
+        "from": "发件人名称",
+        "to": ["收件人邮箱"]
+      }
+    }
+  }
+]
+```
 
 ### 完整环境变量列表
 
@@ -200,6 +397,23 @@ mainn.py是单次打卡的测试文件 gong_xue_yun.py是主程序入口（带�
 | `GX_SMTP_PASSWORD` | SMTP密码 | yourpassword |
 | `GX_SMTP_FROM` | 发件人名称 | gongxueyun |
 | `GX_SMTP_TO` | 收件人列表 | 2154335573@qq.com |
+| **JSON格式SMTP配置**（可选） | | |
+| `SEND` | JSON格式的SMTP配置 | 参见下方示例 |
+
+#### SEND环境变量JSON格式示例：
+```json
+{
+  "smtp": {
+    "enable": true,
+    "host": "smtp.qq.com",
+    "port": 465,
+    "username": "your-email@qq.com",
+    "password": "your-smtp-password",
+    "from": "gongxueyun",
+    "to": ["recipient@example.com"]
+  }
+}
+```
 | **设备信息** | | |
 | `GX_DEVICE_INFO` | 模拟设备信息 | {brand: phone, systemVersion: 16, Platform: Android, isPhysicalDevice: true, incremental: V2352A} |
 ### 配置步骤：
@@ -210,7 +424,9 @@ mainn.py是单次打卡的测试文件 gong_xue_yun.py是主程序入口（带�
 4. 根据您的需求选择配置方式：
    - **单用户配置**：添加 `GX_USER_PHONE` 和 `GX_USER_PASSWORD`
    - **多用户配置**：添加 `GX_USER_PHONES` 和 `GX_USER_PASSWORDS`（多个用户用逗号分隔）
+   - **JSON格式配置（推荐）**：添加 `USER` 环境变量，值为完整的JSON配置
 5. 根据需要添加其他可选环境变量（位置信息、邮件通知等）
+   - 对于邮件通知，可以选择使用单独的SMTP环境变量或使用 `SEND` 环境变量提供JSON格式的SMTP配置
 6. 提交并推送修改后的`.github/workflows/auto-checkin.yml`文件到仓库
 
 ### 注意事项：

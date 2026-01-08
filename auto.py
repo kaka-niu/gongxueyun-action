@@ -25,6 +25,11 @@ def safe_get_env_var(var_name, default_value=""):
             if var_name in ["GX_USER_PHONE", "GX_USER_PASSWORD", "GX_USER_PHONES", "GX_USER_PASSWORDS", "GX_USER"]:
                 logging.error(f"关键环境变量 {var_name} 未设置或为空")
                 logging.error(f"请在GitHub仓库的Settings > Secrets and variables > Actions中添加 {var_name}")
+            elif var_name == "SEND":
+                logging.error(f"SMTP配置环境变量 {var_name} 未设置或为空")
+                logging.error(f"请在GitHub仓库的Settings > Secrets and variables > Actions中添加 {var_name}")
+                logging.error(f"SEND环境变量应包含以下格式的JSON:")
+                logging.error('{ "smtp": { "enable": true, "host": "smtp.qq.com", "port": 465, "username": "your_email@qq.com", "password": "your_password", "from": "gongxueyun", "to": ["your_email@qq.com"] } }')
             else:
                 logging.warning(f"环境变量 {var_name} 未设置，使用默认值: {default_value}")
             return default_value
@@ -40,7 +45,13 @@ def create_config_from_env():
         user_json_str = safe_get_env_var("GX_USER")
         
         # 尝试从SEND环境变量获取SMTP配置
+        logging.info("正在检查SEND环境变量...")
         send_json_str = safe_get_env_var("SEND")
+        if send_json_str and send_json_str.strip():
+            logging.info(f"SEND环境变量已设置，内容长度: {len(send_json_str)} 字符")
+            logging.info(f"SEND环境变量前100个字符: {send_json_str[:100]}")
+        else:
+            logging.warning("SEND环境变量未设置或为空")
         
         # 解析SMTP配置
         smtp_config = None
@@ -48,9 +59,32 @@ def create_config_from_env():
             try:
                 smtp_config = json.loads(send_json_str)
                 logging.info("已从SEND环境变量获取SMTP配置")
+                logging.info(f"SMTP配置: {json.dumps(smtp_config, ensure_ascii=False)}")
+                
+                # 验证必需字段
+                if "smtp" not in smtp_config:
+                    logging.error("SEND环境变量中缺少smtp字段")
+                    raise ValueError("SEND环境变量中缺少smtp字段")
+                
+                smtp = smtp_config["smtp"]
+                required_fields = ["enable", "host", "port", "username", "password", "from", "to"]
+                for field in required_fields:
+                    if field not in smtp:
+                        logging.error(f"SMTP配置中缺少必需字段: {field}")
+                        raise ValueError(f"SMTP配置中缺少必需字段: {field}")
+                
+                logging.info("SMTP配置验证通过")
             except json.JSONDecodeError as e:
                 logging.error(f"SEND环境变量JSON格式错误: {str(e)}")
+                logging.error(f"SEND环境变量内容: {send_json_str}")
+                logging.error("请检查SEND环境变量是否为有效的JSON格式")
                 raise ValueError(f"SEND环境变量不是有效的JSON格式: {str(e)}")
+            except ValueError as e:
+                # 重新抛出我们自己的验证错误
+                raise e
+            except Exception as e:
+                logging.error(f"解析SEND环境变量时出错: {str(e)}")
+                raise ValueError(f"解析SEND环境变量时出错: {str(e)}")
         
         # 如果GX_USER环境变量存在，则解析JSON格式的配置
         if user_json_str and user_json_str.strip():
