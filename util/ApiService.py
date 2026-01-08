@@ -78,29 +78,70 @@ class ApiService:
         """初始化API服务实例。"""
         self.session = requests.Session()
         self.session.headers.update(HEADERS)
+        self.max_retries = 5  # 控制重新尝试的次数
 
-    def _post_request(self, url: str, headers: Dict[str, str], data: Dict[str, Any]) -> Dict[str, Any]:
+    def _post_request(
+            self,
+            url: str,
+            headers: Dict[str, str],
+            data: Dict[str, Any],
+            retry_count: int = 0,
+    ) -> Dict[str, Any]:
         """
-        发送POST请求到指定的URL。
+        发送POST请求，并处理请求过程中可能发生的错误。
+        包括自动重试机制和Token失效处理。
 
         Args:
-            url (str): 请求的URL。
-            headers (Dict[str, str]): 请求头。
-            data (Dict[str, Any]): 请求数据。
+            url (str): 请求的API地址（不包括BASE_URL部分）。
+            headers (Dict[str, str]): 请求头信息，包括授权信息。
+            data (Dict[str, Any]): POST请求的数据。
+            retry_count (int, optional): 当前请求的重试次数，默认为0。
 
         Returns:
-            Dict[str, Any]: 响应数据。
+            Dict[str, Any]: 如果请求成功，返回响应的JSON数据。
 
         Raises:
-            ValueError: 如果请求失败或返回错误状态码，抛出包含详细错误信息的异常。
+            ValueError: 如果请求失败或响应包含错误信息，则抛出包含详细错误信息的异常。
         """
         try:
-            response = self.session.post(BASE_URL + url, headers=headers, json=data, timeout=30)
+            response = requests.post(f"{BASE_URL}{url}",
+                                     headers=headers,
+                                     json=data,
+                                     timeout=10)
             response.raise_for_status()
-            return response.json()
-        except requests.exceptions.RequestException as e:
-            logger.error(f"请求失败: {e}")
-            raise ValueError(f"请求失败: {str(e)}")
+            rsp = response.json()
+
+            if rsp.get("code") == 200 and rsp.get("msg", "未知错误") == "302":
+                raise ValueError("打卡失败，触发行为验证码")
+
+            if rsp.get("code") == 200 or rsp.get("code") == 6111:
+                return rsp
+
+            if ("token失效" in rsp.get("msg", "未知错误")
+                    and retry_count < self.max_retries):
+                wait_time = 1 * (2 ** retry_count)
+                time.sleep(wait_time)
+                logger.warning("Token失效，正在重新登录...")
+                if self.login():
+                    new_token = UserInfoManager.get_token()
+                    headers["authorization"] = new_token
+                    logger.info("已更新 Authorization Token，重试请求")
+                    return self._post_request(url, headers, data, retry_count + 1)
+            else:
+                raise ValueError(rsp.get("msg", "未知错误"))
+
+        except (requests.RequestException, ValueError) as e:
+            if re.search(r"[\u4e00-\u9fff]",
+                         str(e)) or retry_count >= self.max_retries:
+                raise ValueError(f"{str(e)}")
+
+            wait_time = 1 * (2 ** retry_count)
+            logger.warning(
+                f"重试 {retry_count + 1}/{self.max_retries}，等待 {wait_time:.2f} 秒"
+            )
+            time.sleep(wait_time)
+
+        return self._post_request(url, headers, data, retry_count + 1)
 
     def _get_authenticated_headers(
             self,
@@ -128,75 +169,121 @@ class ApiService:
             headers["sign"] = create_sign(*sign_data)
         return headers
 
-    def pass_blockPuzzle_captcha(self) -> str:
+    def pass_blockPuzzle_captcha(self, max_attempts: int = 5) -> str:
         """
-        处理滑块验证码，获取验证结果。
+        通过行为验证码（验证码类型为blockPuzzle）。
+
+        Args:
+            max_attempts (Optional[int]): 最大尝试次数，默认为5次。
 
         Returns:
-            str: 验证码识别结果的JSON字符串。
-        """
-        try:
-            # 获取验证码图片
-            captcha_url = "attach/captcha/slider"
-            response = self.session.get(BASE_URL + captcha_url, timeout=30)
-            response.raise_for_status()
-            
-            captcha_data = response.json()
-            if not captcha_data.get("data"):
-                logger.error("获取滑块验证码失败：返回数据为空")
-                raise ValueError("获取滑块验证码失败：返回数据为空")
-            
-            # 提取验证码图片数据
-            target = captcha_data["data"].get("targetImage", "")
-            background = captcha_data["data"].get("backImage", "")
-            
-            if not target or not background:
-                logger.error("滑块验证码图片数据不完整")
-                raise ValueError("滑块验证码图片数据不完整")
-            
-            # 调用验证码识别函数
-            result = recognize_blockPuzzle_captcha(target, background)
-            logger.info("滑块验证码识别成功")
-            return result
-            
-        except Exception as e:
-            logger.error(f"滑块验证码处理失败: {e}")
-            raise
+            str: 验证参数。
 
-    def solve_click_word_captcha(self) -> str:
+        Raises:
+            Exception: 当达到最大尝试次数时抛出异常。
         """
-        处理点击文字验证码，获取验证结果。
+        attempts = 0
+        while attempts < max_attempts:
+            captcha_url = "session/captcha/v1/get"
+            request_data = {
+                "clientUid": str(uuid.uuid4()).replace("-", ""),
+                "captchaType": "blockPuzzle",
+            }
+            captcha_info = self._post_request(
+                captcha_url,
+                HEADERS,
+                request_data,
+            )
+            slider_data = recognize_blockPuzzle_captcha(
+                captcha_info["data"]["jigsawImageBase64"],
+                captcha_info["data"]["originalImageBase64"],
+            )
+            check_slider_url = "session/captcha/v1/check"
+            check_slider_data = {
+                "pointJson":
+                    aes_encrypt(slider_data, captcha_info["data"]["secretKey"],
+                                "b64"),
+                "token":
+                    captcha_info["data"]["token"],
+                "captchaType":
+                    "blockPuzzle",
+            }
+            check_result = self._post_request(
+                check_slider_url,
+                HEADERS,
+                check_slider_data,
+            )
+            if check_result.get("code") != 6111:
+                return aes_encrypt(
+                    captcha_info["data"]["token"] + "---" + slider_data,
+                    captcha_info["data"]["secretKey"],
+                    "b64",
+                )
+            attempts += 1
+            time.sleep(random.uniform(1, 3))
+        raise Exception("通过滑块验证码失败")
 
-        Returns:
-            str: 验证码识别结果的JSON字符串。
-        """
-        try:
-            # 获取验证码图片
-            captcha_url = "attach/captcha/clickWord"
-            response = self.session.get(BASE_URL + captcha_url, timeout=30)
-            response.raise_for_status()
-            
-            captcha_data = response.json()
-            if not captcha_data.get("data"):
-                logger.error("获取点击文字验证码失败：返回数据为空")
-                raise ValueError("获取点击文字验证码失败：返回数据为空")
-            
-            # 提取验证码图片数据和文字列表
-            target = captcha_data["data"].get("targetImage", "")
-            wordlist = captcha_data["data"].get("wordList", [])
-            
-            if not target or not wordlist:
-                logger.error("点击文字验证码数据不完整")
-                raise ValueError("点击文字验证码数据不完整")
-            
-            # 调用验证码识别函数
-            result = recognize_clickWord_captcha(target, wordlist)
-            logger.info("点击文字验证码识别成功")
-            return result
-            
-        except Exception as e:
-            logger.error(f"点击文字验证码处理失败: {e}")
-            raise
+    def solve_click_word_captcha(self, max_retries: int = 5) -> str:
+        retry_count = 0
+        while retry_count < max_retries:
+
+            # 获取验证码的接口地址
+            captcha_endpoint = "/attendence/clock/v1/get"
+            captcha_request_payload = {
+                "clientUid": str(uuid.uuid4()).replace("-", ""),  # 生成唯一客户端标识
+                "captchaType": "clickWord",  # 验证码类型
+            }
+
+            # 向服务器请求验证码信息
+            captcha_response = self._post_request(
+                captcha_endpoint,
+                self._get_authenticated_headers(),
+                captcha_request_payload,
+            )
+
+            # 解析验证码图片数据
+            captcha_solution = recognize_clickWord_captcha(
+                captcha_response["data"]["originalImageBase64"],
+                captcha_response["data"]["wordList"],
+            )
+
+            # 验证验证码的接口地址
+            verification_endpoint = "/attendence/clock/v1/check"
+            verification_payload = {
+                "pointJson":
+                    aes_encrypt(captcha_solution,
+                                captcha_response["data"]["secretKey"],
+                                "b64"),  # 加密的点位数据
+                "token":
+                    captcha_response["data"]["token"],  # 验证码令牌
+                "captchaType":
+                    "clickWord",  # 验证码类型
+            }
+
+            # 验证用户点击结果
+            verification_response = self._post_request(
+                verification_endpoint,
+                self._get_authenticated_headers(),
+                verification_payload,
+            )
+
+            # 如果验证码验证成功，则返回加密结果
+            if verification_response.get("code") != 6111:  # 6111 表示验证码验证失败
+                encrypted_result = aes_encrypt(
+                    captcha_response["data"]["token"] + "---" +
+                    captcha_solution,
+                    captcha_response["data"]["secretKey"],
+                    "b64",
+                )
+                return encrypted_result
+
+            # 验证失败，增加重试次数
+            retry_count += 1
+            # 随机等待以模拟正常用户行为
+            time.sleep(random.uniform(1, 3))
+
+        # 超过最大重试次数，抛出异常
+        raise Exception("通过点选验证码失败")
 
     def login(self) -> bool:
         """
@@ -308,14 +395,14 @@ class ApiService:
             logger.exception("获取实习计划过程中发生异常: %s", e)
             return False
 
-    def get_checkin_info(self) -> Dict[str, Any] | List[Dict[str, Any]]:
+    def get_checkin_info(self) -> Dict[str, Any]:
         """
         获取用户的打卡信息。
 
         该方法会发送请求获取当前用户当月的打卡记录。
 
         Returns:
-            包含用户打卡信息的字典或字典列表。
+            包含用户打卡信息的字典。
 
         Raises:
             ValueError: 如果获取打卡信息失败，抛出包含详细错误信息的异常。
@@ -330,8 +417,8 @@ class ApiService:
                 aes_encrypt(str(int(time.time() * 1000))),
         }
         rsp = self._post_request(url, headers, data)
-        # 返回打卡记录列表，如果为空则返回空列表
-        return rsp.get("data", []) if rsp.get("data") else []
+        # 每月第一天的第一次打卡返回的是空，所以特殊处理返回空字典
+        return rsp.get("data", [{}])[0] if rsp.get("data") else {}
 
     def submit_clock_in(self, checkin_info: Dict[str, Any]) -> dict[str, dict[str, Any] | bool] | None:
         """
