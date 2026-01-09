@@ -42,33 +42,24 @@ def setup_logging():
 def load_users_config():
     """从环境变量或配置文件加载用户配置"""
     # 尝试从环境变量获取用户配置
-    users_json = os.environ.get('USER', None)
+    users_json = os.environ.get('USERS', None)
     
     if users_json:
         try:
+            # 添加调试信息
+            logging.info(f"从环境变量获取的USERS内容: {users_json[:100]}...")  # 只显示前100个字符
             users = json.loads(users_json)
             logging.info(f"从环境变量加载了 {len(users)} 个用户配置")
             return users
         except json.JSONDecodeError as e:
             logging.error(f"解析环境变量中的用户配置失败: {e}")
+            logging.error(f"USERS内容: {users_json}")
             return None
-    
-    # 如果环境变量中没有配置，尝试从配置文件加载
-    config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "auto.yaml")
-    if os.path.exists(config_file):
-        try:
-             
-            with open(config_file, 'r', encoding='utf-8') as f:
-                config = yaml.safe_load(f)
-                users = config.get('users', [])
-                logging.info(f"从配置文件加载了 {len(users)} 个用户配置")
-                return users
         except Exception as e:
-            logging.error(f"从配置文件加载用户配置失败: {e}")
+            logging.error(f"加载用户配置时发生未知错误: {e}")
             return None
     
-    logging.error("未找到用户配置")
-    return None
+    # ... 其余代码保持不变
 
 def setup_user_config(user_config):
     """为单个用户设置配置"""

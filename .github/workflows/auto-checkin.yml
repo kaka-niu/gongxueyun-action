@@ -50,13 +50,13 @@ jobs:
         # 根据时间设置模式
         if [ "$CURRENT_HOUR" = "23" ]; then
           echo "执行早上打卡（上班卡）"
-          MODE=morning
+          export MODE=morning
         elif [ "$CURRENT_HOUR" = "09" ]; then
           echo "执行下午打卡（下班卡）"
-          MODE=evening
+          export MODE=evening
         else
           echo "手动模式执行"
-          MODE=manual
+          export MODE=manual
         fi
         
         # 执行打卡
