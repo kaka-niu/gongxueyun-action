@@ -129,8 +129,8 @@ def execute_clock_in(user_config, clock_type=None):
             logging.warning(f"用户 {phone} 未获取到打卡信息")
             return False
         
-        # 执行打卡
-        result = clock_in()
+        # 执行打卡 - 根据clock_type参数决定打卡类型
+        result = clock_in_with_type(clock_type)
         logging.info(f"用户 {phone} 打卡结果: {result}")
         
         # 发送邮件通知
@@ -161,6 +161,70 @@ def execute_clock_in(user_config, clock_type=None):
         # 清理临时文件
         import shutil
         shutil.rmtree(temp_dir, ignore_errors=True)
+def clock_in_with_type(clock_type):
+    """
+    根据指定的打卡类型执行打卡
+    """
+    from manager.ConfigManager import ConfigManager
+    from util.ApiService import ApiService
+    from util.HelperFunctions import desensitize_name
+    from manager.UserInfoManager import UserInfoManager
+    from datetime import datetime
+    
+    logging.info(f"执行{clock_type}卡打卡")
+    
+    current_time = datetime.now()
+    
+    # 根据clock_type设置打卡类型
+    if clock_type == "上班":
+        checkin_type = "START"
+        display_type = "上班"
+    elif clock_type == "下班":
+        checkin_type = "END"
+        display_type = "下班"
+    else:
+        # 默认上班卡
+        checkin_type = "START"
+        display_type = "上班"
+    
+    # 调用API服务
+    api_client = ApiService()
+    # 获取打卡信息
+    last_checkin_info = api_client.get_checkin_info()
+    
+    # 检查是否已经打过卡
+    if last_checkin_info and last_checkin_info["type"] == checkin_type:
+        last_checkin_time = datetime.strptime(
+            last_checkin_info["createTime"], "%Y-%m-%d %H:%M:%S")
+        if last_checkin_time.date() == current_time.date():
+            log = f"今日[{display_type}]卡已打，无需重复打卡"
+            logging.info(log)
+            return {"title": "工学云签到任务通知", "content": log}
+
+    user_name = desensitize_name(UserInfoManager.get("nikeName"))
+    logging.info(f"用户 {user_name} 开始 {display_type} 打卡")
+
+    # 设置打卡信息
+    checkin_info = {
+        "type": checkin_type,
+        "lastDetailAddress": last_checkin_info.get("address") if last_checkin_info else None,
+        "attachments": None,
+        "description": "",
+    }
+
+    success = api_client.submit_clock_in(checkin_info)
+
+    # 记录获取结果
+    if success.get("result"):
+        logging.info("打卡成功")
+        # 使用脱敏函数处理敏感信息
+        phone = desensitize_phone(ConfigManager.get('user', 'phone'))
+        address = desensitize_address(ConfigManager.get('clockIn', 'location', 'address'))
+        content = f"签到账号：{phone}\n签到地点：{address}"
+        return {"title": "工学云签到成功通知", "content": content}
+    else:
+        logging.warning(f"打卡失败：{success.get('data')}")
+        return {"title": "工学云签到失败通知", "content": f"签到失败：{success.get('data')}"}
 
 def main():
     """主函数"""
