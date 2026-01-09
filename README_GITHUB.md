@@ -11,17 +11,21 @@
 - ✅ 邮件通知功能
 - ✅ 免服务器运行
 
+## 效果展示
+<img src="/image/签到.jpg" width="360" height="600">
+<img src="/image/消息推送.png" width="300" height="600">
+
 ## 部署步骤
 
 ### 1. Fork 本仓库
 
 点击右上角的"Fork"按钮，将本仓库复制到你的GitHub账户下。
 
-### 2. 配置GitHub Secrets
+### 2. 配置GitHub 工作流
 
-在你的Fork仓库中，进入`Settings` -> `Secrets and variables` -> `Actions`，添加以下Secret：
+在你的Fork仓库中，进入`Settings` -> `Secrets and variables` -> `Actions`，添加Secret：
 
-- `USERS`: 用户配置JSON字符串
+- `教程地址`: (https://github.com/Rockytkg/AutoMoGuDingCheckIn/wiki)
 
 #### 用户配置格式
 
