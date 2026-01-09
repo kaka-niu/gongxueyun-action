@@ -109,11 +109,14 @@ def execute_clock_in(user_config, clock_type=None):
     try:
         # 判断打卡类型
         if clock_type is None:
-            current_time = datetime.now()
+            # 获取北京时间（UTC+8）
+            from datetime import timezone, timedelta
+            current_time = datetime.now(timezone(timedelta(hours=8)))
             hour = current_time.hour
             clock_type = "上班" if hour < 12 else "下班"
-        
-        logging.info(f"执行{clock_type}卡打卡")
+            logging.info(f"当前北京时间: {current_time.strftime('%H:%M')}, 执行{clock_type}卡")
+        else:
+            logging.info(f"执行{clock_type}卡打卡")
         
         # 登录
         is_login = login()
@@ -167,7 +170,7 @@ def clock_in_with_type(clock_type):
     """
     from manager.ConfigManager import ConfigManager
     from util.ApiService import ApiService
-    from util.HelperFunctions import desensitize_name
+    from util.HelperFunctions import desensitize_name, desensitize_phone, desensitize_address
     from manager.UserInfoManager import UserInfoManager
     from datetime import datetime
     

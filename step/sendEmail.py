@@ -32,7 +32,11 @@ def send_email(title, content):
                 server.sendmail(ConfigManager.get("smtp", "username"), to_email, message.as_string())
                 logger.info(f"邮件已成功发送到 {to_email}")
         except smtplib.SMTPResponseException as e:
-            logger.error(f"邮件成功发送了 SMTP响应异常：{e}")
+            # SMTP响应异常，可能是非标准响应码，但邮件可能已发送成功
+            if e.smtp_code == 250:  # 250表示邮件发送成功
+                logger.info(f"邮件已成功发送到 {to_email}，SMTP响应代码: {e.smtp_code}")
+            else:
+                logger.warning(f"邮件发送完成但SMTP响应异常：{e}")
         except smtplib.SMTPServerDisconnected as e:
             logger.error(f"SMTP服务器断开连接：{e}")
         except smtplib.SMTPConnectError as e:
