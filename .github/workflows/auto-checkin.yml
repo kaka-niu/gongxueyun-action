@@ -61,8 +61,18 @@ jobs:
             echo "执行下午打卡（下班卡）"
             export MODE=evening
           else
-            echo "手动模式执行"
-            export MODE=manual
+            # 非预定时间，根据北京时间判断上下班卡
+            # 获取北京时间（UTC+8）的小时
+            BEIJING_HOUR=$(TZ='Asia/Shanghai' date +%H)
+            echo "当前北京时间: $BEIJING_HOUR 点"
+            
+            if [ "$BEIJING_HOUR" -lt "12" ]; then
+              echo "北京时间小于12点，执行上班卡"
+              export MODE=morning
+            else
+              echo "北京时间大于等于12点，执行下班卡"
+              export MODE=evening
+            fi
           fi
         fi
         
