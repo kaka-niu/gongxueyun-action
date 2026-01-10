@@ -190,19 +190,29 @@ def clock_in_with_type(clock_type):
         checkin_type = "START"
         display_type = "上班"
     
-    # 调用API服务
+    # 调用API服务 - 每次创建新的实例确保使用当前用户配置
     api_client = ApiService()
-    # 获取打卡信息
-    last_checkin_info = api_client.get_checkin_info()
     
-    # 检查是否已经打过卡
-    if last_checkin_info and last_checkin_info["type"] == checkin_type:
-        last_checkin_time = datetime.strptime(
-            last_checkin_info["createTime"], "%Y-%m-%d %H:%M:%S")
-        if last_checkin_time.date() == current_time.date():
-            log = f"今日[{display_type}]卡已打，无需重复打卡"
-            logging.info(log)
-            return {"title": "工学云签到任务通知", "content": log}
+    # 重新获取当前用户的打卡信息，确保不是前一个用户的信息
+    try:
+        # 清除缓存，强制重新获取当前用户信息
+        UserInfoManager._userInfo_cache = None
+        PlanInfoManager._planinfo_cache = None
+        
+        # 获取打卡信息
+        last_checkin_info = api_client.get_checkin_info()
+        
+        # 检查是否已经打过卡
+        if last_checkin_info and last_checkin_info.get("type") == checkin_type:
+            last_checkin_time = datetime.strptime(
+                last_checkin_info["createTime"], "%Y-%m-%d %H:%M:%S")
+            if last_checkin_time.date() == current_time.date():
+                log = f"今日[{display_type}]卡已打，无需重复打卡"
+                logging.info(log)
+                return {"title": "工学云签到任务通知", "content": log}
+    except Exception as e:
+        logging.warning(f"获取打卡信息失败，继续执行打卡: {e}")
+        last_checkin_info = None
 
     user_name = desensitize_name(UserInfoManager.get("nikeName"))
     logging.info(f"用户 {user_name} 开始 {display_type} 打卡")
@@ -227,7 +237,11 @@ def clock_in_with_type(clock_type):
         return {"title": "工学云签到成功通知", "content": content}
     else:
         logging.warning(f"打卡失败：{success.get('data')}")
-        return {"title": "工学云签到失败通知", "content": f"签到失败：{success.get('data')}"}
+        # 打卡失败时也返回账号和地点信息
+        phone = desensitize_phone(ConfigManager.get('user', 'phone'))
+        address = desensitize_address(ConfigManager.get('clockIn', 'location', 'address'))
+        content = f"签到账号：{phone}\n签到地点：{address}\n失败原因：{success.get('data')}"
+        return {"title": "工学云签到失败通知", "content": content}
 
 def main():
     """主函数"""
