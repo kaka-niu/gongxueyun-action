@@ -24,6 +24,40 @@ from step.login import login
 from step.sendEmail import send_email
 from util.HelperFunctions import get_checkin_type
 
+def is_custom_checkin_day(user_config):
+    """检查当前日期是否为自定义打卡日期"""
+    try:
+        # 获取自定义打卡日期配置
+        custom_days = user_config.get("config", {}).get("clockIn", {}).get("customDays", [])
+        
+        # 如果没有配置自定义日期，则默认每天都打卡
+        if not custom_days:
+            return True
+        
+        # 获取当前日期（星期几，0-6，0代表周一）
+        from datetime import datetime
+        current_weekday = datetime.now().weekday()
+        
+        # 转换为配置格式（1-7代表周一至周日）
+        # Python weekday(): 0=周一, 1=周二, ..., 6=周日
+        # 配置格式: 1=周一, 2=周二, ..., 7=周日
+        config_weekday = current_weekday + 1
+        
+        # 检查当前日期是否在自定义打卡日期内
+        if config_weekday in custom_days:
+            weekday_names = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
+            logging.info(f"今天是{weekday_names[current_weekday]}，在自定义打卡日期内")
+            return True
+        else:
+            weekday_names = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
+            logging.info(f"今天是{weekday_names[current_weekday]}，不在自定义打卡日期内，跳过打卡")
+            return False
+            
+    except Exception as e:
+        logging.error(f"检查自定义打卡日期时发生错误: {e}")
+        # 发生错误时默认打卡，避免漏打
+        return True
+
 # ======================
 # 日志配置
 # ======================
@@ -102,6 +136,11 @@ def execute_clock_in(user_config, clock_type=None):
     """为单个用户执行打卡操作"""
     phone = user_config.get("config", {}).get("user", {}).get("phone", "未知用户")
     logging.info(f"开始为用户 {phone} 执行打卡任务")
+    
+    # 检查自定义打卡日期
+    if not is_custom_checkin_day(user_config):
+        logging.info(f"用户 {phone} 今日不在自定义打卡日期内，跳过打卡")
+        return True  # 返回True表示成功跳过，不视为失败
     
     # 设置用户配置
     temp_dir, original_config_path, original_user_info_path, original_plan_info_path = setup_user_config(user_config)
