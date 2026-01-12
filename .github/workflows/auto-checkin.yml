@@ -47,32 +47,25 @@ jobs:
         CURRENT_HOUR=$(date -u +%H)
         echo "当前UTC时间: $CURRENT_HOUR 点"
         
+        # 获取北京时间（UTC+8）的小时和星期
+        BEIJING_HOUR=$(TZ='Asia/Shanghai' date +%H)
+        BEIJING_WEEKDAY=$(TZ='Asia/Shanghai' date +%u)  # 1-7，1代表周一
+        BEIJING_DAY_NAME=$(TZ='Asia/Shanghai' date +%A)
+        echo "当前北京时间: $BEIJING_HOUR 点，星期$BEIJING_WEEKDAY ($BEIJING_DAY_NAME)"
+        
         # 判断是否为手动触发
         if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
           # 手动触发时使用用户选择的模式
           echo "手动触发模式: ${{ github.event.inputs.mode }}"
           export MODE=${{ github.event.inputs.mode }}
         else
-          # 定时任务时根据时间设置模式
-          if [ "$CURRENT_HOUR" = "23" ]; then
-            echo "执行早上打卡（上班卡）"
+          # 定时任务时根据北京时间判断模式
+          if [ "$BEIJING_HOUR" -lt "12" ]; then
+            echo "北京时间小于12点，执行上班卡"
             export MODE=morning
-          elif [ "$CURRENT_HOUR" = "09" ]; then
-            echo "执行下午打卡（下班卡）"
-            export MODE=evening
           else
-            # 非预定时间，根据北京时间判断上下班卡
-            # 获取北京时间（UTC+8）的小时
-            BEIJING_HOUR=$(TZ='Asia/Shanghai' date +%H)
-            echo "当前北京时间: $BEIJING_HOUR 点"
-            
-            if [ "$BEIJING_HOUR" -lt "12" ]; then
-              echo "北京时间小于12点，执行上班卡"
-              export MODE=morning
-            else
-              echo "北京时间大于等于12点，执行下班卡"
-              export MODE=evening
-            fi
+            echo "北京时间大于等于12点，执行下班卡"
+            export MODE=evening
           fi
         fi
         
